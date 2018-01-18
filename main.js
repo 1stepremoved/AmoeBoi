@@ -1,6 +1,6 @@
 
 window.momentumDelta = 1;
-window.massDelta = 600;
+window.massDelta = 1000;
 window.momentumMax = 10;
 window.maxZoom = 3;
 window.minZoom = 1;
@@ -119,13 +119,14 @@ class Amoeba {
       amoeba.nextMomentum['y'] = amoeba.nextMomentum['y'] * boundNum(amoeba.mass / this.mass, .95, 1);
 
       if (this.mass <= amoeba.mass) {
-        if ((currentDistance - amoeba.radius) / this.radius < 0 || this.radius < 3) {
+        if ((currentDistance - amoeba.radius) / this.radius < 0 || this.mass < 100) {
           amoeba.mass += this.mass;
           this.mass = 0;
           return;
         }
 
-        let bubble = window.massDelta  * boundNum( (currentDistance - amoeba.radius) / this.radius, 0, 1);
+        let bubble = window.massDelta  * boundNum( (this.radius - (currentDistance - amoeba.radius)) / this.radius, 0, 1);
+
         this.mass -= bubble;
         amoeba.mass += bubble;
       }
