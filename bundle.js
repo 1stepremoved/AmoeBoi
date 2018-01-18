@@ -69,7 +69,7 @@
 
 
 window.momentumDelta = 1;
-window.radiusDelta = 10;
+window.radiusDelta = 1;
 window.momentumMax = 10;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -109,6 +109,16 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   requestAnimationFrame(animate);
 });
+
+const boundNum = (num, min, max) => {
+  if (num > max) {
+    return max;
+  } else if (num < min) {
+    return min;
+  } else {
+    return num;
+  }
+};
 
 class Amoeba {
   constructor(ctx, x, y, mass) {
@@ -160,22 +170,25 @@ class Amoeba {
       // amoeba.nextMomentum['y'] = amoeba.momentum['y'] * ((distance - amoeba.radius) / distance);
       // amoeba.momentum['y'] = amoeba.momentum['y'] * ((currentDistance - this.radius) / amoeba.radius);
 
-      // if (this.radius <= amoeba.radius) {
-      //   // if ((currentDistance - amoeba.radius) / this.radius < 0) {
-      //   //   amoeba.radius += this.radius;
-      //   //   this.radius = 0;
-      //   //   return;
-      //   // }
-      //   let bubble = this.radius * ((currentDistance - amoeba.radius) / this.radius);
-      //   this.radius -= bubble;
-      //   amoeba.radius += bubble;
-      // }
+      if (this.radius <= amoeba.radius) {
+        if ((currentDistance - amoeba.radius) / this.radius < 0) {
+          amoeba.radius += this.radius;
+          this.radius = 0;
+          return;
+        }
+        // let bubble = this.radius * ((currentDistance - amoeba.radius) / this.radius);
+        let bubble = window.radiusDelta  * boundNum( (currentDistance - amoeba.radius) / this.radius, 0, 1);
+        this.radius -= bubble;
+        amoeba.radius += bubble;
+      }
       // this.momentum['y'] =
       //   ((this.momentum['y'] * (this.radius - amoeba.radius))
       //   + (2 * amoeba.radius * amoeba.momentum['y']))
       //   / (this.radius + amoeba.radius);
     }
   }
+
+
 
   wallCollision() {
     if (this.xpos + this.radius >= window.innerWidth) {
