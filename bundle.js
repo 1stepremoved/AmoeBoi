@@ -105,10 +105,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
       amoeba.draw();
     });
+    makeMargins(ctx);
     requestAnimationFrame(animate);
   };
   requestAnimationFrame(animate);
 });
+
+const makeMargins = (ctx) => {
+  ctx.globalAlpha = 0.7;
+  ctx.fillStyle = "black";
+  let marginHeight = Math.floor(window.innerHeight / 8);
+  let marginWidth = Math.floor(window.innerWidth / 8);
+  ctx.fillRect(0,0, window.innerWidth, marginHeight);
+  ctx.fillRect(0,  window.innerHeight - marginHeight, window.innerWidth, window.innerHeight);
+  ctx.fillRect(0, marginHeight, marginWidth, window.innerHeight - (marginHeight * 2));
+  ctx.fillRect(window.innerWidth - marginWidth, marginHeight, window.innerWidth, window.innerHeight - (marginHeight * 2));
+  ctx.globalAlpha = 1;
+};
 
 const boundNum = (num, min, max) => {
   if (num > max) {
