@@ -69,17 +69,19 @@
 
 
 window.momentumDelta = 1;
-window.massDelta = 1000;
+window.massDelta = 3000;
 window.momentumMax = 10;
 window.maxZoom = 3;
 window.minZoom = 1;
-window.currentZoom = window.maxZoom;
+window.currentZoom = window.minZoom;
+window.boardHeight = window.innerHeight;
+window.boardWidth = window.innerWidth;
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.addEventListener("resize", ()=>{
+  window.onresize = ()=>{
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-  });
+  };
 
   document.addEventListener("mousewheel", (e)=> {
     let zoomDelta = (e.deltaY / -1000);
@@ -183,9 +185,9 @@ class Amoeba {
     if (distance > currentDistance){
 
       this.nextMomentum['x'] += boundNum(amoeba.momentum['x'] * amoeba.mass * (currentDistance / distance), -50, 50);
-      amoeba.nextMomentum['x'] = amoeba.nextMomentum['x'] * boundNum(amoeba.mass / this.mass, .95, 1);
+      amoeba.nextMomentum['x'] = amoeba.nextMomentum['x'] * boundNum(amoeba.mass / this.mass, .99, 1);
       this.nextMomentum['y'] += boundNum(amoeba.momentum['y'] * amoeba.mass * (currentDistance / distance), -50, 50);
-      amoeba.nextMomentum['y'] = amoeba.nextMomentum['y'] * boundNum(amoeba.mass / this.mass, .95, 1);
+      amoeba.nextMomentum['y'] = amoeba.nextMomentum['y'] * boundNum(amoeba.mass / this.mass, .99, 1);
 
       if (this.mass <= amoeba.mass) {
         if ((currentDistance - amoeba.radius) / this.radius < 0 || this.mass < 100) {
@@ -222,7 +224,7 @@ class Amoeba {
   }
 
   draw() {
-    this.radius = Math.sqrt(this.mass / (4 * Math.PI));
+    this.radius = Math.sqrt(this.mass / (4 * Math.PI)) * window.currentZoom;
     this.ctx.beginPath();
     this.ctx.arc(this.xpos, this.ypos, this.radius, 0, Math.PI * 2);
     this.ctx.fillStyle="blue";
