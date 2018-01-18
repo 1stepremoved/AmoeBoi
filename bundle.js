@@ -71,11 +71,19 @@
 window.momentumDelta = 1;
 window.radiusDelta = 1;
 window.momentumMax = 10;
+window.maxZooom = 10;
+window.minZoom = 1;
+window.currentZoom = 10;
 
 document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("resize", ()=>{
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+  });
+
+  document.addEventListener("mousewheel", (e)=> {
+    let zoomDelta = (e.deltaY / -1000);
+    window.currentZoom = boundNum(window.currentZoom + zoomDelta, 1, 10);
   });
 
   const canvas = document.getElementById("background");
@@ -93,16 +101,15 @@ document.addEventListener("DOMContentLoaded", () => {
       return amoeba.radius > 0;
     });
     amoebas.forEach(amoeba => {
-      amoeba.move();
-    });
-    amoebas.forEach(amoeba => {
       amoebas.forEach(amoeba2 =>{
         if (amoeba2 !== amoeba){
           amoeba.collision(amoeba2);
         }
       });
       amoeba.wallCollision();
-
+    });
+    amoebas.forEach(amoeba => {
+      amoeba.move();
       amoeba.draw();
     });
     makeMargins(ctx);
@@ -171,26 +178,11 @@ class Amoeba {
       Math.pow(this.xpos - amoeba.xpos ,2)  + Math.pow(this.ypos - amoeba.ypos ,2)
     );
     if (distance > currentDistance){
-      // this.momentum['x'] =
-      //   ((this.momentum['x'] * (this.radius - amoeba.radius))
-      //   + (2 * amoeba.radius * amoeba.momentum['x']))
-      //   / (this.radius + amoeba.radius);
-      // debugger
-      // window.momentumDelta *
-      // this.nextMomentum['x'] += amoeba.momentum['x'] / amoeba.radius * (currentDistance / distance);
+
       this.nextMomentum['x'] += boundNum(amoeba.momentum['x'] * amoeba.radius * (currentDistance / distance), -1, 1);
-      // if (this.radius < amoeba.radius) {
-        amoeba.nextMomentum['x'] = amoeba.nextMomentum['x'] * boundNum(amoeba.radius / this.radius, .8, 1)
-      // }
-      // amoeba.nextMomentum['x'] = amoeba.momentum['x'] * boundNum((currentDistance - this.radius) / amoeba.radius, 0.9, 1)
-      // debugger
-      // amoeba.nextMomentum['x'] = amoeba.momentum['x'] * ((currentDistance - this.radius) / amoeba.radius) ;
-      // this.nextMomentum['y'] += amoeba.momentum['y'] / amoeba.radius * (currentDistance / distance);
+      amoeba.nextMomentum['x'] = amoeba.nextMomentum['x'] * boundNum(amoeba.radius / this.radius, .8, 1)
       this.nextMomentum['y'] += boundNum(amoeba.momentum['y'] * amoeba.radius * (currentDistance / distance), -1, 1);
       amoeba.nextMomentum['y'] = amoeba.nextMomentum['y'] * boundNum(amoeba.radius / this.radius, .8, 1)
-      // amoeba.nextMomentum['y'] = amoeba.momentum['y'] * boundNum((currentDistance - this.radius) / amoeba.radius, 0.9, 1)
-      // amoeba.nextMomentum['y'] = amoeba.momentum['y'] * ((distance - amoeba.radius) / distance);
-      // amoeba.momentum['y'] = amoeba.momentum['y'] * ((currentDistance - this.radius) / amoeba.radius);
 
       if (this.radius <= amoeba.radius) {
         if ((currentDistance - amoeba.radius) / this.radius < 0) {
@@ -198,15 +190,11 @@ class Amoeba {
           this.radius = 0;
           return;
         }
-        // let bubble = this.radius * ((currentDistance - amoeba.radius) / this.radius);
+
         let bubble = window.radiusDelta  * boundNum( (currentDistance - amoeba.radius) / this.radius, 0, 1);
         this.radius -= bubble;
         amoeba.radius += bubble;
       }
-      // this.momentum['y'] =
-      //   ((this.momentum['y'] * (this.radius - amoeba.radius))
-      //   + (2 * amoeba.radius * amoeba.momentum['y']))
-      //   / (this.radius + amoeba.radius);
     }
   }
 
