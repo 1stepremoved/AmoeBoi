@@ -84,6 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   document.addEventListener("mousewheel", (e)=> {
+    e.preventDefault();
     let zoomDelta = (e.deltaY / -1000);
     window.currentZoom = boundNum(window.currentZoom + zoomDelta, window.minZoom, window.maxZoom);
   });
