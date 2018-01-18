@@ -116,7 +116,7 @@ class Amoeba {
       amoeba.nextMomentum['y'] = amoeba.nextMomentum['y'] * boundNum(amoeba.radius / this.radius, .8, 1)
 
       if (this.radius <= amoeba.radius) {
-        if ((currentDistance - amoeba.radius) / this.radius < 0) {
+        if ((currentDistance - amoeba.radius) / this.radius < 0 || this.radius < 3) {
           amoeba.radius += this.radius;
           this.radius = 0;
           return;
