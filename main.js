@@ -1,6 +1,6 @@
 
 window.momentumDelta = 1;
-window.radiusDelta = 1;
+window.massDelta = 600;
 window.momentumMax = 10;
 window.maxZoom = 3;
 window.minZoom = 1;
@@ -26,7 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
   for (let i = 0; i < 4; i++) {
     amoebas.push(new Amoeba(ctx));
   }
+  // amoebas.push(new Amoeba(ctx, 200, 200, 100000, [100, 0]));
   let animate = () => {
+    // debugger
     ctx.clearRect(0,0, innerWidth, innerHeight);
     amoebas = amoebas.filter(amoeba => {
       return amoeba.radius > 0;
@@ -72,12 +74,13 @@ const boundNum = (num, min, max) => {
 };
 
 class Amoeba {
-  constructor(ctx, x, y, mass) {
+  constructor(ctx, x, y, mass, momentum) {
     this.ctx = ctx;
-    this.radius = mass || Math.floor(Math.random() * 100);
+    this.mass = mass || Math.floor((Math.random() * 100000) + 10000);
+    this.radius = Math.sqrt(this.mass / (2 * Math.PI));
     this.xpos = x || Math.floor(Math.random() * (window.innerWidth - this.radius)) + this.radius;
     this.ypos = y || Math.floor(Math.random() * (window.innerHeight - this.radius)) + this.radius;
-    this.momentum = {x: Math.floor(Math.random() * 50) - 5, y: Math.floor(Math.random() * 50) - 5};
+    this.momentum = momentum || {x: Math.floor(Math.random() * 100000) - 50000, y: Math.floor(Math.random() * 100000) - 50000};
     this.nextMomentum = Object.assign({}, this.momentum);
     this.draw = this.draw.bind(this);
     this.collision = this.collision.bind(this);
@@ -86,8 +89,8 @@ class Amoeba {
 
   move() {
     this.momentum = Object.assign({}, this.nextMomentum);
-    let xDelta = this.momentum['x'] / this.radius;
-    let yDelta = this.momentum['y'] / this.radius;
+    let xDelta = this.momentum['x'] / this.mass;
+    let yDelta = this.momentum['y'] / this.mass;
     xDelta = (xDelta > window.momentumMax) ? Math.abs(xDelta) / xDelta * window.momentumMax : xDelta;
     yDelta = (yDelta > window.momentumMax) ? Math.abs(yDelta) / yDelta * window.momentumMax : yDelta;
     this.xpos += xDelta;
@@ -110,21 +113,21 @@ class Amoeba {
     );
     if (distance > currentDistance){
 
-      this.nextMomentum['x'] += boundNum(amoeba.momentum['x'] * amoeba.radius * (currentDistance / distance), -1, 1);
-      amoeba.nextMomentum['x'] = amoeba.nextMomentum['x'] * boundNum(amoeba.radius / this.radius, .8, 1);
-      this.nextMomentum['y'] += boundNum(amoeba.momentum['y'] * amoeba.radius * (currentDistance / distance), -1, 1);
-      amoeba.nextMomentum['y'] = amoeba.nextMomentum['y'] * boundNum(amoeba.radius / this.radius, .8, 1);
+      this.nextMomentum['x'] += boundNum(amoeba.momentum['x'] * amoeba.mass * (currentDistance / distance), -50, 50);
+      amoeba.nextMomentum['x'] = amoeba.nextMomentum['x'] * boundNum(amoeba.mass / this.mass, .95, 1);
+      this.nextMomentum['y'] += boundNum(amoeba.momentum['y'] * amoeba.mass * (currentDistance / distance), -50, 50);
+      amoeba.nextMomentum['y'] = amoeba.nextMomentum['y'] * boundNum(amoeba.mass / this.mass, .95, 1);
 
-      if (this.radius <= amoeba.radius) {
+      if (this.mass <= amoeba.mass) {
         if ((currentDistance - amoeba.radius) / this.radius < 0 || this.radius < 3) {
-          amoeba.radius += this.radius;
-          this.radius = 0;
+          amoeba.mass += this.mass;
+          this.mass = 0;
           return;
         }
 
-        let bubble = window.radiusDelta  * boundNum( (currentDistance - amoeba.radius) / this.radius, 0, 1);
-        this.radius -= bubble;
-        amoeba.radius += bubble;
+        let bubble = window.massDelta  * boundNum( (currentDistance - amoeba.radius) / this.radius, 0, 1);
+        this.mass -= bubble;
+        amoeba.mass += bubble;
       }
     }
   }
@@ -149,6 +152,7 @@ class Amoeba {
   }
 
   draw() {
+    this.radius = Math.sqrt(this.mass / (4 * Math.PI));
     this.ctx.beginPath();
     this.ctx.arc(this.xpos, this.ypos, this.radius, 0, Math.PI * 2);
     this.ctx.fillStyle="blue";
