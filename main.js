@@ -110,11 +110,15 @@ class Amoeba {
       // window.momentumDelta *
       // this.nextMomentum['x'] += amoeba.momentum['x'] / amoeba.radius * (currentDistance / distance);
       this.nextMomentum['x'] += boundNum(amoeba.momentum['x'] * amoeba.radius * (currentDistance / distance), -1, 1);
+      // if (this.radius < amoeba.radius) {
+        amoeba.nextMomentum['x'] = amoeba.nextMomentum['x'] * boundNum(amoeba.radius / this.radius, .8, 1)
+      // }
       // amoeba.nextMomentum['x'] = amoeba.momentum['x'] * boundNum((currentDistance - this.radius) / amoeba.radius, 0.9, 1)
       // debugger
       // amoeba.nextMomentum['x'] = amoeba.momentum['x'] * ((currentDistance - this.radius) / amoeba.radius) ;
       // this.nextMomentum['y'] += amoeba.momentum['y'] / amoeba.radius * (currentDistance / distance);
       this.nextMomentum['y'] += boundNum(amoeba.momentum['y'] * amoeba.radius * (currentDistance / distance), -1, 1);
+      amoeba.nextMomentum['y'] = amoeba.nextMomentum['y'] * boundNum(amoeba.radius / this.radius, .8, 1)
       // amoeba.nextMomentum['y'] = amoeba.momentum['y'] * boundNum((currentDistance - this.radius) / amoeba.radius, 0.9, 1)
       // amoeba.nextMomentum['y'] = amoeba.momentum['y'] * ((distance - amoeba.radius) / distance);
       // amoeba.momentum['y'] = amoeba.momentum['y'] * ((currentDistance - this.radius) / amoeba.radius);
