@@ -74,15 +74,29 @@ window.momentumMax = 10;
 window.maxZoom = 2;
 window.minZoom = 1;
 window.currentZoom = window.minZoom;
-window.boardHeight = 10000;
-window.boardWidth = 10000;
-window.boardFocus = [5000, 5000];
+window.realBoardHeight = 10000;
+window.realBoardWidth = 10000;
+window.boardFocus = {x: 5000, y: 5000};
+window.timeCoefficient = 1;
 
 document.addEventListener("DOMContentLoaded", () => {
   window.onresize = ()=>{
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   };
+
+  window.addEventListener("keydown", (e) => {
+    switch (e.keyCode) {
+      case 39:
+        window.timeCoefficient = Math.min(window.timeCoefficient * 1.1, 10);
+        return;
+      case 37:
+        window.timeCoefficient = Math.max(window.timeCoefficient * 0.9, 0.5);
+        return;
+      default:
+        return;
+    }
+  });
 
   document.addEventListener("mousewheel", (e)=> {
     e.preventDefault();
@@ -166,8 +180,8 @@ class Amoeba {
     let yDelta = this.momentum['y'] / this.mass;
     xDelta = (xDelta > window.momentumMax) ? Math.abs(xDelta) / xDelta * window.momentumMax : xDelta;
     yDelta = (yDelta > window.momentumMax) ? Math.abs(yDelta) / yDelta * window.momentumMax : yDelta;
-    this.xpos += xDelta;
-    this.ypos += yDelta;
+    this.xpos += xDelta * window.timeCoefficient;
+    this.ypos += yDelta * window.timeCoefficient;
   }
 
   aabbCheck(amoeba) {
@@ -186,10 +200,16 @@ class Amoeba {
     );
     if (distance > currentDistance){
 
-      this.nextMomentum['x'] += boundNum(amoeba.momentum['x'] * amoeba.mass * (currentDistance / distance), -50, 50);
-      amoeba.nextMomentum['x'] = amoeba.nextMomentum['x'] * boundNum(amoeba.mass / this.mass, .99, 1);
-      this.nextMomentum['y'] += boundNum(amoeba.momentum['y'] * amoeba.mass * (currentDistance / distance), -50, 50);
-      amoeba.nextMomentum['y'] = amoeba.nextMomentum['y'] * boundNum(amoeba.mass / this.mass, .99, 1);
+      this.nextMomentum['x'] += boundNum(amoeba.momentum['x']
+        * amoeba.mass * (currentDistance / distance) * window.timeCoefficient, -50, 50);
+      amoeba.nextMomentum['x'] = amoeba.nextMomentum['x']
+        * boundNum(amoeba.mass / this.mass, .99, 1);
+        // * window.timeCoefficient;
+      this.nextMomentum['y'] += boundNum(amoeba.momentum['y']
+        * amoeba.mass * (currentDistance / distance) * window.timeCoefficient, -50, 50);
+      amoeba.nextMomentum['y'] = amoeba.nextMomentum['y']
+        * boundNum(amoeba.mass / this.mass, .99, 1);
+        // * window.timeCoefficient;
 
       if (this.mass <= amoeba.mass) {
         if ((currentDistance - amoeba.radius) / this.radius < 0 || this.mass < 100) {
@@ -200,7 +220,9 @@ class Amoeba {
           return;
         }
 
-        let bubble = window.massDelta  * boundNum( (this.radius - (currentDistance - amoeba.radius)) / this.radius, 0, 1);
+        let bubble = window.massDelta
+            * boundNum( (this.radius - (currentDistance - amoeba.radius)) / this.radius, 0, 1)
+            * window.timeCoefficient;
 
         this.mass -= bubble;
         amoeba.mass += bubble;
@@ -228,9 +250,15 @@ class Amoeba {
   }
 
   draw() {
+    let boardHeight = window.realBoardHeight / window.currentZoom;
+    let boardWidth = window.realBoardWidth / window.currentZoom;
+    let relativeX = (this.xpos - window.boardFocus['x'] + (boardWidth / 2)) * window.currentZoom;
+    let relativeY = (this.ypos - window.boardFocus['y'] + (boardHeight / 2)) * window.currentZoom;
+    // debugger
+
     this.radius = Math.sqrt(this.mass / (4 * Math.PI)) * window.currentZoom;
     this.ctx.beginPath();
-    this.ctx.arc(this.xpos, this.ypos, this.radius, 0, Math.PI * 2);
+    this.ctx.arc(relativeX, relativeY, this.radius, 0, Math.PI * 2);
     this.ctx.fillStyle="blue";
     this.ctx.fill();
   }
