@@ -2,11 +2,12 @@
 window.momentumDelta = 1;
 window.massDelta = 3000;
 window.momentumMax = 10;
-window.maxZoom = 3;
+window.maxZoom = 2;
 window.minZoom = 1;
 window.currentZoom = window.minZoom;
-window.boardHeight = window.innerHeight;
-window.boardWidth = window.innerWidth;
+window.boardHeight = 10000;
+window.boardWidth = 10000;
+window.boardFocus = [5000, 5000];
 
 document.addEventListener("DOMContentLoaded", () => {
   window.onresize = ()=>{
@@ -125,6 +126,8 @@ class Amoeba {
         if ((currentDistance - amoeba.radius) / this.radius < 0 || this.mass < 100) {
           amoeba.mass += this.mass;
           this.mass = 0;
+          amoeba.nextMomentum['x'] += this.nextMomentum['x'];
+          amoeba.nextMomentum['y'] += this.nextMomentum['y'];
           return;
         }
 
