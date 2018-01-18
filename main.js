@@ -84,11 +84,11 @@ class Amoeba {
       //   + (2 * amoeba.radius * amoeba.momentum['x']))
       //   / (this.radius + amoeba.radius);
       // debugger
-      // window.momentumDelta
-      // this.momentum['x'] += amoeba.momentum['x'] / amoeba.radius * (currentDistance / distance);
-      // amoeba.momentum['x'] = amoeba.momentum['x'] * ((currentDistance - this.radius) / amoeba.radius) ;
-      // this.momentum['y'] += amoeba.momentum['y'] / amoeba.radius * (currentDistance / distance);
-      // // amoeba.momentum['y'] = amoeba.momentum['y'] * ((distance - amoeba.radius) / distance);
+      // window.momentumDelta *
+      this.nextMomentum['x'] += amoeba.momentum['x'] / amoeba.radius * (currentDistance / distance);
+      // amoeba.nextMomentum['x'] = amoeba.momentum['x'] * ((currentDistance - this.radius) / amoeba.radius) ;
+      this.nextMomentum['y'] += amoeba.momentum['y'] / amoeba.radius * (currentDistance / distance);
+      // amoeba.nextMomentum['y'] = amoeba.momentum['y'] * ((distance - amoeba.radius) / distance);
       // amoeba.momentum['y'] = amoeba.momentum['y'] * ((currentDistance - this.radius) / amoeba.radius);
 
       // if (this.radius <= amoeba.radius) {
@@ -109,13 +109,19 @@ class Amoeba {
   }
 
   wallCollision() {
-    if (this.xpos + this.radius > window.innerWidth || this.xpos - this.radius <= 0) {
+    if (this.xpos + this.radius >= window.innerWidth) {
       this.nextMomentum['x'] = -1 * this.momentum['x'];
-      this.xpos += (this.xpos + this.radius > window.innerWidth) ? -1 : 1;
+      this.xpos = window.innerWidth - this.radius - 1;
+    } else if (this.xpos - this.radius <= 0) {
+      this.nextMomentum['x'] = -1 * this.momentum['x'];
+      this.xpos = 0 + this.radius + 1;
     }
-    if (this.ypos + this.radius > window.innerHeight || this.ypos - this.radius <= 0) {
+    if (this.ypos + this.radius >= window.innerHeight) {
       this.nextMomentum['y'] = -1 * this.momentum['y'];
-      this.ypos += (this.ypos + this.radius > window.innerHeight) ? -1 : 1;
+      this.ypos = window.innerHeight - this.radius - 1;
+    } else if (this.ypos - this.radius <= 0) {
+      this.nextMomentum['y'] = -1 * this.momentum['y'];
+      this.ypos = 0 + this.radius + 1;
     }
   }
 
