@@ -1,0 +1,13 @@
+{
+  "name": "Osmosis",
+  "engines": {
+    "npm": "3.10.7",
+    "node": "v6.7.0"
+  },
+  "dependencies": {
+    "webpack": "^3.10.0"
+  },
+  "scripts": {
+    "postinstall": "webpack"
+  }
+}
