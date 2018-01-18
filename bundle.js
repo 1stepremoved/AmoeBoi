@@ -117,15 +117,16 @@ class Amoeba {
     this.xpos = x || Math.floor(Math.random() * (window.innerWidth - this.radius)) + this.radius;
     this.ypos = y || Math.floor(Math.random() * (window.innerHeight - this.radius)) + this.radius;
     this.momentum = {x: Math.floor(Math.random() * 50) - 5, y: Math.floor(Math.random() * 50) - 5};
-    
+    this.nextMomentum = Object.assign({}, this.momentum);
     this.draw = this.draw.bind(this);
     this.collision = this.collision.bind(this);
     this.color = "blue";
   }
 
   move() {
+    this.momentum = Object.assign({}, this.nextMomentum);
     let xDelta = this.momentum['x'] / this.radius;
-    let yDelta = this.momentum['x'] / this.radius;
+    let yDelta = this.momentum['y'] / this.radius;
     xDelta = (xDelta > window.momentumMax) ? Math.abs(xDelta) / xDelta * window.momentumMax : xDelta;
     yDelta = (yDelta > window.momentumMax) ? Math.abs(yDelta) / yDelta * window.momentumMax : yDelta;
     this.xpos += xDelta;
@@ -152,23 +153,23 @@ class Amoeba {
       //   + (2 * amoeba.radius * amoeba.momentum['x']))
       //   / (this.radius + amoeba.radius);
       // debugger
-      window.momentumDelta
-      this.momentum['x'] += amoeba.momentum['x'] / amoeba.radius * (currentDistance / distance);
-      amoeba.momentum['x'] = amoeba.momentum['x'] * ((currentDistance - this.radius) / amoeba.radius) ;
-      this.momentum['y'] += amoeba.momentum['y'] / amoeba.radius * (currentDistance / distance);
-      // amoeba.momentum['y'] = amoeba.momentum['y'] * ((distance - amoeba.radius) / distance);
-      amoeba.momentum['y'] = amoeba.momentum['y'] * ((currentDistance - this.radius) / amoeba.radius);
+      // window.momentumDelta
+      // this.momentum['x'] += amoeba.momentum['x'] / amoeba.radius * (currentDistance / distance);
+      // amoeba.momentum['x'] = amoeba.momentum['x'] * ((currentDistance - this.radius) / amoeba.radius) ;
+      // this.momentum['y'] += amoeba.momentum['y'] / amoeba.radius * (currentDistance / distance);
+      // // amoeba.momentum['y'] = amoeba.momentum['y'] * ((distance - amoeba.radius) / distance);
+      // amoeba.momentum['y'] = amoeba.momentum['y'] * ((currentDistance - this.radius) / amoeba.radius);
 
-      if (this.radius <= amoeba.radius) {
-        // if ((currentDistance - amoeba.radius) / this.radius < 0) {
-        //   amoeba.radius += this.radius;
-        //   this.radius = 0;
-        //   return;
-        // }
-        let bubble = this.radius * ((currentDistance - amoeba.radius) / this.radius);
-        this.radius -= bubble;
-        amoeba.radius += bubble;
-      }
+      // if (this.radius <= amoeba.radius) {
+      //   // if ((currentDistance - amoeba.radius) / this.radius < 0) {
+      //   //   amoeba.radius += this.radius;
+      //   //   this.radius = 0;
+      //   //   return;
+      //   // }
+      //   let bubble = this.radius * ((currentDistance - amoeba.radius) / this.radius);
+      //   this.radius -= bubble;
+      //   amoeba.radius += bubble;
+      // }
       // this.momentum['y'] =
       //   ((this.momentum['y'] * (this.radius - amoeba.radius))
       //   + (2 * amoeba.radius * amoeba.momentum['y']))
@@ -178,11 +179,11 @@ class Amoeba {
 
   wallCollision() {
     if (this.xpos + this.radius > window.innerWidth || this.xpos - this.radius <= 0) {
-      this.momentum['x'] = -1 * this.momentum['x'];
+      this.nextMomentum['x'] = -1 * this.momentum['x'];
       this.xpos += (this.xpos + this.radius > window.innerWidth) ? -1 : 1;
     }
     if (this.ypos + this.radius > window.innerHeight || this.ypos - this.radius <= 0) {
-      this.momentum['y'] = -1 * this.momentum['y'];
+      this.nextMomentum['y'] = -1 * this.momentum['y'];
       this.ypos += (this.ypos + this.radius > window.innerHeight) ? -1 : 1;
     }
   }
