@@ -95,14 +95,17 @@ class Amoeba {
   }
 
   colorize(relativeX, relativeY, relativeRadius) {
+    if (this.mass <= 0) {
+      return;
+    }
     let gradient = this.ctx.createRadialGradient(relativeX, relativeY,relativeRadius, relativeX, relativeY, 0);
     if (this.mass < window.baseMass) {
       gradient.addColorStop(0, `rgb(${20}, ${20}, ${255})`);
-      gradient.addColorStop(1 - (this.mass / window.baseMass) , `rgb(${50}, ${20}, ${200})`);
+      gradient.addColorStop(boundNum(1 - (this.mass / window.baseMass),0, 1) , `rgb(${50}, ${20}, ${200})`);
       gradient.addColorStop(1 , `rgb(${255}, ${20}, ${20})`);
     } else {
       gradient.addColorStop(0, `rgb(${255}, ${20}, ${20})`);
-      gradient.addColorStop(1 -(window.baseMass / this.mass) , `rgb(${200}, ${20}, ${50})` );
+      gradient.addColorStop(boundNum(1 -(window.baseMass / this.mass), 0, 1) , `rgb(${200}, ${20}, ${50})` );
       gradient.addColorStop(1 , `rgb(${20}, ${20}, ${255})`);
     }
     return gradient;
@@ -111,7 +114,7 @@ class Amoeba {
   relativePos() {
     let relativeX = (((this.xpos - window.boardFocus['x']) / (window.boardWidth / 2)) * 500) + (window.innerWidth / 2);
     let relativeY = (((this.ypos - window.boardFocus['y']) / (window.boardHeight/ 2)) * 500) + (window.innerHeight / 2);
-    return {x: relativeX, y: relativeY}
+    return {x: relativeX, y: relativeY};
   }
 
   draw() {

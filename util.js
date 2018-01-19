@@ -7,3 +7,7 @@ export const boundNum = (num, min, max) => {
     return num;
   }
 };
+
+export const baseLog = (x, y) => {
+  return Math.log(y) / Math.log(x);
+};

@@ -79,11 +79,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 window.momentumDelta = 1;
 window.massDelta = 3000;
 window.momentumMax = 10;
-window.maxZoom = 2;
+window.maxZoom = 4;
 window.minZoom = 1;
 window.currentZoom = window.minZoom;
-window.realBoardHeight = 10000;
-window.realBoardWidth = 10000;
+window.realBoardHeight = 20000;
+window.realBoardWidth = 20000;
 window.boardHeight = window.realBoardHeight / window.currentZoom;
 window.boardWidth = window.realBoardWidth / window.currentZoom;
 window.boardFocus = {x: 5000, y: 5000};
@@ -99,10 +99,10 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("keydown", (e) => {
     switch (e.keyCode) {
       case 39:
-        window.timeCoefficient = Math.min(window.timeCoefficient * 1.1, 10);
+        window.timeCoefficient = Math.min(window.timeCoefficient * 1.1, 20);
         return;
       case 37:
-        window.timeCoefficient = Math.max(window.timeCoefficient * 0.9, 0.1);
+        window.timeCoefficient = Math.max(window.timeCoefficient * 0.9, 0.05);
         return;
       default:
         return;
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("mousewheel", (e)=> {
     e.preventDefault();
     let zoomDelta = (e.deltaY / -1000);
-    window.currentZoom = Object(__WEBPACK_IMPORTED_MODULE_2__util__["a" /* boundNum */])(window.currentZoom + zoomDelta, window.minZoom, window.maxZoom);
+    window.currentZoom = Object(__WEBPACK_IMPORTED_MODULE_2__util__["b" /* boundNum */])(window.currentZoom + zoomDelta, window.minZoom, window.maxZoom);
     window.boardHeight = window.realBoardHeight / window.currentZoom;
     window.boardWidth = window.realBoardWidth / window.currentZoom;
   });
@@ -123,18 +123,22 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.height = window.innerHeight;
 
   let amoebas = [];
-  for (let i = 0; i < 400; i++) {
+  window.amoeboi = new __WEBPACK_IMPORTED_MODULE_1__amoeboi_js__["a" /* default */](ctx, 5000, 5000, 100000, {x: 100000, y: 0});
+  for (let i = 0; i < 40; i++) {
     amoebas.push(new __WEBPACK_IMPORTED_MODULE_0__amoeba_js__["a" /* default */](ctx));
   }
   // amoebas.push(new Amoeba(ctx, 4500, 5000, 100000, {x: 100000, y: 0}));
-  // amoebas.push(new Amoeba(ctx, 5500, 5000, 10000, {x: -100000, y: 0}));
+  // amoebas.push(new Amoeba(ctx, 5500, 5000, 300000, {x: -100000, y: 0}));
   // amoebas.push(new Amoeba(ctx, 5300, 5000, 100000, {x: -100000, y: 0}));
   let animate = () => {
     ctx.clearRect(0,0, innerWidth, innerHeight);
+    makeGrid(ctx);
     amoebas = amoebas.filter(amoeba => {
       return amoeba.radius > 0;
     });
     amoebas.forEach(amoeba => {
+      window.amoeboi.aabbCheck(amoeba);
+      amoeba.aabbCheck(window.amoeboi);
       amoebas.forEach(amoeba2 =>{
         if (amoeba2 !== amoeba){
           amoeba.aabbCheck(amoeba2);
@@ -142,17 +146,68 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       amoeba.wallCollision();
     });
+    window.amoeboi.wallCollision();
     ctx.globalAlpha = 0.8;
     amoebas.forEach(amoeba => {
       amoeba.move();
       amoeba.draw();
     });
+    window.amoeboi.move();
+    window.amoeboi.draw();
     ctx.globalAlpha = 1;
     makeMargins(ctx);
+    if (window.amoeboi.mass > 0) {
+      window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
+      window.baseMass = window.amoeboi.mass;
+    } else {
+      window.boardFocus['x'] += (window.boardFocus['x'] < 5000) ? 10 : -10;
+      window.boardFocus['y'] += (window.boardFocus['y'] < 5000) ? 10 : -10;
+      window.currentZoom = window.currentZoom > 1 ? window.currentZoom * 0.9 : window.currentZoom;
+      window.baseMass = 0;
+    }
     requestAnimationFrame(animate);
   };
   requestAnimationFrame(animate);
 });
+
+const makeGrid = (ctx) => {
+  // let currentLineX = window.boardFocus['x'] - (window.boardWidth / 2);
+  ctx.globalAlpha = 0.4;
+
+  let interval = 500;
+  let realX = 0;
+  while (realX <= window.realBoardWidth) {
+    ctx.fillStyle = (realX ===window.realBoardWidth || realX === 0) ? "red" :"black";
+    let lineX = (((realX - window.boardFocus['x']) / (window.boardWidth / 2)) * 500) + (window.innerWidth / 2);
+    ctx.fillRect(lineX,0, 2, window.innerHeight);
+    realX += interval;
+  }
+
+  let realY = 0;
+  while (realY <= window.realBoardHeight) {
+    ctx.fillStyle = (realY ===window.realBoardHeight || realY === 0) ? "red" :"black";
+    let lineY = (((realY - window.boardFocus['y']) / (window.boardHeight / 2)) * 500) + (window.innerHeight / 2);
+    ctx.fillRect(0,lineY, window.innerWidth, 2);
+    realY += interval;
+  }
+
+
+  // let interval = 50 * window.currentZoom;
+  // let currentLineX = interval - ((window.boardFocus['x']/ window.realBoardWidth * window.innerWidth) % interval);
+  // while (currentLineX < window.boardFocus['x'] + window.boardWidth) {
+  //   ctx.fillStyle = "black";
+  //   ctx.fillRect(currentLineX,0, 2, window.innerHeight);
+  //   currentLineX += interval;
+  // }
+  // let currentLineY = interval - ((window.boardFocus['y']/ window.realBoardHeight * window.innerHeight) % interval);
+  // while (currentLineY < window.boardFocus['y'] + window.boardHeight) {
+  //   ctx.fillStyle = "black";
+  //   ctx.fillRect(0, currentLineY, window.innerWidth, 2);
+  //   currentLineY += interval;
+  // }
+  ctx.globalAlpha = 1;
+  // window.boardFocus['x'] =
+};
 
 const makeMargins = (ctx) => {
   ctx.globalAlpha = 0.7;
@@ -163,14 +218,16 @@ const makeMargins = (ctx) => {
   ctx.fillRect(0,  window.innerHeight - marginHeight, window.innerWidth, window.innerHeight);
   ctx.fillRect(0, marginHeight, marginWidth, window.innerHeight - (marginHeight * 2));
   ctx.fillRect(window.innerWidth - marginWidth, marginHeight, window.innerWidth, window.innerHeight - (marginHeight * 2));
+
+
   let timebarWidth = 500;
   let timebarHeight = 50;
   let timebarX = (window.innerWidth / 2) - (timebarWidth / 2);
   let timebarY = window.innerHeight - (marginHeight / 2) - (timebarHeight / 2);
   let gradient = ctx.createLinearGradient(timebarX, timebarY, timebarX + timebarWidth, timebarY + timebarHeight);
   gradient.addColorStop(0, "rgb(0,0,0)");
-  gradient.addColorStop((Math.log10(window.timeCoefficient) + 1) / 2, "rgb(255,255,255)");
-  gradient.addColorStop((Math.log10(window.timeCoefficient) + 1) / 2, "rgb(255,255,255)");
+  gradient.addColorStop((Object(__WEBPACK_IMPORTED_MODULE_2__util__["a" /* baseLog */])(20, window.timeCoefficient) + 1) / 2, "rgb(255,255,255)");
+  gradient.addColorStop((Object(__WEBPACK_IMPORTED_MODULE_2__util__["a" /* baseLog */])(20, window.timeCoefficient) + 1) / 2, "rgb(255,255,255)");
   gradient.addColorStop(1, "rgb(0,0,0)");
   ctx.fillStyle = gradient;
   ctx.fillRect(timebarX, timebarY, timebarWidth, timebarHeight);
@@ -233,14 +290,14 @@ class Amoeba {
     );
     if (distance > currentDistance){
 
-      this.nextMomentum['x'] += Object(__WEBPACK_IMPORTED_MODULE_0__util__["a" /* boundNum */])(amoeba.momentum['x']
+      this.nextMomentum['x'] += Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(amoeba.momentum['x']
         * amoeba.mass * (currentDistance / distance) * window.timeCoefficient, -50, 50);
       amoeba.nextMomentum['x'] = amoeba.nextMomentum['x']
-        * Object(__WEBPACK_IMPORTED_MODULE_0__util__["a" /* boundNum */])(amoeba.mass / this.mass, .99, 1);
-      this.nextMomentum['y'] += Object(__WEBPACK_IMPORTED_MODULE_0__util__["a" /* boundNum */])(amoeba.momentum['y']
+        * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(amoeba.mass / this.mass, .99, 1);
+      this.nextMomentum['y'] += Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(amoeba.momentum['y']
         * amoeba.mass * (currentDistance / distance) * window.timeCoefficient, -50, 50);
       amoeba.nextMomentum['y'] = amoeba.nextMomentum['y']
-        * Object(__WEBPACK_IMPORTED_MODULE_0__util__["a" /* boundNum */])(amoeba.mass / this.mass, .99, 1);
+        * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(amoeba.mass / this.mass, .99, 1);
 
       if (this.mass <= amoeba.mass) {
         if ((currentDistance - amoeba.radius) / this.radius < 0 || this.mass < 100) {
@@ -252,7 +309,7 @@ class Amoeba {
         }
 
         let bubble = window.massDelta
-            * Object(__WEBPACK_IMPORTED_MODULE_0__util__["a" /* boundNum */])( (this.radius - (currentDistance - amoeba.radius)) / this.radius, .1, 1)
+            * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])( (this.radius - (currentDistance - amoeba.radius)) / this.radius, .1, 1)
             * window.timeCoefficient;
 
         this.mass -= bubble;
@@ -281,14 +338,17 @@ class Amoeba {
   }
 
   colorize(relativeX, relativeY, relativeRadius) {
+    if (this.mass <= 0) {
+      return;
+    }
     let gradient = this.ctx.createRadialGradient(relativeX, relativeY,relativeRadius, relativeX, relativeY, 0);
     if (this.mass < window.baseMass) {
       gradient.addColorStop(0, `rgb(${20}, ${20}, ${255})`);
-      gradient.addColorStop(1 - (this.mass / window.baseMass) , `rgb(${50}, ${20}, ${200})`);
+      gradient.addColorStop(Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(1 - (this.mass / window.baseMass),0, 1) , `rgb(${50}, ${20}, ${200})`);
       gradient.addColorStop(1 , `rgb(${255}, ${20}, ${20})`);
     } else {
       gradient.addColorStop(0, `rgb(${255}, ${20}, ${20})`);
-      gradient.addColorStop(1 -(window.baseMass / this.mass) , `rgb(${200}, ${20}, ${50})` );
+      gradient.addColorStop(Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(1 -(window.baseMass / this.mass), 0, 1) , `rgb(${200}, ${20}, ${50})` );
       gradient.addColorStop(1 , `rgb(${20}, ${20}, ${255})`);
     }
     return gradient;
@@ -297,7 +357,7 @@ class Amoeba {
   relativePos() {
     let relativeX = (((this.xpos - window.boardFocus['x']) / (window.boardWidth / 2)) * 500) + (window.innerWidth / 2);
     let relativeY = (((this.ypos - window.boardFocus['y']) / (window.boardHeight/ 2)) * 500) + (window.innerHeight / 2);
-    return {x: relativeX, y: relativeY}
+    return {x: relativeX, y: relativeY};
   }
 
   draw() {
@@ -337,7 +397,13 @@ const boundNum = (num, min, max) => {
     return num;
   }
 };
-/* harmony export (immutable) */ __webpack_exports__["a"] = boundNum;
+/* harmony export (immutable) */ __webpack_exports__["b"] = boundNum;
+
+
+const baseLog = (x, y) => {
+  return Math.log(y) / Math.log(x);
+};
+/* harmony export (immutable) */ __webpack_exports__["a"] = baseLog;
 
 
 
@@ -355,14 +421,19 @@ class Amoeboi extends __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */] {
   }
 
   colorize(relativeX, relativeY, relativeRadius) {
+    if (this.mass <= 0) {
+      return;
+    }
     let gradient = this.ctx.createRadialGradient(relativeX, relativeY,relativeRadius, relativeX, relativeY, 0);
     gradient.addColorStop(0, `rgb(${0}, ${255}, ${0})`);
-    gradient.addColorStop(1, `rgb(${0}, ${255}, ${0})`);
+    gradient.addColorStop(1, `rgb(${0}, ${150}, ${0})`);
     return gradient;
   }
+
+
 }
 
-/* unused harmony default export */ var _unused_webpack_default_export = (Amoeboi);
+/* harmony default export */ __webpack_exports__["a"] = (Amoeboi);
 
 
 /***/ })
