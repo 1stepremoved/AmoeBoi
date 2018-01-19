@@ -18,7 +18,22 @@ class Amoeboi extends Amoeba {
   propel(e, amoebas) {
     let diffX = e.pageX - (window.innerWidth / 2);
     let diffY = e.pageY - (window.innerHeight / 2);
-    let distance = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2) )
+    let angle = Math.atan2(diffY, diffX);
+    let dirX = Math.cos(angle);
+    let dirY = Math.sin(angle);
+
+
+    let mass = this.mass * .02;
+    this.mass -= mass;
+    let radius = Math.sqrt(mass / (Math.PI));
+    let xpos = this.xpos + (dirX * this.radius) + ((dirX > 0 ) ? radius : -1 * radius);
+    let ypos = this.ypos + (dirY * this.radius) + ((dirY > 0 ) ? radius : -1 * radius);
+    let momentum = {x: mass * 100 * dirX, y: mass * 100 * dirY};
+    amoebas.push(new Amoeba(this.ctx, xpos, ypos, mass, momentum));
+    this.nextMomentum['x'] += momentum['x'] * -1 * 10;
+    this.nextMomentum['y'] += momentum['y'] * -1 * 10;
+    // debugger
+    let distance = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2) );
     // debugger
   }
 

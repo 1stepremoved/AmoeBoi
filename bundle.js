@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   window.addEventListener("click", (e) => {
-    window.amoeboi.propel(e,amoebas);
+    window.amoeboi.propel(e,window.amoebas);
   });
 
   window.addEventListener("keydown", (e) => {
@@ -127,9 +127,9 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  let amoebas = [];
+  window.amoebas = [];
   window.amoeboi = new __WEBPACK_IMPORTED_MODULE_1__amoeboi_js__["a" /* default */](ctx, window.realBoardWidth / 2, window.realBoardHeight / 2, 100000, {x: 100000, y: 0});
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 400; i++) {
     amoebas.push(new __WEBPACK_IMPORTED_MODULE_0__amoeba_js__["a" /* default */](ctx));
   }
   // amoebas.push(new Amoeba(ctx, 4500, 5000, 100000, {x: 100000, y: 0}));
@@ -423,7 +423,22 @@ class Amoeboi extends __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */] {
   propel(e, amoebas) {
     let diffX = e.pageX - (window.innerWidth / 2);
     let diffY = e.pageY - (window.innerHeight / 2);
-    let distance = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2) )
+    let angle = Math.atan2(diffY, diffX);
+    let dirX = Math.cos(angle);
+    let dirY = Math.sin(angle);
+
+
+    let mass = this.mass * .02;
+    this.mass -= mass;
+    let radius = Math.sqrt(mass / (Math.PI));
+    let xpos = this.xpos + (dirX * this.radius) + ((dirX > 0 ) ? radius : -1 * radius);
+    let ypos = this.ypos + (dirY * this.radius) + ((dirY > 0 ) ? radius : -1 * radius);
+    let momentum = {x: mass * 100 * dirX, y: mass * 100 * dirY};
+    amoebas.push(new __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */](this.ctx, xpos, ypos, mass, momentum));
+    this.nextMomentum['x'] += momentum['x'] * -1 * 10;
+    this.nextMomentum['y'] += momentum['y'] * -1 * 10;
+    // debugger
+    let distance = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2) );
     // debugger
   }
 

@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   window.addEventListener("click", (e) => {
-    window.amoeboi.propel(e,amoebas);
+    window.amoeboi.propel(e,window.amoebas);
   });
 
   window.addEventListener("keydown", (e) => {
@@ -53,9 +53,9 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  let amoebas = [];
+  window.amoebas = [];
   window.amoeboi = new Amoeboi(ctx, window.realBoardWidth / 2, window.realBoardHeight / 2, 100000, {x: 100000, y: 0});
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 400; i++) {
     amoebas.push(new Amoeba(ctx));
   }
   // amoebas.push(new Amoeba(ctx, 4500, 5000, 100000, {x: 100000, y: 0}));
