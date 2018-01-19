@@ -100,10 +100,11 @@ class Amoeba {
     let boardHeight = window.realBoardHeight / window.currentZoom;
     let boardWidth = window.realBoardWidth / window.currentZoom;
 
-    let relativeX = (((this.xpos - window.boardFocus['x']) / (boardWidth / 2)) * (innerWidth / 2)) + (innerWidth / 2);
-    let relativeY = (this.ypos - window.boardFocus['y']) / (boardHeight/ 2) * (innerHeight / 2) + (innerHeight / 2);
+    let relativeX = (((this.xpos - window.boardFocus['x']) / (boardWidth / 2)) * 500) + (innerWidth / 2);
+    let relativeY = (((this.ypos - window.boardFocus['y']) / (boardHeight/ 2)) * 500) + (innerHeight / 2);
 
-    let relativeRadius = this.radius / window.realBoardWidth * window.innerWidth * window.currentZoom;
+    let relativeRadius = this.radius / window.realBoardWidth * 1000 * window.currentZoom;
+    //radius cannot be kept proportional to window.innerWidth, it will throw of there size on screen
 
     let gradient = this.ctx.createRadialGradient(relativeX, relativeY,relativeRadius, relativeX, relativeY, 0);
     if (this.mass < window.baseMass) {
