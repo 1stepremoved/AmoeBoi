@@ -164,6 +164,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.amoeboi.mass > 0) {
       window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
       window.baseMass = window.amoeboi.mass;
+      // window.maxZoom = 1 / 10 / (window.amoeboi.radius / window.realBoardWidth) ;
+      // window.currentZoom = (window.maxZoom < window.currentZoom) ? window.maxZoom : window.currentZoom;
+      // debugger
     } else {
       window.boardFocus['x'] += (window.boardFocus['x'] < window.realBoardWidth / 2) ? 10 : -10;
       window.boardFocus['y'] += (window.boardFocus['y'] < window.realBoardHeight / 2) ? 10 : -10;
@@ -433,7 +436,7 @@ class Amoeboi extends __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */] {
     let radius = Math.sqrt(mass / (Math.PI));
     let xpos = this.xpos + (dirX * this.radius) + ((dirX > 0 ) ? radius : -1 * radius);
     let ypos = this.ypos + (dirY * this.radius) + ((dirY > 0 ) ? radius : -1 * radius);
-    let momentum = {x: mass * 100 * dirX, y: mass * 100 * dirY};
+    let momentum = {x: mass * 50 * dirX, y: mass * 50 * dirY};
     amoebas.push(new __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */](this.ctx, xpos, ypos, mass, momentum));
     this.nextMomentum['x'] += momentum['x'] * -1 * 10;
     this.nextMomentum['y'] += momentum['y'] * -1 * 10;

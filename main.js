@@ -90,6 +90,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.amoeboi.mass > 0) {
       window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
       window.baseMass = window.amoeboi.mass;
+      // window.maxZoom = 1 / 10 / (window.amoeboi.radius / window.realBoardWidth) ;
+      // window.currentZoom = (window.maxZoom < window.currentZoom) ? window.maxZoom : window.currentZoom;
+      // debugger
     } else {
       window.boardFocus['x'] += (window.boardFocus['x'] < window.realBoardWidth / 2) ? 10 : -10;
       window.boardFocus['y'] += (window.boardFocus['y'] < window.realBoardHeight / 2) ? 10 : -10;

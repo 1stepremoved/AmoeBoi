@@ -28,7 +28,7 @@ class Amoeboi extends Amoeba {
     let radius = Math.sqrt(mass / (Math.PI));
     let xpos = this.xpos + (dirX * this.radius) + ((dirX > 0 ) ? radius : -1 * radius);
     let ypos = this.ypos + (dirY * this.radius) + ((dirY > 0 ) ? radius : -1 * radius);
-    let momentum = {x: mass * 100 * dirX, y: mass * 100 * dirY};
+    let momentum = {x: mass * 50 * dirX, y: mass * 50 * dirY};
     amoebas.push(new Amoeba(this.ctx, xpos, ypos, mass, momentum));
     this.nextMomentum['x'] += momentum['x'] * -1 * 10;
     this.nextMomentum['y'] += momentum['y'] * -1 * 10;
