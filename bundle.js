@@ -97,6 +97,10 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas.height = window.innerHeight;
   };
 
+  window.addEventListener("click", (e) => {
+    window.amoeboi.propel(e,amoebas);
+  });
+
   window.addEventListener("keydown", (e) => {
     switch (e.keyCode) {
       case 39:
@@ -416,6 +420,12 @@ class Amoeboi extends __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */] {
     return gradient;
   }
 
+  propel(e, amoebas) {
+    let diffX = e.pageX - (window.innerWidth / 2);
+    let diffY = e.pageY - (window.innerHeight / 2);
+    let distance = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2) )
+    // debugger
+  }
 
 }
 

@@ -15,6 +15,12 @@ class Amoeboi extends Amoeba {
     return gradient;
   }
 
+  propel(e, amoebas) {
+    let diffX = e.pageX - (window.innerWidth / 2);
+    let diffY = e.pageY - (window.innerHeight / 2);
+    let distance = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2) )
+    // debugger
+  }
 
 }
 

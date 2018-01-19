@@ -23,6 +23,10 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas.height = window.innerHeight;
   };
 
+  window.addEventListener("click", (e) => {
+    window.amoeboi.propel(e,amoebas);
+  });
+
   window.addEventListener("keydown", (e) => {
     switch (e.keyCode) {
       case 39:
