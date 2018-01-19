@@ -25,6 +25,8 @@ class Amoeba {
     // yDelta = (yDelta > window.momentumMax) ? Math.abs(yDelta) / yDelta * window.momentumMax : yDelta;
     this.xpos += xDelta * window.timeCoefficient;
     this.ypos += yDelta * window.timeCoefficient;
+    // this.xpos += boundNum(xDelta * window.timeCoefficient, -10, 10);
+    // this.ypos += boundNum(yDelta * window.timeCoefficient, -10, 10);
   }
 
   adjustRadius() {

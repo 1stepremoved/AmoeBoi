@@ -77,7 +77,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 window.momentumDelta = 1;
-window.massDelta =  1 / 5;
+window.massDelta =  1 / 2;
 window.momentumMax = 10;
 window.maxZoom = 4;
 window.minZoom = 1;
@@ -164,10 +164,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.amoeboi.mass > 0) {
       window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
       window.baseMass = window.amoeboi.mass;
+      debugger
       if (window.amoeboi.radius / window.realBoardWidth * 1000 * window.currentZoom > 75) {
+        // debugger
         this.currentZoom *= .9;
         window.maxZoom = this.currentZoom;
-        debugger;
       }
       // window.maxZoom = 1 / 10 / (window.amoeboi.radius / window.realBoardWidth) ;
       // window.currentZoom = (window.maxZoom < window.currentZoom) ? window.maxZoom : window.currentZoom;
@@ -269,6 +270,8 @@ class Amoeba {
     // yDelta = (yDelta > window.momentumMax) ? Math.abs(yDelta) / yDelta * window.momentumMax : yDelta;
     this.xpos += xDelta * window.timeCoefficient;
     this.ypos += yDelta * window.timeCoefficient;
+    // this.xpos += boundNum(xDelta * window.timeCoefficient, -10, 10);
+    // this.ypos += boundNum(yDelta * window.timeCoefficient, -10, 10);
   }
 
   adjustRadius() {
