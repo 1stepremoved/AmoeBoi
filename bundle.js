@@ -65,7 +65,13 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__amoeba_js__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(2);
+
 
 
 window.momentumDelta = 1;
@@ -102,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("mousewheel", (e)=> {
     e.preventDefault();
     let zoomDelta = (e.deltaY / -1000);
-    window.currentZoom = boundNum(window.currentZoom + zoomDelta, window.minZoom, window.maxZoom);
+    window.currentZoom = Object(__WEBPACK_IMPORTED_MODULE_1__util__["a" /* boundNum */])(window.currentZoom + zoomDelta, window.minZoom, window.maxZoom);
   });
 
   const canvas = document.getElementById("background");
@@ -112,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let amoebas = [];
   for (let i = 0; i < 30; i++) {
-    amoebas.push(new Amoeba(ctx));
+    amoebas.push(new __WEBPACK_IMPORTED_MODULE_0__amoeba_js__["a" /* default */](ctx));
   }
   // amoebas.push(new Amoeba(ctx, 4500, 5000, 100000, {x: 100000, y: 0}));
   // amoebas.push(new Amoeba(ctx, 5500, 5000, 10000, {x: -100000, y: 0}));
@@ -154,15 +160,14 @@ const makeMargins = (ctx) => {
   ctx.globalAlpha = 1;
 };
 
-const boundNum = (num, min, max) => {
-  if (num > max) {
-    return max;
-  } else if (num < min) {
-    return min;
-  } else {
-    return num;
-  }
-};
+
+/***/ }),
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(2);
+
 
 class Amoeba {
   constructor(ctx, x, y, mass, momentum) {
@@ -209,14 +214,14 @@ class Amoeba {
     );
     if (distance > currentDistance){
 
-      this.nextMomentum['x'] += boundNum(amoeba.momentum['x']
+      this.nextMomentum['x'] += Object(__WEBPACK_IMPORTED_MODULE_0__util__["a" /* boundNum */])(amoeba.momentum['x']
         * amoeba.mass * (currentDistance / distance) * window.timeCoefficient, -50, 50);
       amoeba.nextMomentum['x'] = amoeba.nextMomentum['x']
-        * boundNum(amoeba.mass / this.mass, .99, 1);
-      this.nextMomentum['y'] += boundNum(amoeba.momentum['y']
+        * Object(__WEBPACK_IMPORTED_MODULE_0__util__["a" /* boundNum */])(amoeba.mass / this.mass, .99, 1);
+      this.nextMomentum['y'] += Object(__WEBPACK_IMPORTED_MODULE_0__util__["a" /* boundNum */])(amoeba.momentum['y']
         * amoeba.mass * (currentDistance / distance) * window.timeCoefficient, -50, 50);
       amoeba.nextMomentum['y'] = amoeba.nextMomentum['y']
-        * boundNum(amoeba.mass / this.mass, .99, 1);
+        * Object(__WEBPACK_IMPORTED_MODULE_0__util__["a" /* boundNum */])(amoeba.mass / this.mass, .99, 1);
 
       if (this.mass <= amoeba.mass) {
         if ((currentDistance - amoeba.radius) / this.radius < 0 || this.mass < 100) {
@@ -228,7 +233,7 @@ class Amoeba {
         }
 
         let bubble = window.massDelta
-            * boundNum( (this.radius - (currentDistance - amoeba.radius)) / this.radius, .1, 1)
+            * Object(__WEBPACK_IMPORTED_MODULE_0__util__["a" /* boundNum */])( (this.radius - (currentDistance - amoeba.radius)) / this.radius, .1, 1)
             * window.timeCoefficient;
 
         this.mass -= bubble;
@@ -290,6 +295,26 @@ class Amoeba {
     this.ctx.fill();
   }
 }
+
+/* harmony default export */ __webpack_exports__["a"] = (Amoeba);
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+const boundNum = (num, min, max) => {
+  if (num > max) {
+    return max;
+  } else if (num < min) {
+    return min;
+  } else {
+    return num;
+  }
+};
+/* harmony export (immutable) */ __webpack_exports__["a"] = boundNum;
+
 
 
 /***/ })
