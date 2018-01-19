@@ -90,13 +90,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.amoeboi.mass > 0) {
       window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
       window.baseMass = window.amoeboi.mass;
+      if (window.amoeboi.radius / window.realBoardWidth * 1000 * window.currentZoom > 75) {
+        this.currentZoom *= .9;
+        window.maxZoom = this.currentZoom;
+        debugger;
+      }
       // window.maxZoom = 1 / 10 / (window.amoeboi.radius / window.realBoardWidth) ;
       // window.currentZoom = (window.maxZoom < window.currentZoom) ? window.maxZoom : window.currentZoom;
+
       // debugger
     } else {
       window.boardFocus['x'] += (window.boardFocus['x'] < window.realBoardWidth / 2) ? 10 : -10;
       window.boardFocus['y'] += (window.boardFocus['y'] < window.realBoardHeight / 2) ? 10 : -10;
       window.currentZoom = window.currentZoom > 1 ? window.currentZoom * 0.9 : window.currentZoom;
+      window.boardHeight = window.realBoardHeight / window.currentZoom;
+      window.boardWidth = window.realBoardWidth / window.currentZoom;
       window.baseMass = 0;
     }
     requestAnimationFrame(animate);

@@ -164,13 +164,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.amoeboi.mass > 0) {
       window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
       window.baseMass = window.amoeboi.mass;
+      if (window.amoeboi.radius / window.realBoardWidth * 1000 * window.currentZoom > 75) {
+        this.currentZoom *= .9;
+        window.maxZoom = this.currentZoom;
+        debugger;
+      }
       // window.maxZoom = 1 / 10 / (window.amoeboi.radius / window.realBoardWidth) ;
       // window.currentZoom = (window.maxZoom < window.currentZoom) ? window.maxZoom : window.currentZoom;
+
       // debugger
     } else {
       window.boardFocus['x'] += (window.boardFocus['x'] < window.realBoardWidth / 2) ? 10 : -10;
       window.boardFocus['y'] += (window.boardFocus['y'] < window.realBoardHeight / 2) ? 10 : -10;
       window.currentZoom = window.currentZoom > 1 ? window.currentZoom * 0.9 : window.currentZoom;
+      window.boardHeight = window.realBoardHeight / window.currentZoom;
+      window.boardWidth = window.realBoardWidth / window.currentZoom;
       window.baseMass = 0;
     }
     requestAnimationFrame(animate);
@@ -257,8 +265,8 @@ class Amoeba {
     this.momentum = Object.assign({}, this.nextMomentum);
     let xDelta = this.momentum['x'] / this.mass;
     let yDelta = this.momentum['y'] / this.mass;
-    xDelta = (xDelta > window.momentumMax) ? Math.abs(xDelta) / xDelta * window.momentumMax : xDelta;
-    yDelta = (yDelta > window.momentumMax) ? Math.abs(yDelta) / yDelta * window.momentumMax : yDelta;
+    // xDelta = (xDelta > window.momentumMax) ? Math.abs(xDelta) / xDelta * window.momentumMax : xDelta;
+    // yDelta = (yDelta > window.momentumMax) ? Math.abs(yDelta) / yDelta * window.momentumMax : yDelta;
     this.xpos += xDelta * window.timeCoefficient;
     this.ypos += yDelta * window.timeCoefficient;
   }
@@ -301,7 +309,7 @@ class Amoeba {
           return;
         }
 
-        let bubble = window.massDelta * this.mass 
+        let bubble = window.massDelta * this.mass
             * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])( (this.radius - (currentDistance - amoeba.radius)) / this.radius, .1, 1)
             * window.timeCoefficient;
 
@@ -424,6 +432,9 @@ class Amoeboi extends __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */] {
   }
 
   propel(e, amoebas) {
+    if (this.mass <= 0) {
+      return;
+    }
     let diffX = e.pageX - (window.innerWidth / 2);
     let diffY = e.pageY - (window.innerHeight / 2);
     let angle = Math.atan2(diffY, diffX);

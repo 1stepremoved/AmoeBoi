@@ -16,6 +16,9 @@ class Amoeboi extends Amoeba {
   }
 
   propel(e, amoebas) {
+    if (this.mass <= 0) {
+      return;
+    }
     let diffX = e.pageX - (window.innerWidth / 2);
     let diffY = e.pageY - (window.innerHeight / 2);
     let angle = Math.atan2(diffY, diffX);
