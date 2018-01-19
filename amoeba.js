@@ -65,7 +65,7 @@ class Amoeba {
           return;
         }
 
-        let bubble = window.massDelta
+        let bubble = window.massDelta * this.mass 
             * boundNum( (this.radius - (currentDistance - amoeba.radius)) / this.radius, .1, 1)
             * window.timeCoefficient;
 

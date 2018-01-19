@@ -77,18 +77,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 window.momentumDelta = 1;
-window.massDelta = 3000;
+window.massDelta =  1 / 5;
 window.momentumMax = 10;
 window.maxZoom = 4;
 window.minZoom = 1;
-window.currentZoom = window.minZoom;
+window.currentZoom = window.maxZoom;
 window.realBoardHeight = 20000;
 window.realBoardWidth = 20000;
 window.boardHeight = window.realBoardHeight / window.currentZoom;
 window.boardWidth = window.realBoardWidth / window.currentZoom;
 window.boardFocus = {x: 5000, y: 5000};
 window.timeBase = 10;
-window.timeCoefficient = 1;
+window.timeCoefficient = .2;
 window.baseMass = 50000;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -298,7 +298,7 @@ class Amoeba {
           return;
         }
 
-        let bubble = window.massDelta
+        let bubble = window.massDelta * this.mass 
             * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])( (this.radius - (currentDistance - amoeba.radius)) / this.radius, .1, 1)
             * window.timeCoefficient;
 
