@@ -95,7 +95,7 @@ class Amoeba {
   constructor(ctx, x, y, mass, momentum) {
     this.ctx = ctx;
     this.mass = mass || Math.floor((Math.random() * 100000) + 10000);
-    this.radius = Math.sqrt(this.mass / (2 * Math.PI));
+    this.radius = Math.sqrt(this.mass / (Math.PI));
     this.xpos = x || Math.floor(Math.random() * (window.realBoardWidth - this.radius)) + this.radius;
     this.ypos = y || Math.floor(Math.random() * (window.realBoardHeight - this.radius)) + this.radius;
     this.momentum = momentum || {x: Math.floor(Math.random() * 100000) - 50000, y: Math.floor(Math.random() * 100000) - 50000};
@@ -117,7 +117,7 @@ class Amoeba {
   }
 
   adjustRadius() {
-    this.radius = Math.sqrt(this.mass / (2 * Math.PI));
+    this.radius = Math.sqrt(this.mass / (Math.PI));
   }
 
   aabbCheck(amoeba) {
