@@ -87,6 +87,7 @@ window.realBoardWidth = 20000;
 window.boardHeight = window.realBoardHeight / window.currentZoom;
 window.boardWidth = window.realBoardWidth / window.currentZoom;
 window.boardFocus = {x: 5000, y: 5000};
+window.timeBase = 10;
 window.timeCoefficient = 1;
 window.baseMass = 50000;
 
@@ -99,10 +100,10 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("keydown", (e) => {
     switch (e.keyCode) {
       case 39:
-        window.timeCoefficient = Math.min(window.timeCoefficient * 1.1, 20);
+        window.timeCoefficient = Math.min(window.timeCoefficient * 1.1, window.timeBase);
         return;
       case 37:
-        window.timeCoefficient = Math.max(window.timeCoefficient * 0.9, 0.05);
+        window.timeCoefficient = Math.max(window.timeCoefficient * 0.9, Math.pow(window.timeBase, - 1));
         return;
       default:
         return;
@@ -123,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.height = window.innerHeight;
 
   let amoebas = [];
-  window.amoeboi = new __WEBPACK_IMPORTED_MODULE_1__amoeboi_js__["a" /* default */](ctx, 5000, 5000, 100000, {x: 100000, y: 0});
+  window.amoeboi = new __WEBPACK_IMPORTED_MODULE_1__amoeboi_js__["a" /* default */](ctx, window.realBoardWidth / 2, window.realBoardHeight / 2, 100000, {x: 100000, y: 0});
   for (let i = 0; i < 40; i++) {
     amoebas.push(new __WEBPACK_IMPORTED_MODULE_0__amoeba_js__["a" /* default */](ctx));
   }
@@ -160,8 +161,8 @@ document.addEventListener("DOMContentLoaded", () => {
       window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
       window.baseMass = window.amoeboi.mass;
     } else {
-      window.boardFocus['x'] += (window.boardFocus['x'] < 5000) ? 10 : -10;
-      window.boardFocus['y'] += (window.boardFocus['y'] < 5000) ? 10 : -10;
+      window.boardFocus['x'] += (window.boardFocus['x'] < window.realBoardWidth / 2) ? 10 : -10;
+      window.boardFocus['y'] += (window.boardFocus['y'] < window.realBoardHeight / 2) ? 10 : -10;
       window.currentZoom = window.currentZoom > 1 ? window.currentZoom * 0.9 : window.currentZoom;
       window.baseMass = 0;
     }
@@ -191,22 +192,7 @@ const makeGrid = (ctx) => {
     realY += interval;
   }
 
-
-  // let interval = 50 * window.currentZoom;
-  // let currentLineX = interval - ((window.boardFocus['x']/ window.realBoardWidth * window.innerWidth) % interval);
-  // while (currentLineX < window.boardFocus['x'] + window.boardWidth) {
-  //   ctx.fillStyle = "black";
-  //   ctx.fillRect(currentLineX,0, 2, window.innerHeight);
-  //   currentLineX += interval;
-  // }
-  // let currentLineY = interval - ((window.boardFocus['y']/ window.realBoardHeight * window.innerHeight) % interval);
-  // while (currentLineY < window.boardFocus['y'] + window.boardHeight) {
-  //   ctx.fillStyle = "black";
-  //   ctx.fillRect(0, currentLineY, window.innerWidth, 2);
-  //   currentLineY += interval;
-  // }
   ctx.globalAlpha = 1;
-  // window.boardFocus['x'] =
 };
 
 const makeMargins = (ctx) => {
@@ -226,8 +212,8 @@ const makeMargins = (ctx) => {
   let timebarY = window.innerHeight - (marginHeight / 2) - (timebarHeight / 2);
   let gradient = ctx.createLinearGradient(timebarX, timebarY, timebarX + timebarWidth, timebarY + timebarHeight);
   gradient.addColorStop(0, "rgb(0,0,0)");
-  gradient.addColorStop((Object(__WEBPACK_IMPORTED_MODULE_2__util__["a" /* baseLog */])(20, window.timeCoefficient) + 1) / 2, "rgb(255,255,255)");
-  gradient.addColorStop((Object(__WEBPACK_IMPORTED_MODULE_2__util__["a" /* baseLog */])(20, window.timeCoefficient) + 1) / 2, "rgb(255,255,255)");
+  gradient.addColorStop((Object(__WEBPACK_IMPORTED_MODULE_2__util__["a" /* baseLog */])(window.timeBase, window.timeCoefficient) + 1) / 2, "rgb(255,255,255)");
+  gradient.addColorStop((Object(__WEBPACK_IMPORTED_MODULE_2__util__["a" /* baseLog */])(window.timeBase, window.timeCoefficient) + 1) / 2, "rgb(255,255,255)");
   gradient.addColorStop(1, "rgb(0,0,0)");
   ctx.fillStyle = gradient;
   ctx.fillRect(timebarX, timebarY, timebarWidth, timebarHeight);
@@ -250,7 +236,7 @@ class Amoeba {
     this.radius = Math.sqrt(this.mass / (Math.PI));
     this.xpos = x || Math.floor(Math.random() * (window.realBoardWidth - this.radius)) + this.radius;
     this.ypos = y || Math.floor(Math.random() * (window.realBoardHeight - this.radius)) + this.radius;
-    this.momentum = momentum || {x: Math.floor(Math.random() * 100000) - 50000, y: Math.floor(Math.random() * 100000) - 50000};
+    this.momentum = momentum || {x: Math.floor(Math.random() * 1000000) - 500000, y: Math.floor(Math.random() * 1000000) - 500000};
     this.nextMomentum = Object.assign({}, this.momentum);
     this.draw = this.draw.bind(this);
     this.collision = this.collision.bind(this);

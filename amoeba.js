@@ -7,7 +7,7 @@ class Amoeba {
     this.radius = Math.sqrt(this.mass / (Math.PI));
     this.xpos = x || Math.floor(Math.random() * (window.realBoardWidth - this.radius)) + this.radius;
     this.ypos = y || Math.floor(Math.random() * (window.realBoardHeight - this.radius)) + this.radius;
-    this.momentum = momentum || {x: Math.floor(Math.random() * 100000) - 50000, y: Math.floor(Math.random() * 100000) - 50000};
+    this.momentum = momentum || {x: Math.floor(Math.random() * 1000000) - 500000, y: Math.floor(Math.random() * 1000000) - 500000};
     this.nextMomentum = Object.assign({}, this.momentum);
     this.draw = this.draw.bind(this);
     this.collision = this.collision.bind(this);
