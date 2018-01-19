@@ -41,13 +41,13 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.height = window.innerHeight;
 
   let amoebas = [];
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 30; i++) {
     amoebas.push(new Amoeba(ctx));
   }
-  // amoebas.push(new Amoeba(ctx, 4500, 5000, 100000, {x: 100000, y: 0}));
-  // amoebas.push(new Amoeba(ctx, 5500, 5000, 100000, {x: -100000, y: 0}));
+  // amoebas.push(new Amoeba(ctx, 4900, 5000, 100000, {x: 100000, y: 0}));
+  // amoebas.push(new Amoeba(ctx, 5100, 5000, 100000, {x: -100000, y: 0}));
+  // amoebas.push(new Amoeba(ctx, 5300, 5000, 100000, {x: -100000, y: 0}));
   let animate = () => {
-    // debugger
     ctx.clearRect(0,0, innerWidth, innerHeight);
     amoebas = amoebas.filter(amoeba => {
       return amoeba.radius > 0;
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     amoebas.forEach(amoeba => {
       amoebas.forEach(amoeba2 =>{
         if (amoeba2 !== amoeba){
-          amoeba.collision(amoeba2);
+          amoeba.aabbCheck(amoeba2);
         }
       });
       amoeba.wallCollision();
@@ -141,12 +141,10 @@ class Amoeba {
         * amoeba.mass * (currentDistance / distance) * window.timeCoefficient, -50, 50);
       amoeba.nextMomentum['x'] = amoeba.nextMomentum['x']
         * boundNum(amoeba.mass / this.mass, .99, 1);
-        // * window.timeCoefficient;
       this.nextMomentum['y'] += boundNum(amoeba.momentum['y']
         * amoeba.mass * (currentDistance / distance) * window.timeCoefficient, -50, 50);
       amoeba.nextMomentum['y'] = amoeba.nextMomentum['y']
         * boundNum(amoeba.mass / this.mass, .99, 1);
-        // * window.timeCoefficient;
 
       if (this.mass <= amoeba.mass) {
         if ((currentDistance - amoeba.radius) / this.radius < 0 || this.mass < 100) {
@@ -158,7 +156,7 @@ class Amoeba {
         }
 
         let bubble = window.massDelta
-            * boundNum( (this.radius - (currentDistance - amoeba.radius)) / this.radius, 0, 1)
+            * boundNum( (this.radius - (currentDistance - amoeba.radius)) / this.radius, .1, 1)
             * window.timeCoefficient;
 
         this.mass -= bubble;
@@ -190,18 +188,12 @@ class Amoeba {
     this.adjustRadius();
     let boardHeight = window.realBoardHeight / window.currentZoom;
     let boardWidth = window.realBoardWidth / window.currentZoom;
-    // let relativeX = (this.xpos - window.boardFocus['x'] + (boardWidth / 2)) * window.currentZoom;
-    // let relativeY = (this.ypos - window.boardFocus['y'] + (boardHeight / 2)) * window.currentZoom;
-    // debugger
-    // relativeX = this.xpos / window.realBoardWidth * window.innerWidth;
-    // relativeY = this.ypos / window.realBoardHeight * window.innerWidth; //To keep things proportional
-    // relativeX = this.xpos - window.boardFocus['x'] + (boardWidth/ 2)
+
     let relativeX = (((this.xpos - window.boardFocus['x']) / (boardWidth / 2)) * (innerWidth / 2)) + (innerWidth / 2);
     let relativeY = (this.ypos - window.boardFocus['y']) / (boardHeight/ 2) * (innerHeight / 2) + (innerHeight / 2);
-    // debugger
+
     let relativeRadius = this.radius / window.realBoardWidth * window.innerWidth * window.currentZoom;
 
-    // this.radius = Math.sqrt(this.mass / (4 * Math.PI)) * window.currentZoom;
     this.ctx.beginPath();
     this.ctx.arc(relativeX, relativeY, relativeRadius, 0, Math.PI * 2);
     this.ctx.fillStyle="blue";
