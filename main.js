@@ -44,7 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
   for (let i = 0; i < 40; i++) {
     amoebas.push(new Amoeba(ctx));
   }
-  // amoebas.push(new Amoeba(ctx, 200, 200, 100000, [100, 0]));
+  // amoebas.push(new Amoeba(ctx, 4500, 5000, 100000, {x: 100000, y: 0}));
+  // amoebas.push(new Amoeba(ctx, 5500, 5000, 100000, {x: -100000, y: 0}));
   let animate = () => {
     // debugger
     ctx.clearRect(0,0, innerWidth, innerHeight);
