@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.height = window.innerHeight;
 
   let amoebas = [];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 40; i++) {
     amoebas.push(new Amoeba(ctx));
   }
   // amoebas.push(new Amoeba(ctx, 200, 200, 100000, [100, 0]));
@@ -165,12 +165,13 @@ class Amoeba {
     this.ctx = ctx;
     this.mass = mass || Math.floor((Math.random() * 100000) + 10000);
     this.radius = Math.sqrt(this.mass / (2 * Math.PI));
-    this.xpos = x || Math.floor(Math.random() * (window.innerWidth - this.radius)) + this.radius;
-    this.ypos = y || Math.floor(Math.random() * (window.innerHeight - this.radius)) + this.radius;
+    this.xpos = x || Math.floor(Math.random() * (window.realBoardWidth - this.radius)) + this.radius;
+    this.ypos = y || Math.floor(Math.random() * (window.realBoardHeight - this.radius)) + this.radius;
     this.momentum = momentum || {x: Math.floor(Math.random() * 100000) - 50000, y: Math.floor(Math.random() * 100000) - 50000};
     this.nextMomentum = Object.assign({}, this.momentum);
     this.draw = this.draw.bind(this);
     this.collision = this.collision.bind(this);
+    this.adjustRadius = this.adjustRadius.bind(this);
     this.color = "blue";
   }
 
@@ -182,6 +183,10 @@ class Amoeba {
     yDelta = (yDelta > window.momentumMax) ? Math.abs(yDelta) / yDelta * window.momentumMax : yDelta;
     this.xpos += xDelta * window.timeCoefficient;
     this.ypos += yDelta * window.timeCoefficient;
+  }
+
+  adjustRadius() {
+    this.radius = Math.sqrt(this.mass / (2 * Math.PI));
   }
 
   aabbCheck(amoeba) {
@@ -233,16 +238,16 @@ class Amoeba {
 
 
   wallCollision() {
-    if (this.xpos + this.radius >= window.innerWidth) {
+    if (this.xpos + this.radius >= window.realBoardWidth) {
       this.nextMomentum['x'] = -1 * this.momentum['x'];
-      this.xpos = window.innerWidth - this.radius - 1;
+      this.xpos = window.realBoardWidth - this.radius - 1;
     } else if (this.xpos - this.radius <= 0) {
       this.nextMomentum['x'] = -1 * this.momentum['x'];
       this.xpos = 0 + this.radius + 1;
     }
-    if (this.ypos + this.radius >= window.innerHeight) {
+    if (this.ypos + this.radius >= window.realBoardHeight) {
       this.nextMomentum['y'] = -1 * this.momentum['y'];
-      this.ypos = window.innerHeight - this.radius - 1;
+      this.ypos = window.realBoardHeight - this.radius - 1;
     } else if (this.ypos - this.radius <= 0) {
       this.nextMomentum['y'] = -1 * this.momentum['y'];
       this.ypos = 0 + this.radius + 1;
@@ -250,15 +255,23 @@ class Amoeba {
   }
 
   draw() {
+    this.adjustRadius();
     let boardHeight = window.realBoardHeight / window.currentZoom;
     let boardWidth = window.realBoardWidth / window.currentZoom;
-    let relativeX = (this.xpos - window.boardFocus['x'] + (boardWidth / 2)) * window.currentZoom;
-    let relativeY = (this.ypos - window.boardFocus['y'] + (boardHeight / 2)) * window.currentZoom;
+    // let relativeX = (this.xpos - window.boardFocus['x'] + (boardWidth / 2)) * window.currentZoom;
+    // let relativeY = (this.ypos - window.boardFocus['y'] + (boardHeight / 2)) * window.currentZoom;
     // debugger
+    // relativeX = this.xpos / window.realBoardWidth * window.innerWidth;
+    // relativeY = this.ypos / window.realBoardHeight * window.innerWidth; //To keep things proportional
+    // relativeX = this.xpos - window.boardFocus['x'] + (boardWidth/ 2)
+    let relativeX = (((this.xpos - window.boardFocus['x']) / (boardWidth / 2)) * (innerWidth / 2)) + (innerWidth / 2);
+    let relativeY = (this.ypos - window.boardFocus['y']) / (boardHeight/ 2) * (innerHeight / 2) + (innerHeight / 2);
+    // debugger
+    let relativeRadius = this.radius / window.realBoardWidth * window.innerWidth * window.currentZoom;
 
-    this.radius = Math.sqrt(this.mass / (4 * Math.PI)) * window.currentZoom;
+    // this.radius = Math.sqrt(this.mass / (4 * Math.PI)) * window.currentZoom;
     this.ctx.beginPath();
-    this.ctx.arc(relativeX, relativeY, this.radius, 0, Math.PI * 2);
+    this.ctx.arc(relativeX, relativeY, relativeRadius, 0, Math.PI * 2);
     this.ctx.fillStyle="blue";
     this.ctx.fill();
   }
