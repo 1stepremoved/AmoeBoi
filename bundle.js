@@ -70,7 +70,9 @@
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__amoeba_js__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__amoeboi_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(2);
+
 
 
 
@@ -82,6 +84,8 @@ window.minZoom = 1;
 window.currentZoom = window.minZoom;
 window.realBoardHeight = 10000;
 window.realBoardWidth = 10000;
+window.boardHeight = window.realBoardHeight / window.currentZoom;
+window.boardWidth = window.realBoardWidth / window.currentZoom;
 window.boardFocus = {x: 5000, y: 5000};
 window.timeCoefficient = 1;
 window.baseMass = 50000;
@@ -108,7 +112,9 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("mousewheel", (e)=> {
     e.preventDefault();
     let zoomDelta = (e.deltaY / -1000);
-    window.currentZoom = Object(__WEBPACK_IMPORTED_MODULE_1__util__["a" /* boundNum */])(window.currentZoom + zoomDelta, window.minZoom, window.maxZoom);
+    window.currentZoom = Object(__WEBPACK_IMPORTED_MODULE_2__util__["a" /* boundNum */])(window.currentZoom + zoomDelta, window.minZoom, window.maxZoom);
+    window.boardHeight = window.realBoardHeight / window.currentZoom;
+    window.boardWidth = window.realBoardWidth / window.currentZoom;
   });
 
   const canvas = document.getElementById("background");
@@ -192,6 +198,8 @@ class Amoeba {
     this.draw = this.draw.bind(this);
     this.collision = this.collision.bind(this);
     this.adjustRadius = this.adjustRadius.bind(this);
+    this.colorize = this.colorize.bind(this);
+    this.relativePos = this.relativePos.bind(this);
     this.color = "blue";
   }
 
@@ -272,37 +280,41 @@ class Amoeba {
     }
   }
 
+  colorize(relativeX, relativeY, relativeRadius) {
+    let gradient = this.ctx.createRadialGradient(relativeX, relativeY,relativeRadius, relativeX, relativeY, 0);
+    if (this.mass < window.baseMass) {
+      gradient.addColorStop(0, `rgb(${20}, ${20}, ${255})`);
+      gradient.addColorStop(1 - (this.mass / window.baseMass) , `rgb(${50}, ${20}, ${200})`);
+      gradient.addColorStop(1 , `rgb(${255}, ${20}, ${20})`);
+    } else {
+      gradient.addColorStop(0, `rgb(${255}, ${20}, ${20})`);
+      gradient.addColorStop(1 -(window.baseMass / this.mass) , `rgb(${200}, ${20}, ${50})` );
+      gradient.addColorStop(1 , `rgb(${20}, ${20}, ${255})`);
+    }
+    return gradient;
+  }
+
+  relativePos() {
+    let relativeX = (((this.xpos - window.boardFocus['x']) / (window.boardWidth / 2)) * 500) + (window.innerWidth / 2);
+    let relativeY = (((this.ypos - window.boardFocus['y']) / (window.boardHeight/ 2)) * 500) + (window.innerHeight / 2);
+    return {x: relativeX, y: relativeY}
+  }
+
   draw() {
     if (this.mass <= 0) {
       return;
     }
     this.adjustRadius();
-    let boardHeight = window.realBoardHeight / window.currentZoom;
-    let boardWidth = window.realBoardWidth / window.currentZoom;
 
-    let relativeX = (((this.xpos - window.boardFocus['x']) / (boardWidth / 2)) * 500) + (innerWidth / 2);
-    let relativeY = (((this.ypos - window.boardFocus['y']) / (boardHeight/ 2)) * 500) + (innerHeight / 2);
+    let relativeCoors = this.relativePos();
 
     let relativeRadius = this.radius / window.realBoardWidth * 1000 * window.currentZoom;
     //radius cannot be kept proportional to window.innerWidth, it will throw of there size on screen
 
-    let gradient = this.ctx.createRadialGradient(relativeX, relativeY,relativeRadius, relativeX, relativeY, 0);
-    if (this.mass < window.baseMass) {
-      gradient.addColorStop(0, `rgb(${20}, ${20}, ${255})`);
-      // debugger
-      gradient.addColorStop(1 - (this.mass / window.baseMass) , `rgb(${50}, ${20}, ${200})`);
-      gradient.addColorStop(1 , `rgb(${255}, ${20}, ${20})`);
-    } else {
-      gradient.addColorStop(0, `rgb(${255}, ${20}, ${20})`);
-      // debugger
-      gradient.addColorStop(1 -(window.baseMass / this.mass) , `rgb(${200}, ${20}, ${50})` );
-      gradient.addColorStop(1 , `rgb(${20}, ${20}, ${255})`);
-    }
-    // if (this.mass < window.baseMass) {
-    //   let red = 50 + (50 * this.mass / window.baseMass);
-    // }
+    let gradient = this.colorize(relativeCoors['x'], relativeCoors['y'],relativeRadius);
+
     this.ctx.beginPath();
-    this.ctx.arc(relativeX, relativeY, relativeRadius, 0, Math.PI * 2);
+    this.ctx.arc(relativeCoors['x'], relativeCoors['y'], relativeRadius, 0, Math.PI * 2);
     this.ctx.fillStyle=gradient;
     this.ctx.fill();
   }
@@ -327,6 +339,30 @@ const boundNum = (num, min, max) => {
 };
 /* harmony export (immutable) */ __webpack_exports__["a"] = boundNum;
 
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__amoeba__ = __webpack_require__(1);
+
+
+class Amoeboi extends __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */] {
+  constructor(ctx, x, y, mass, momentum) {
+    super(ctx, x, y, mass, momentum);
+  }
+
+  colorize(relativeX, relativeY, relativeRadius) {
+    let gradient = this.ctx.createRadialGradient(relativeX, relativeY,relativeRadius, relativeX, relativeY, 0);
+    gradient.addColorStop(0, `rgb(${0}, ${255}, ${0})`);
+    gradient.addColorStop(1, `rgb(${0}, ${255}, ${0})`);
+    return gradient;
+  }
+}
+
+/* unused harmony default export */ var _unused_webpack_default_export = (Amoeboi);
 
 
 /***/ })

@@ -1,4 +1,5 @@
 import Amoeba from './amoeba.js';
+import Amoeboi from './amoeboi.js';
 import {boundNum} from './util';
 
 window.momentumDelta = 1;
@@ -9,6 +10,8 @@ window.minZoom = 1;
 window.currentZoom = window.minZoom;
 window.realBoardHeight = 10000;
 window.realBoardWidth = 10000;
+window.boardHeight = window.realBoardHeight / window.currentZoom;
+window.boardWidth = window.realBoardWidth / window.currentZoom;
 window.boardFocus = {x: 5000, y: 5000};
 window.timeCoefficient = 1;
 window.baseMass = 50000;
@@ -36,6 +39,8 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     let zoomDelta = (e.deltaY / -1000);
     window.currentZoom = boundNum(window.currentZoom + zoomDelta, window.minZoom, window.maxZoom);
+    window.boardHeight = window.realBoardHeight / window.currentZoom;
+    window.boardWidth = window.realBoardWidth / window.currentZoom;
   });
 
   const canvas = document.getElementById("background");
