@@ -77,7 +77,8 @@ window.currentZoom = window.minZoom;
 window.realBoardHeight = 10000;
 window.realBoardWidth = 10000;
 window.boardFocus = {x: 5000, y: 5000};
-window.timeCoefficient = 1;
+window.timeCoefficient = 0.1;
+window.baseMass = 50000;
 
 document.addEventListener("DOMContentLoaded", () => {
   window.onresize = ()=>{
@@ -113,8 +114,8 @@ document.addEventListener("DOMContentLoaded", () => {
   for (let i = 0; i < 30; i++) {
     amoebas.push(new Amoeba(ctx));
   }
-  // amoebas.push(new Amoeba(ctx, 4900, 5000, 100000, {x: 100000, y: 0}));
-  // amoebas.push(new Amoeba(ctx, 5100, 5000, 100000, {x: -100000, y: 0}));
+  // amoebas.push(new Amoeba(ctx, 4500, 5000, 100000, {x: 100000, y: 0}));
+  // amoebas.push(new Amoeba(ctx, 5500, 5000, 10000, {x: -100000, y: 0}));
   // amoebas.push(new Amoeba(ctx, 5300, 5000, 100000, {x: -100000, y: 0}));
   let animate = () => {
     ctx.clearRect(0,0, innerWidth, innerHeight);
@@ -129,10 +130,12 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       amoeba.wallCollision();
     });
+    ctx.globalAlpha = 0.8;
     amoebas.forEach(amoeba => {
       amoeba.move();
       amoeba.draw();
     });
+    ctx.globalAlpha = 1;
     makeMargins(ctx);
     requestAnimationFrame(animate);
   };
@@ -254,6 +257,9 @@ class Amoeba {
   }
 
   draw() {
+    if (this.mass <= 0) {
+      return;
+    }
     this.adjustRadius();
     let boardHeight = window.realBoardHeight / window.currentZoom;
     let boardWidth = window.realBoardWidth / window.currentZoom;
@@ -263,9 +269,24 @@ class Amoeba {
 
     let relativeRadius = this.radius / window.realBoardWidth * window.innerWidth * window.currentZoom;
 
+    let gradient = this.ctx.createRadialGradient(relativeX, relativeY,relativeRadius, relativeX, relativeY, 0);
+    if (this.mass < window.baseMass) {
+      gradient.addColorStop(0, `rgb(${20}, ${20}, ${255})`);
+      // debugger
+      gradient.addColorStop(1 - (this.mass / window.baseMass) , `rgb(${50}, ${20}, ${200})`);
+      gradient.addColorStop(1 , `rgb(${255}, ${20}, ${20})`);
+    } else {
+      gradient.addColorStop(0, `rgb(${255}, ${20}, ${20})`);
+      // debugger
+      gradient.addColorStop(1 -(window.baseMass / this.mass) , `rgb(${200}, ${20}, ${50})` );
+      gradient.addColorStop(1 , `rgb(${20}, ${20}, ${255})`);
+    }
+    // if (this.mass < window.baseMass) {
+    //   let red = 50 + (50 * this.mass / window.baseMass);
+    // }
     this.ctx.beginPath();
     this.ctx.arc(relativeX, relativeY, relativeRadius, 0, Math.PI * 2);
-    this.ctx.fillStyle="blue";
+    this.ctx.fillStyle=gradient;
     this.ctx.fill();
   }
 }
