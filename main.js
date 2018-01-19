@@ -10,7 +10,7 @@ window.currentZoom = window.minZoom;
 window.realBoardHeight = 10000;
 window.realBoardWidth = 10000;
 window.boardFocus = {x: 5000, y: 5000};
-window.timeCoefficient = 0.1;
+window.timeCoefficient = 1;
 window.baseMass = 50000;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.timeCoefficient = Math.min(window.timeCoefficient * 1.1, 10);
         return;
       case 37:
-        window.timeCoefficient = Math.max(window.timeCoefficient * 0.9, 0.5);
+        window.timeCoefficient = Math.max(window.timeCoefficient * 0.9, 0.1);
         return;
       default:
         return;
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.height = window.innerHeight;
 
   let amoebas = [];
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 400; i++) {
     amoebas.push(new Amoeba(ctx));
   }
   // amoebas.push(new Amoeba(ctx, 4500, 5000, 100000, {x: 100000, y: 0}));
@@ -84,5 +84,16 @@ const makeMargins = (ctx) => {
   ctx.fillRect(0,  window.innerHeight - marginHeight, window.innerWidth, window.innerHeight);
   ctx.fillRect(0, marginHeight, marginWidth, window.innerHeight - (marginHeight * 2));
   ctx.fillRect(window.innerWidth - marginWidth, marginHeight, window.innerWidth, window.innerHeight - (marginHeight * 2));
+  let timebarWidth = 500;
+  let timebarHeight = 50;
+  let timebarX = (window.innerWidth / 2) - (timebarWidth / 2);
+  let timebarY = window.innerHeight - (marginHeight / 2) - (timebarHeight / 2);
+  let gradient = ctx.createLinearGradient(timebarX, timebarY, timebarX + timebarWidth, timebarY + timebarHeight);
+  gradient.addColorStop(0, "rgb(0,0,0)");
+  gradient.addColorStop((Math.log10(window.timeCoefficient) + 1) / 2, "rgb(255,255,255)");
+  gradient.addColorStop((Math.log10(window.timeCoefficient) + 1) / 2, "rgb(255,255,255)");
+  gradient.addColorStop(1, "rgb(0,0,0)");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(timebarX, timebarY, timebarWidth, timebarHeight);
   ctx.globalAlpha = 1;
 };
