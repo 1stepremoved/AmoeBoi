@@ -21,8 +21,8 @@ class Amoeba {
     this.momentum = Object.assign({}, this.nextMomentum);
     let xDelta = this.momentum['x'] / this.mass;
     let yDelta = this.momentum['y'] / this.mass;
-    // xDelta = (xDelta > window.momentumMax) ? Math.abs(xDelta) / xDelta * window.momentumMax : xDelta;
-    // yDelta = (yDelta > window.momentumMax) ? Math.abs(yDelta) / yDelta * window.momentumMax : yDelta;
+    // xDelta = (xDelta > this.momentumMax) ? Math.abs(xDelta) / xDelta * this.momentumMax : xDelta;
+    // yDelta = (yDelta > this.momentumMax) ? Math.abs(yDelta) / yDelta * this.momentumMax : yDelta;
     this.xpos += xDelta * window.timeCoefficient;
     this.ypos += yDelta * window.timeCoefficient;
     // this.xpos += boundNum(xDelta * window.timeCoefficient, -10, 10);
@@ -67,7 +67,7 @@ class Amoeba {
           return;
         }
 
-        let bubble = window.massDelta * this.mass
+        let bubble = this.massDelta * this.mass
             * boundNum( (this.radius - (currentDistance - amoeba.radius)) / this.radius, .1, 1)
             * window.timeCoefficient;
 
@@ -138,5 +138,9 @@ class Amoeba {
     this.ctx.fill();
   }
 }
+
+Amoeba.prototype.momentumDelta = 1;
+Amoeba.prototype.massDelta =  1 / 2;
+Amoeba.prototype.momentumMax = 10;
 
 export default Amoeba;

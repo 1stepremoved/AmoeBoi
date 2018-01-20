@@ -2,9 +2,7 @@ import Amoeba from './amoeba.js';
 import Amoeboi from './amoeboi.js';
 import {boundNum, baseLog} from './util';
 
-window.momentumDelta = 1;
-window.massDelta =  1 / 2;
-window.momentumMax = 10;
+
 window.maxZoom = 4;
 window.minZoom = 1;
 window.currentZoom = window.maxZoom;
@@ -45,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("mouseup", (e) => {
     window.mouseDownTime = null;
     clearInterval(window.mouseDownInterval);
-  })
+  });
 
   window.addEventListener("keydown", (e) => {
     switch (e.keyCode) {
@@ -76,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.amoebas = [];
   window.amoeboi = new Amoeboi(ctx, window.realBoardWidth / 2, window.realBoardHeight / 2, 100000, {x: 100000, y: 0});
   for (let i = 0; i < 400; i++) {
-    amoebas.push(new Amoeba(ctx));
+    window.amoebas.push(new Amoeba(ctx));
   }
   // amoebas.push(new Amoeba(ctx, 4500, 5000, 100000, {x: 100000, y: 0}));
   // amoebas.push(new Amoeba(ctx, 5500, 5000, 300000, {x: -100000, y: 0}));
@@ -84,13 +82,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let animate = () => {
     ctx.clearRect(0,0, innerWidth, innerHeight);
     makeGrid(ctx);
-    amoebas = amoebas.filter(amoeba => {
+    window.amoebas = window.amoebas.filter(amoeba => {
       return amoeba.radius > 0;
     });
-    amoebas.forEach(amoeba => {
+    window.amoebas.forEach(amoeba => {
       window.amoeboi.aabbCheck(amoeba);
       amoeba.aabbCheck(window.amoeboi);
-      amoebas.forEach(amoeba2 =>{
+      window.amoebas.forEach(amoeba2 =>{
         if (amoeba2 !== amoeba){
           amoeba.aabbCheck(amoeba2);
         }
@@ -99,35 +97,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     window.amoeboi.wallCollision();
     ctx.globalAlpha = 0.8;
-    amoebas.forEach(amoeba => {
+    window.amoebas.forEach(amoeba => {
       amoeba.move();
       amoeba.draw();
     });
     window.amoeboi.move();
     window.amoeboi.draw();
     ctx.globalAlpha = 1;
+
     makeMargins(ctx);
     if (window.amoeboi.mass > 0) {
       window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
       window.baseMass = window.amoeboi.mass;
       if (window.amoeboi.radius / window.realBoardWidth * 1000 * window.currentZoom > 75) {
-        // debugger
         window.currentZoom = boundNum(window.currentZoom * 0.999, window.minZoom, window.maxZoom);
-        // window.maxZoom = window.currentZoom;
         window.boardHeight = window.realBoardHeight / window.currentZoom;
         window.boardWidth = window.realBoardWidth / window.currentZoom;
       }
       if (window.amoeboi.radius / window.realBoardWidth * 1000 * window.maxZoom < 75) {
-        // debugger
-        // window.currentZoom *= 1.01;
-        // // window.maxZoom = window.currentZoom;
-        // window.boardHeight = window.realBoardHeight / window.currentZoom;
-        // window.boardWidth = window.realBoardWidth / window.currentZoom;
-      }
-      // window.maxZoom = 1 / 10 / (window.amoeboi.radius / window.realBoardWidth) ;
-      // window.currentZoom = (window.maxZoom < window.currentZoom) ? window.maxZoom : window.currentZoom;
 
-      // debugger
+      }
     } else {
       window.boardFocus['x'] += (window.boardFocus['x'] < window.realBoardWidth / 2) ? 10 : -10;
       window.boardFocus['y'] += (window.boardFocus['y'] < window.realBoardHeight / 2) ? 10 : -10;
