@@ -16,6 +16,8 @@ window.boardFocus = {x: 5000, y: 5000};
 window.timeBase = 10;
 window.timeCoefficient = .2;
 window.baseMass = 50000;
+window.mouseDownTime = null;
+window.mouseDownInterval = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   window.onresize = ()=>{
@@ -23,9 +25,27 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas.height = window.innerHeight;
   };
 
-  window.addEventListener("click", (e) => {
+  window.addEventListener("mousedown", (e) => {
+    window.mouseDownTime = Date.now();
+    window.amoeboi.mousePosX = e.pageX;
+    window.amoeboi.mousePosY = e.pageY;
     window.amoeboi.propel(e,window.amoebas);
+    window.mouseDownInterval = setInterval(() => {
+      window.amoeboi.propel(e,window.amoebas);
+    }, 200);
   });
+
+  window.addEventListener("mousemove", (e) => {
+    if (window.mouseDownTime) {
+      window.amoeboi.mousePosX = e.pageX;
+      window.amoeboi.mousePosY = e.pageY;
+    }
+  });
+
+  window.addEventListener("mouseup", (e) => {
+    window.mouseDownTime = null;
+    clearInterval(window.mouseDownInterval);
+  })
 
   window.addEventListener("keydown", (e) => {
     switch (e.keyCode) {

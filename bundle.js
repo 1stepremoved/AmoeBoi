@@ -90,6 +90,8 @@ window.boardFocus = {x: 5000, y: 5000};
 window.timeBase = 10;
 window.timeCoefficient = .2;
 window.baseMass = 50000;
+window.mouseDownTime = null;
+window.mouseDownInterval = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   window.onresize = ()=>{
@@ -97,9 +99,27 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas.height = window.innerHeight;
   };
 
-  window.addEventListener("click", (e) => {
+  window.addEventListener("mousedown", (e) => {
+    window.mouseDownTime = Date.now();
+    window.amoeboi.mousePosX = e.pageX;
+    window.amoeboi.mousePosY = e.pageY;
     window.amoeboi.propel(e,window.amoebas);
+    window.mouseDownInterval = setInterval(() => {
+      window.amoeboi.propel(e,window.amoebas);
+    }, 200);
   });
+
+  window.addEventListener("mousemove", (e) => {
+    if (window.mouseDownTime) {
+      window.amoeboi.mousePosX = e.pageX;
+      window.amoeboi.mousePosY = e.pageY;
+    }
+  });
+
+  window.addEventListener("mouseup", (e) => {
+    window.mouseDownTime = null;
+    clearInterval(window.mouseDownInterval);
+  })
 
   window.addEventListener("keydown", (e) => {
     switch (e.keyCode) {
@@ -417,11 +437,15 @@ const baseLog = (x, y) => {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__amoeba__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(2);
+
 
 
 class Amoeboi extends __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */] {
   constructor(ctx, x, y, mass, momentum) {
     super(ctx, x, y, mass, momentum);
+    this.mousePosX = null;
+    this.mousePosY = null;
   }
 
   colorize(relativeX, relativeY, relativeRadius) {
@@ -438,22 +462,21 @@ class Amoeboi extends __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */] {
     if (this.mass <= 0) {
       return;
     }
-    let diffX = e.pageX - (window.innerWidth / 2);
-    let diffY = e.pageY - (window.innerHeight / 2);
+    let diffX = this.mousePosX - (window.innerWidth / 2);
+    let diffY = this.mousePosY - (window.innerHeight / 2);
     let angle = Math.atan2(diffY, diffX);
     let dirX = Math.cos(angle);
     let dirY = Math.sin(angle);
 
-
-    let mass = this.mass * .02;
+    let mass = this.mass * Object(__WEBPACK_IMPORTED_MODULE_1__util__["b" /* boundNum */])(((Date.now() - window.mouseDownTime) / 30000), .01, .1);
     this.mass -= mass;
     let radius = Math.sqrt(mass / (Math.PI));
     let xpos = this.xpos + (dirX * this.radius) + ((dirX > 0 ) ? radius : -1 * radius);
     let ypos = this.ypos + (dirY * this.radius) + ((dirY > 0 ) ? radius : -1 * radius);
     let momentum = {x: mass * 50 * dirX, y: mass * 50 * dirY};
     amoebas.push(new __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */](this.ctx, xpos, ypos, mass, momentum));
-    this.nextMomentum['x'] += momentum['x'] * -1 * 10;
-    this.nextMomentum['y'] += momentum['y'] * -1 * 10;
+    this.nextMomentum['x'] += momentum['x'] * -1 * 3;
+    this.nextMomentum['y'] += momentum['y'] * -1 * 3;
     // debugger
     let distance = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2) );
     // debugger
