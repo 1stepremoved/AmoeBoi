@@ -87,6 +87,7 @@ window.boardWidth = window.realBoardWidth / window.currentZoom;
 window.boardFocus = {x: 5000, y: 5000};
 window.timeBase = 10;
 window.timeCoefficient = .2;
+window.clockAngle = 0;
 window.baseMass = 50000;
 window.mouseDownTime = null;
 window.mouseDownInterval = null;
@@ -180,6 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.globalAlpha = 1;
 
     makeMargins(ctx);
+    makeClock(ctx);
     if (window.amoeboi.mass > 0) {
       window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
       window.baseMass = window.amoeboi.mass;
@@ -204,24 +206,50 @@ document.addEventListener("DOMContentLoaded", () => {
   requestAnimationFrame(animate);
 });
 
+const makeClock = (ctx) => {
+  ctx.globalAlpha = 0.5;
+  ctx.beginPath();
+  ctx.arc(120, 120, 60, 0, Math.PI * 2);
+  ctx.fillStyle = 'black';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.globalAlpha = 0.8;
+  ctx.fillStyle = 'white';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(120,120);
+  ctx.lineTo(120 + (60*Math.cos(window.clockAngle * Math.PI / 180)), 120 + (60*Math.sin(window.clockAngle * Math.PI / 180)));
+  ctx.fillStyle = 'black';
+  ctx.stroke();
+  window.clockAngle = (window.clockAngle + (window.timeCoefficient)) % 360;
+  ctx.globalAlpha = 1;
+};
+
 const makeGrid = (ctx) => {
   // let currentLineX = window.boardFocus['x'] - (window.boardWidth / 2);
   ctx.globalAlpha = 0.4;
 
   let interval = 500;
   let realX = 0;
+  let topBorderY =  (((0 - window.boardFocus['y']) / (window.boardHeight / 2)) * 500) + (window.innerHeight / 2);
+  let bottomBorderY =  (((window.realBoardHeight - window.boardFocus['y']) / (window.boardHeight / 2)) * 500) + (window.innerHeight / 2);
   while (realX <= window.realBoardWidth) {
     ctx.fillStyle = (realX ===window.realBoardWidth || realX === 0) ? "red" :"black";
     let lineX = (((realX - window.boardFocus['x']) / (window.boardWidth / 2)) * 500) + (window.innerWidth / 2);
-    ctx.fillRect(lineX,0, 2, window.innerHeight);
+    ctx.fillRect(lineX,topBorderY, 2, bottomBorderY - topBorderY);
+    // ctx.fillRect(lineX,0, 2, window.innerHeight);
     realX += interval;
   }
 
   let realY = 0;
+  let leftBorderX = (((0 - window.boardFocus['x']) / (window.boardWidth / 2)) * 500) + (window.innerWidth / 2);
+  let rightBorderX = (((window.realBoardWidth - window.boardFocus['x']) / (window.boardWidth / 2)) * 500) + (window.innerWidth / 2);
   while (realY <= window.realBoardHeight) {
     ctx.fillStyle = (realY ===window.realBoardHeight || realY === 0) ? "red" :"black";
     let lineY = (((realY - window.boardFocus['y']) / (window.boardHeight / 2)) * 500) + (window.innerHeight / 2);
-    ctx.fillRect(0,lineY, window.innerWidth, 2);
+    ctx.fillRect(leftBorderX,lineY, rightBorderX - leftBorderX, 2);
+    // ctx.fillRect(0,lineY, window.innerWidth, 2);
     realY += interval;
   }
 
