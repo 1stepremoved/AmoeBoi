@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
       window.baseMass = window.amoeboi.mass;
       if (window.amoeboi.radius / window.realBoardWidth * 1000 * window.currentZoom > 75) {
         // debugger
-        window.currentZoom *= 0.999;
+        window.currentZoom = Object(__WEBPACK_IMPORTED_MODULE_2__util__["b" /* boundNum */])(window.currentZoom * 0.999, window.minZoom, window.maxZoom);
         // window.maxZoom = window.currentZoom;
         window.boardHeight = window.realBoardHeight / window.currentZoom;
         window.boardWidth = window.realBoardWidth / window.currentZoom;
