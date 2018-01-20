@@ -184,11 +184,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.amoeboi.mass > 0) {
       window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
       window.baseMass = window.amoeboi.mass;
-      debugger
       if (window.amoeboi.radius / window.realBoardWidth * 1000 * window.currentZoom > 75) {
         // debugger
-        this.currentZoom *= .9;
-        window.maxZoom = this.currentZoom;
+        window.currentZoom *= 0.999;
+        // window.maxZoom = window.currentZoom;
+        window.boardHeight = window.realBoardHeight / window.currentZoom;
+        window.boardWidth = window.realBoardWidth / window.currentZoom;
+      }
+      if (window.amoeboi.radius / window.realBoardWidth * 1000 * window.maxZoom < 75) {
+        // debugger
+        // window.currentZoom *= 1.01;
+        // // window.maxZoom = window.currentZoom;
+        // window.boardHeight = window.realBoardHeight / window.currentZoom;
+        // window.boardWidth = window.realBoardWidth / window.currentZoom;
       }
       // window.maxZoom = 1 / 10 / (window.amoeboi.radius / window.realBoardWidth) ;
       // window.currentZoom = (window.maxZoom < window.currentZoom) ? window.maxZoom : window.currentZoom;
@@ -236,10 +244,10 @@ const makeMargins = (ctx) => {
   ctx.fillStyle = "black";
   let marginHeight = Math.floor(window.innerHeight / 8);
   let marginWidth = Math.floor(window.innerWidth / 8);
-  ctx.fillRect(0,0, window.innerWidth, marginHeight);
-  ctx.fillRect(0,  window.innerHeight - marginHeight, window.innerWidth, window.innerHeight);
-  ctx.fillRect(0, marginHeight, marginWidth, window.innerHeight - (marginHeight * 2));
-  ctx.fillRect(window.innerWidth - marginWidth, marginHeight, window.innerWidth, window.innerHeight - (marginHeight * 2));
+  // ctx.fillRect(0,0, window.innerWidth, marginHeight);
+  // ctx.fillRect(0,  window.innerHeight - marginHeight, window.innerWidth, window.innerHeight);
+  // ctx.fillRect(0, marginHeight, marginWidth, window.innerHeight - (marginHeight * 2));
+  // ctx.fillRect(window.innerWidth - marginWidth, marginHeight, window.innerWidth, window.innerHeight - (marginHeight * 2));
 
 
   let timebarWidth = 500;
