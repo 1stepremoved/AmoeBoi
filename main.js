@@ -53,9 +53,11 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("keydown", (e) => {
     switch (e.keyCode) {
       case 39:
+        if (window.paused) {return;}
         window.timeCoefficient = Math.min(window.timeCoefficient * 1.1, window.timeBase);
         return;
       case 37:
+        if (window.paused) {return;}
         window.timeCoefficient = Math.max(window.timeCoefficient * 0.9, Math.pow(window.timeBase, - 1));
         return;
       case 32:
@@ -68,6 +70,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.addEventListener("mousewheel", (e)=> {
+    if (window.paused) {
+      return;
+    }
     e.preventDefault();
     let zoomDelta = (e.deltaY / -1000);
     window.currentZoom = boundNum(window.currentZoom + zoomDelta, window.minZoom, window.maxZoom);
@@ -154,6 +159,10 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   requestAnimationFrame(animate);
 });
+
+const makePause = (ctx) => {
+
+};
 
 const makeClock = (ctx) => {
   ctx.globalAlpha = 0.5;
