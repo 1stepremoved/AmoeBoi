@@ -170,10 +170,11 @@ document.addEventListener("DOMContentLoaded", () => {
       window.amoebas.forEach(amoeba => {
         amoeba.draw();
       });
-      window.amoeboi.draw();
       ctx.globalAlpha = 0.7;
       ctx.fillStyle = "black";
       ctx.fillRect(0,0, innerWidth, innerHeight);
+      window.amoeboi.draw();
+      makeMargins(ctx);
       return requestAnimationFrame(animate);
     }
 
@@ -207,12 +208,13 @@ document.addEventListener("DOMContentLoaded", () => {
       window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
       window.baseMass = window.amoeboi.mass;
       if (window.amoeboi.radius / window.realBoardWidth * 1000 * window.currentZoom > 75) {
+        window.maxZoom = 75 / (window.amoeboi.radius / window.realBoardWidth * 1000);
         window.currentZoom = Object(__WEBPACK_IMPORTED_MODULE_2__util__["b" /* boundNum */])(window.currentZoom * 0.999, window.minZoom, window.maxZoom);
         window.boardHeight = window.realBoardHeight / window.currentZoom;
         window.boardWidth = window.realBoardWidth / window.currentZoom;
       }
       if (window.amoeboi.radius / window.realBoardWidth * 1000 * window.maxZoom < 75) {
-
+        window.maxZoom = 75 / (window.amoeboi.radius / window.realBoardWidth * 1000);
       }
     } else {
       window.boardFocus['x'] += (window.boardFocus['x'] < window.realBoardWidth / 2) ? 10 : -10;
