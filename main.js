@@ -17,6 +17,7 @@ window.clockAngle = 0;
 window.baseMass = 50000;
 window.mouseDownTime = null;
 window.mouseDownInterval = null;
+window.paused = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   window.onresize = ()=>{
@@ -25,6 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   window.addEventListener("mousedown", (e) => {
+    if (window.paused) {
+      return;
+    }
     window.mouseDownTime = Date.now();
     window.amoeboi.mousePosX = e.pageX;
     window.amoeboi.mousePosY = e.pageY;
@@ -53,6 +57,10 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       case 37:
         window.timeCoefficient = Math.max(window.timeCoefficient * 0.9, Math.pow(window.timeBase, - 1));
+        return;
+      case 32:
+        window.paused = !window.paused;
+        window.mouseDownTime = null;
         return;
       default:
         return;
@@ -83,6 +91,18 @@ document.addEventListener("DOMContentLoaded", () => {
   let animate = () => {
     ctx.clearRect(0,0, innerWidth, innerHeight);
     makeGrid(ctx);
+
+    if (window.paused) {
+      window.amoebas.forEach(amoeba => {
+        amoeba.draw();
+      });
+      window.amoeboi.draw();
+      ctx.globalAlpha = 0.7;
+      ctx.fillStyle = "black";
+      ctx.fillRect(0,0, innerWidth, innerHeight);
+      return requestAnimationFrame(animate);
+    }
+
     window.amoebas = window.amoebas.filter(amoeba => {
       return amoeba.radius > 0;
     });
@@ -107,7 +127,8 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.globalAlpha = 1;
 
     makeMargins(ctx);
-    makeClock(ctx);
+    makeMassDisplay(ctx);
+    // makeClock(ctx);
     if (window.amoeboi.mass > 0) {
       window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
       window.baseMass = window.amoeboi.mass;
@@ -134,9 +155,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const makeClock = (ctx) => {
   ctx.globalAlpha = 0.5;
+
+  ctx.beginPath();
+  ctx.arc(120, 120, 65, 0, ((baseLog(window.timeBase, window.timeCoefficient) + 1) / 2 * Math.PI * 2));
+  ctx.strokeStyle = 'orange';
+  ctx.lineWidth = 5;
+  ctx.stroke();
+
   ctx.beginPath();
   ctx.arc(120, 120, 60, 0, Math.PI * 2);
-  ctx.fillStyle = 'black';
+  ctx.strokeStyle = 'black';
   ctx.lineWidth = 3;
   ctx.stroke();
   ctx.globalAlpha = 0.8;
@@ -164,7 +192,6 @@ const makeGrid = (ctx) => {
     ctx.fillStyle = (realX ===window.realBoardWidth || realX === 0) ? "red" :"black";
     let lineX = (((realX - window.boardFocus['x']) / (window.boardWidth / 2)) * 500) + (window.innerWidth / 2);
     ctx.fillRect(lineX,topBorderY, 2, bottomBorderY - topBorderY);
-    // ctx.fillRect(lineX,0, 2, window.innerHeight);
     realX += interval;
   }
 
@@ -175,11 +202,20 @@ const makeGrid = (ctx) => {
     ctx.fillStyle = (realY ===window.realBoardHeight || realY === 0) ? "red" :"black";
     let lineY = (((realY - window.boardFocus['y']) / (window.boardHeight / 2)) * 500) + (window.innerHeight / 2);
     ctx.fillRect(leftBorderX,lineY, rightBorderX - leftBorderX, 2);
-    // ctx.fillRect(0,lineY, window.innerWidth, 2);
     realY += interval;
   }
 
   ctx.globalAlpha = 1;
+};
+
+const makeMassDisplay = (ctx) => {
+  ctx.globalAlpha = 0.7;
+  ctx.fillStyle = 'black';
+  ctx.fillRect(window.innerWidth - 300, 65, 130 + (20 * boundNum(Math.floor(Math.log10(window.amoeboi.mass / 100),1, 10000))), 50);
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = 'white';
+  ctx.font = '30px Georgia';
+  ctx.fillText(`Mass: ${Math.floor(window.amoeboi.mass / 100) }`, window.innerWidth - 280, 100);
 };
 
 const makeMargins = (ctx) => {
@@ -197,12 +233,20 @@ const makeMargins = (ctx) => {
   let timebarHeight = 50;
   let timebarX = (window.innerWidth / 2) - (timebarWidth / 2);
   let timebarY = window.innerHeight - (marginHeight / 2) - (timebarHeight / 2);
-  let gradient = ctx.createLinearGradient(timebarX, timebarY, timebarX + timebarWidth, timebarY + timebarHeight);
-  gradient.addColorStop(0, "rgb(0,0,0)");
-  gradient.addColorStop((baseLog(window.timeBase, window.timeCoefficient) + 1) / 2, "rgb(255,255,255)");
-  gradient.addColorStop((baseLog(window.timeBase, window.timeCoefficient) + 1) / 2, "rgb(255,255,255)");
-  gradient.addColorStop(1, "rgb(0,0,0)");
-  ctx.fillStyle = gradient;
-  ctx.fillRect(timebarX, timebarY, timebarWidth, timebarHeight);
+  let time0to1 = (baseLog(window.timeBase, window.timeCoefficient) + 1) / 2;
+
+  // let gradient = ctx.createLinearGradient(timebarX, timebarY, timebarX + timebarWidth, timebarY + timebarHeight);
+  // gradient.addColorStop(0, "rgb(0,0,0)");
+  // gradient.addColorStop(time0to1, "rgb(255,255,255)");
+  // gradient.addColorStop(time0to1, "rgb(255,255,255)");
+  // gradient.addColorStop(1, "rgb(0,0,0)");
+  // let color = (baseLog(window.timeBase, window.timeCoefficient) + 1) / 2 * 255;
+  // debugger
+  // ctx.fillStyle = gradient;
+  // ctx.fillStyle = `rgb(${255 - color},0,${color})`;
+  ctx.fillStyle = `black`;
+  ctx.fillRect(timebarX - 10, timebarY, timebarWidth + 20, timebarHeight);
+  ctx.fillStyle = `white`;
+  ctx.fillRect(timebarX + (timebarWidth * time0to1) - 10, timebarY, 20, timebarHeight);
   ctx.globalAlpha = 1;
 };
