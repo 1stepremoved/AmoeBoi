@@ -280,6 +280,7 @@ window.iconImages.folderIcon.src = './assets/images/folderIcon.png';
 window.homepageClock = null;
 
 window.maxZoom = 4;
+window.absoluteMaxZoom = 4;
 window.minZoom = 0.7;
 window.currentZoom = window.maxZoom;
 window.realBoardHeight = 20000;
@@ -455,6 +456,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.currentStatus === "reset") {
       window.maxZoom = 4;
       window.currentZoom = 2;
+      window.timeCoefficient = 0.2;
       window.boardHeight = window.realBoardHeight / window.currentZoom;
       window.boardWidth = window.realBoardWidth / window.currentZoom;
       window.baseMass = 50000;
@@ -537,13 +539,13 @@ document.addEventListener("DOMContentLoaded", () => {
       window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
       window.baseMass = window.amoeboi.mass;
       if (window.amoeboi.radius / window.realBoardWidth * 1000 * window.currentZoom > 75) {
-        window.maxZoom = Object(__WEBPACK_IMPORTED_MODULE_2__util__["b" /* boundNum */])(75 / (window.amoeboi.radius / window.realBoardWidth * 1000), 1, 4);
+        window.maxZoom = Object(__WEBPACK_IMPORTED_MODULE_2__util__["b" /* boundNum */])(75 / (window.amoeboi.radius / window.realBoardWidth * 1000), 1, window.absoluteMaxZoom);
         window.currentZoom = Object(__WEBPACK_IMPORTED_MODULE_2__util__["b" /* boundNum */])(window.currentZoom * 0.999, window.minZoom, window.maxZoom);
         window.boardHeight = window.realBoardHeight / window.currentZoom;
         window.boardWidth = window.realBoardWidth / window.currentZoom;
       }
       if (window.amoeboi.radius / window.realBoardWidth * 1000 * window.maxZoom < 75) {
-        window.maxZoom = Object(__WEBPACK_IMPORTED_MODULE_2__util__["b" /* boundNum */])(75 / (window.amoeboi.radius / window.realBoardWidth * 1000), 1, 4);
+        window.maxZoom = Object(__WEBPACK_IMPORTED_MODULE_2__util__["b" /* boundNum */])(75 / (window.amoeboi.radius / window.realBoardWidth * 1000), 1, window.absoluteMaxZoom);
       }
     } else {
       window.boardFocus['x'] += (window.boardFocus['x'] < window.realBoardWidth / 2) ? 10 : -10;
