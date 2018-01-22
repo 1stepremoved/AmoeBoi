@@ -484,7 +484,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (window.currentStatus === "homepage") {
-      Object(__WEBPACK_IMPORTED_MODULE_3__game__["e" /* moveAmoebas */])(ctx);
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["f" /* moveAmoebas */])(ctx);
       Object(__WEBPACK_IMPORTED_MODULE_3__game__["b" /* makeHomepage */])(ctx);
       return requestAnimationFrame(animate);
     }
@@ -495,13 +495,13 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         window.currentStatus = "instructions";
       }
-      Object(__WEBPACK_IMPORTED_MODULE_3__game__["e" /* moveAmoebas */])(ctx);
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["f" /* moveAmoebas */])(ctx);
       Object(__WEBPACK_IMPORTED_MODULE_3__game__["b" /* makeHomepage */])(ctx);
       return requestAnimationFrame(animate);
     }
 
     if (window.currentStatus === "instructions") {
-      Object(__WEBPACK_IMPORTED_MODULE_3__game__["e" /* moveAmoebas */])(ctx);
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["f" /* moveAmoebas */])(ctx);
       Object(__WEBPACK_IMPORTED_MODULE_3__game__["b" /* makeHomepage */])(ctx);
       return requestAnimationFrame(animate);
     }
@@ -512,7 +512,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         window.currentStatus = "homepage";
       }
-      Object(__WEBPACK_IMPORTED_MODULE_3__game__["e" /* moveAmoebas */])(ctx);
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["f" /* moveAmoebas */])(ctx);
       Object(__WEBPACK_IMPORTED_MODULE_3__game__["b" /* makeHomepage */])(ctx);
       return requestAnimationFrame(animate);
     }
@@ -521,15 +521,14 @@ document.addEventListener("DOMContentLoaded", () => {
       window.amoebas.forEach(amoeba => {
         amoeba.draw();
       });
-      ctx.globalAlpha = 0.7;
-      ctx.fillStyle = "black";
-      ctx.fillRect(0,0, innerWidth, innerHeight);
       window.amoeboi.draw();
-      Object(__WEBPACK_IMPORTED_MODULE_3__game__["c" /* makeMargins */])(ctx);
+
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["e" /* makePause */])(ctx);
+      // makeMargins(ctx);
       return requestAnimationFrame(animate);
     }
 
-    Object(__WEBPACK_IMPORTED_MODULE_3__game__["e" /* moveAmoebas */])(ctx);
+    Object(__WEBPACK_IMPORTED_MODULE_3__game__["f" /* moveAmoebas */])(ctx);
 
     Object(__WEBPACK_IMPORTED_MODULE_3__game__["c" /* makeMargins */])(ctx);
     Object(__WEBPACK_IMPORTED_MODULE_3__game__["d" /* makeMassDisplay */])(ctx);
@@ -625,9 +624,22 @@ class Amoeboi extends __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */] {
 
 
 const makePause = (ctx) => {
+  ctx.globalAlpha = 0.7;
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  let mouseOffsetX = window.mousePos['x'] / window.innerWidth * 50;
+  let mouseOffsetY = window.mousePos['y'] / window.innerHeight * 50;
 
+  let homepageWave = Math.sin(((Date.now() - window.homepageTime) % 1500) / 1500 * Math.PI);
+
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = 'white';
+  ctx.font = '70px Impact';
+  let titlePosX = (window.innerWidth / 2) - 75 - mouseOffsetX;
+  let titlePosY = (window.innerHeight / 2) + 50 - mouseOffsetY + window.homepageYOffset;
+  ctx.fillText(`PAUSED`, titlePosX, titlePosY);
 };
-/* unused harmony export makePause */
+/* harmony export (immutable) */ __webpack_exports__["e"] = makePause;
 
 
 const makeClock = (ctx) => {
@@ -692,7 +704,13 @@ const makeGrid = (ctx) => {
 const makeMassDisplay = (ctx) => {
   ctx.globalAlpha = 0.7;
   ctx.fillStyle = 'black';
-  ctx.fillRect(window.innerWidth - 300, 65, 130 + (15 * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(Math.floor(Math.log10(window.amoeboi.mass / 100),1, 10000))), 50);
+  let displayWidth;
+  if (window.amoeboi.mass > 0) {
+    displayWidth = 130 + (15 * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(Math.floor(Math.log10(window.amoeboi.mass / 100),1, 10000)));
+  } else {
+    displayWidth = 145;
+  }
+  ctx.fillRect(window.innerWidth - 300, 65, displayWidth, 50);
   ctx.globalAlpha = 1;
   ctx.fillStyle = 'white';
   ctx.font = '30px Impact';
@@ -760,7 +778,7 @@ const moveAmoebas = (ctx) => {
   window.amoeboi ? window.amoeboi.draw() : null;
   ctx.globalAlpha = 1;
 };
-/* harmony export (immutable) */ __webpack_exports__["e"] = moveAmoebas;
+/* harmony export (immutable) */ __webpack_exports__["f"] = moveAmoebas;
 
 
 const makeHomepage = (ctx) => {
