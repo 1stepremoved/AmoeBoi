@@ -269,6 +269,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+window.iconImages = {};
+window.iconImages.githubLogo = new Image();
+window.iconImages.githubLogo.src = './assets/images/githubLogo.png';
+window.iconImages.linkedInLogo = new Image();
+window.iconImages.linkedInLogo.src = './assets/images/linkedInLogo.png';
+window.iconImages.folderIcon = new Image();
+window.iconImages.folderIcon.src = './assets/images/folderIcon.png';
+
+window.homepageClock = null;
+
 window.maxZoom = 4;
 window.minZoom = 0.7;
 window.currentZoom = window.maxZoom;
@@ -284,16 +294,35 @@ window.baseMass = 50000;
 window.mouseDownTime = null;
 window.mouseDownInterval = null;
 window.paused = false;
-window.status = "playing";
-window.mousePos= {x: 0, y: 0}
+window.currentStatus = "playing";
+window.mousePos= {x: 0, y: 0};
 document.addEventListener("DOMContentLoaded", () => {
   window.onresize = ()=>{
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   };
 
+  window.addEventListener("click", (e) => {
+    if (window.currentStatus === "homepage") {
+      let mouseOffsetX = window.mousePos['x'] / window.innerWidth * 50;
+      let mouseOffsetY = window.mousePos['y'] / window.innerHeight * 50;
+      let titlePosX = (window.innerWidth / 2) - 180 - mouseOffsetX;
+      let titlePosY = (window.innerHeight / 2) - 40 - mouseOffsetY;
+      if (e.pageX > titlePosX - 50 && e.pageX < titlePosX + 30
+       && e.pageY > titlePosY + 150 && e.pageY < titlePosY + 230) {
+         window.location = "https://github.com/1stepremoved";
+      } else if (e.pageX > titlePosX + 170 && e.pageX < titlePosX + 242
+        && e.pageY > titlePosY + 150 && e.pageY < titlePosY + 222) {
+        window.location = "https://linkedin.com/in/hamilton-sands";
+      } else if (e.pageX > titlePosX + 380 && e.pageX < titlePosX + 468
+        && e.pageY > titlePosY + 150 && e.pageY < titlePosY + 238) {
+        window.location = "https://1stepremoved.github.io/portfolio/";
+      }
+    }
+  });
+
   window.addEventListener("mousedown", (e) => {
-    if (window.paused || window.status !== "playing") {
+    if (window.paused || window.currentStatus !== "playing") {
       return;
     }
     window.mouseDownTime = Date.now();
@@ -306,6 +335,25 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   window.addEventListener("mousemove", (e) => {
+    if (window.currentStatus === "homepage") {
+      let mouseOffsetX = window.mousePos['x'] / window.innerWidth * 50;
+      let mouseOffsetY = window.mousePos['y'] / window.innerHeight * 50;
+      let titlePosX = (window.innerWidth / 2) - 180 - mouseOffsetX;
+      let titlePosY = (window.innerHeight / 2) - 40 - mouseOffsetY;
+      if (e.pageX > titlePosX - 50 && e.pageX < titlePosX + 30
+       && e.pageY > titlePosY + 150 && e.pageY < titlePosY + 230) {
+        document.body.style.cursor = "pointer";
+      } else if (e.pageX > titlePosX + 170 && e.pageX < titlePosX + 242
+        && e.pageY > titlePosY + 150 && e.pageY < titlePosY + 222) {
+        document.body.style.cursor = "pointer";
+      } else if (e.pageX > titlePosX + 380 && e.pageX < titlePosX + 468
+        && e.pageY > titlePosY + 150 && e.pageY < titlePosY + 238) {
+        document.body.style.cursor = "pointer";
+      } else {
+        document.body.style.cursor = "default";
+      }
+    }
+
     window.mousePos = {x: e.pageX, y: e.pageY};
     if (window.mouseDownTime) {
       window.amoeboi.mousePosX = e.pageX;
@@ -321,20 +369,20 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("keydown", (e) => {
     switch (e.keyCode) {
       case 39:
-        if (window.paused || window.status !== "playing") { return; }
+        if (window.paused || window.currentStatus !== "playing") { return; }
         window.timeCoefficient = Math.min(window.timeCoefficient * 1.1, window.timeBase);
         return;
       case 37:
-        if (window.paused || window.status !== "playing") { return; }
+        if (window.paused || window.currentStatus !== "playing") { return; }
         window.timeCoefficient = Math.max(window.timeCoefficient * 0.9, Math.pow(window.timeBase, - 1));
         return;
       case 32:
-        if (window.status !== "playing") { return; }
+        if (window.currentStatus !== "playing") { return; }
         window.paused = !window.paused;
         window.mouseDownTime = null;
         return;
       case 72:
-        window.status = "reset";
+        window.currentStatus = "reset";
         window.paused = false;
         return;
       default:
@@ -344,7 +392,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("mousewheel", (e)=> {
     e.preventDefault();
-    if (window.paused  || window.status !== "playing") { return; }
+    if (window.paused  || window.currentStatus !== "playing") { return; }
     let zoomDelta = (e.deltaY / -1000);
     window.currentZoom = Object(__WEBPACK_IMPORTED_MODULE_2__util__["b" /* boundNum */])(window.currentZoom + zoomDelta, window.minZoom, window.maxZoom);
     window.boardHeight = window.realBoardHeight / window.currentZoom;
@@ -368,7 +416,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.clearRect(0,0, innerWidth, innerHeight);
     Object(__WEBPACK_IMPORTED_MODULE_3__game__["a" /* makeGrid */])(ctx);
 
-    if (window.status === "reset") {
+    if (window.currentStatus === "reset") {
       window.maxZoom = 4;
       window.currentZoom = 2;
       window.boardHeight = window.realBoardHeight / window.currentZoom;
@@ -380,13 +428,13 @@ document.addEventListener("DOMContentLoaded", () => {
         window.amoebas.push(new __WEBPACK_IMPORTED_MODULE_0__amoeba_js__["a" /* default */](ctx));
       }
       window.boardFocus = {x: window.realBoardWidth / 2, y: window.realBoardHeight / 2};
-      window.status = "homescreen";
+      window.currentStatus = "homepage";
       return requestAnimationFrame(animate);
     }
 
-    if (window.status === "homescreen") {
+    if (window.currentStatus === "homepage") {
       Object(__WEBPACK_IMPORTED_MODULE_3__game__["e" /* moveAmoebas */])(ctx);
-      Object(__WEBPACK_IMPORTED_MODULE_3__game__["b" /* makeHomescreen */])(ctx);
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["b" /* makeHomepage */])(ctx);
       return requestAnimationFrame(animate);
     }
 
@@ -636,7 +684,7 @@ const moveAmoebas = (ctx) => {
 /* harmony export (immutable) */ __webpack_exports__["e"] = moveAmoebas;
 
 
-const makeHomescreen = (ctx) => {
+const makeHomepage = (ctx) => {
   ctx.globalAlpha = 0.7;
   ctx.fillStyle = 'black';
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
@@ -646,9 +694,23 @@ const makeHomescreen = (ctx) => {
   ctx.globalAlpha = 1;
   ctx.fillStyle = 'white';
   ctx.font = '120px Impact';
-  ctx.fillText(`AmoeBoi`, (window.innerWidth / 2) - 180 - mouseOffsetX, (window.innerHeight / 2) - 40 - mouseOffsetY);
+  let titlePosX = (window.innerWidth / 2) - 180 - mouseOffsetX;
+  let titlePosY = (window.innerHeight / 2) - 40 - mouseOffsetY;
+  ctx.fillText(`AmoeBoi`, titlePosX, titlePosY);
+
+  // Object.keys(window.iconImages).forEach(key => {
+  //   let image = window.iconImages[key];
+  //   image.width = "100";
+  //   image.height = "100";
+  // });
+
+  // window.iconImages.githubLogo.style = 'border-radius: 50%';
+
+  ctx.drawImage(window.iconImages.githubLogo, titlePosX - 50, titlePosY + 150, 80, 80);
+  ctx.drawImage(window.iconImages.linkedInLogo, titlePosX + 170, titlePosY + 150, 72, 72);
+  ctx.drawImage(window.iconImages.folderIcon, titlePosX + 380, titlePosY + 150, 88, 88);
 };
-/* harmony export (immutable) */ __webpack_exports__["b"] = makeHomescreen;
+/* harmony export (immutable) */ __webpack_exports__["b"] = makeHomepage;
 
 
 
