@@ -294,8 +294,11 @@ window.baseMass = 50000;
 window.mouseDownTime = null;
 window.mouseDownInterval = null;
 window.paused = false;
-window.currentStatus = "playing";
+window.currentStatus = "reset";
+window.homepageYOffset = 0;
+window.homepageTime = null;
 window.mousePos= {x: 0, y: 0};
+
 document.addEventListener("DOMContentLoaded", () => {
   window.onresize = ()=>{
     canvas.width = window.innerWidth;
@@ -306,17 +309,31 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.currentStatus === "homepage") {
       let mouseOffsetX = window.mousePos['x'] / window.innerWidth * 50;
       let mouseOffsetY = window.mousePos['y'] / window.innerHeight * 50;
-      let titlePosX = (window.innerWidth / 2) - 180 - mouseOffsetX;
-      let titlePosY = (window.innerHeight / 2) - 40 - mouseOffsetY;
-      if (e.pageX > titlePosX - 50 && e.pageX < titlePosX + 30
-       && e.pageY > titlePosY + 150 && e.pageY < titlePosY + 230) {
+      let titlePosX = (window.innerWidth / 2) - 195 - mouseOffsetX;
+      let titlePosY = (window.innerHeight / 2) - 80 - mouseOffsetY + window.homepageYOffset;
+      if (e.pageX > titlePosX - 40 && e.pageX < titlePosX + 40
+       && e.pageY > titlePosY + 170 && e.pageY < titlePosY + 250) {
          window.location = "https://github.com/1stepremoved";
-      } else if (e.pageX > titlePosX + 170 && e.pageX < titlePosX + 242
-        && e.pageY > titlePosY + 150 && e.pageY < titlePosY + 222) {
+      } else if (e.pageX > titlePosX + 180 && e.pageX < titlePosX + 252
+        && e.pageY > titlePosY + 170 && e.pageY < titlePosY + 242) {
         window.location = "https://linkedin.com/in/hamilton-sands";
       } else if (e.pageX > titlePosX + 380 && e.pageX < titlePosX + 468
-        && e.pageY > titlePosY + 150 && e.pageY < titlePosY + 238) {
+        && e.pageY > titlePosY + 170 && e.pageY < titlePosY + 258) {
         window.location = "https://1stepremoved.github.io/portfolio/";
+      } else if (e.pageX > titlePosX + 75 && e.pageX < titlePosX + 365
+        && e.pageY > titlePosY + 315 && e.pageY < titlePosY + 360) {
+          window.currentStatus = "movingToInstructions";
+          document.body.style.cursor = "default";
+      }
+    } else if (window.currentStatus === "instructions") {
+      let mouseOffsetX = window.mousePos['x'] / window.innerWidth * 50;
+      let mouseOffsetY = window.mousePos['y'] / window.innerHeight * 50;
+      let titlePosX = (window.innerWidth / 2) - 195 - mouseOffsetX;
+      let titlePosY = (window.innerHeight / 2) - 80 - mouseOffsetY + window.homepageYOffset;
+      if (e.pageX > titlePosX + 110 && e.pageX < titlePosX + 335
+       && e.pageY > titlePosY + 805 && e.pageY < titlePosY + 850) {
+         window.currentStatus = "movingToHomePage";
+         document.body.style.cursor = "default";
       }
     }
   });
@@ -338,17 +355,32 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.currentStatus === "homepage") {
       let mouseOffsetX = window.mousePos['x'] / window.innerWidth * 50;
       let mouseOffsetY = window.mousePos['y'] / window.innerHeight * 50;
-      let titlePosX = (window.innerWidth / 2) - 180 - mouseOffsetX;
-      let titlePosY = (window.innerHeight / 2) - 40 - mouseOffsetY;
-      if (e.pageX > titlePosX - 50 && e.pageX < titlePosX + 30
-       && e.pageY > titlePosY + 150 && e.pageY < titlePosY + 230) {
+      let titlePosX = (window.innerWidth / 2) - 195 - mouseOffsetX;
+      let titlePosY = (window.innerHeight / 2) - 80 - mouseOffsetY + window.homepageYOffset;
+      if (e.pageX > titlePosX - 40 && e.pageX < titlePosX + 40
+       && e.pageY > titlePosY + 170 && e.pageY < titlePosY + 250) {
         document.body.style.cursor = "pointer";
-      } else if (e.pageX > titlePosX + 170 && e.pageX < titlePosX + 242
-        && e.pageY > titlePosY + 150 && e.pageY < titlePosY + 222) {
+      } else if (e.pageX > titlePosX + 180 && e.pageX < titlePosX + 252
+        && e.pageY > titlePosY + 170 && e.pageY < titlePosY + 242) {
         document.body.style.cursor = "pointer";
       } else if (e.pageX > titlePosX + 380 && e.pageX < titlePosX + 468
-        && e.pageY > titlePosY + 150 && e.pageY < titlePosY + 238) {
+        && e.pageY > titlePosY + 170 && e.pageY < titlePosY + 258) {
         document.body.style.cursor = "pointer";
+      } else if (e.pageX > titlePosX + 75 && e.pageX < titlePosX + 365
+        && e.pageY > titlePosY + 315 && e.pageY < titlePosY + 360) {
+          document.body.style.cursor = "pointer";
+      } else {
+        document.body.style.cursor = "default";
+      }
+    } else if (window.currentStatus === "instructions") {
+      let mouseOffsetX = window.mousePos['x'] / window.innerWidth * 50;
+      let mouseOffsetY = window.mousePos['y'] / window.innerHeight * 50;
+      let titlePosX = (window.innerWidth / 2) - 195 - mouseOffsetX;
+      let titlePosY = (window.innerHeight / 2) - 80 - mouseOffsetY + window.homepageYOffset;
+
+      if (e.pageX > titlePosX + 110 && e.pageX < titlePosX + 335
+       && e.pageY > titlePosY + 805 && e.pageY < titlePosY + 850) {
+         document.body.style.cursor = "pointer";
       } else {
         document.body.style.cursor = "default";
       }
@@ -382,9 +414,18 @@ document.addEventListener("DOMContentLoaded", () => {
         window.mouseDownTime = null;
         return;
       case 72:
+        if (window.currentStatus === "instructions") {
+          document.body.style.cursor = "default";
+          window.currentStatus = "movingToHomePage";
+          return;
+        }
         window.currentStatus = "reset";
         window.paused = false;
         return;
+      case 13:
+        window.homepageTime = null;
+        if (window.currentStatus !== "homepage") { return; }
+        window.currentStatus = "setup";
       default:
         return;
     }
@@ -404,11 +445,6 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  window.amoebas = [];
-  window.amoeboi = new __WEBPACK_IMPORTED_MODULE_1__amoeboi_js__["a" /* default */](ctx, window.realBoardWidth / 2, window.realBoardHeight / 2, 100000, {x: 100000, y: 0});
-  for (let i = 0; i < 400; i++) {
-    window.amoebas.push(new __WEBPACK_IMPORTED_MODULE_0__amoeba_js__["a" /* default */](ctx));
-  }
   // amoebas.push(new Amoeba(ctx, 4500, 5000, 100000, {x: 100000, y: 0}));
   // amoebas.push(new Amoeba(ctx, 5500, 5000, 300000, {x: -100000, y: 0}));
   // amoebas.push(new Amoeba(ctx, 5300, 5000, 100000, {x: -100000, y: 0}));
@@ -432,7 +468,50 @@ document.addEventListener("DOMContentLoaded", () => {
       return requestAnimationFrame(animate);
     }
 
+    if (window.currentStatus === "setup") {
+      window.amoebas = [];
+      window.amoeboi = new __WEBPACK_IMPORTED_MODULE_1__amoeboi_js__["a" /* default */](ctx, window.realBoardWidth / 2, window.realBoardHeight / 2, 100000, {x: 100000, y: 0});
+      for (let i = 0; i < 400; i++) {
+        window.amoebas.push(new __WEBPACK_IMPORTED_MODULE_0__amoeba_js__["a" /* default */](ctx));
+      }
+      window.currentZoom = 4;
+      window.boardHeight = window.realBoardHeight / window.currentZoom;
+      window.boardWidth = window.realBoardWidth / window.currentZoom;
+      window.baseMass = window.amoeboi.mass;
+      window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
+      window.currentStatus = "playing";
+      return requestAnimationFrame(animate);
+    }
+
     if (window.currentStatus === "homepage") {
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["e" /* moveAmoebas */])(ctx);
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["b" /* makeHomepage */])(ctx);
+      return requestAnimationFrame(animate);
+    }
+
+    if (window.currentStatus === "movingToInstructions") {
+      if (window.homepageYOffset > -1000) {
+        window.homepageYOffset -= 20;
+      } else {
+        window.currentStatus = "instructions";
+      }
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["e" /* moveAmoebas */])(ctx);
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["b" /* makeHomepage */])(ctx);
+      return requestAnimationFrame(animate);
+    }
+
+    if (window.currentStatus === "instructions") {
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["e" /* moveAmoebas */])(ctx);
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["b" /* makeHomepage */])(ctx);
+      return requestAnimationFrame(animate);
+    }
+
+    if (window.currentStatus === "movingToHomePage") {
+      if (window.homepageYOffset < 0) {
+        window.homepageYOffset += 20;
+      } else {
+        window.currentStatus = "homepage";
+      }
       Object(__WEBPACK_IMPORTED_MODULE_3__game__["e" /* moveAmoebas */])(ctx);
       Object(__WEBPACK_IMPORTED_MODULE_3__game__["b" /* makeHomepage */])(ctx);
       return requestAnimationFrame(animate);
@@ -691,24 +770,50 @@ const makeHomepage = (ctx) => {
   let mouseOffsetX = window.mousePos['x'] / window.innerWidth * 50;
   let mouseOffsetY = window.mousePos['y'] / window.innerHeight * 50;
 
+  let homepageWave = Math.sin(((Date.now() - window.homepageTime) % 1500) / 1500 * Math.PI);
+
   ctx.globalAlpha = 1;
   ctx.fillStyle = 'white';
   ctx.font = '120px Impact';
-  let titlePosX = (window.innerWidth / 2) - 180 - mouseOffsetX;
-  let titlePosY = (window.innerHeight / 2) - 40 - mouseOffsetY;
+  let titlePosX = (window.innerWidth / 2) - 195 - mouseOffsetX;
+  let titlePosY = (window.innerHeight / 2) - 80 - mouseOffsetY + window.homepageYOffset;
   ctx.fillText(`AmoeBoi`, titlePosX, titlePosY);
 
-  // Object.keys(window.iconImages).forEach(key => {
-  //   let image = window.iconImages[key];
-  //   image.width = "100";
-  //   image.height = "100";
-  // });
+  ctx.globalAlpha = 0.7;
+  ctx.fillStyle = "rgb(0,0,50)";
+  ctx.fillRect(titlePosX - 300, titlePosY + 885, 1050, 530);
+  ctx.globalAlpha = 1;
 
-  // window.iconImages.githubLogo.style = 'border-radius: 50%';
 
-  ctx.drawImage(window.iconImages.githubLogo, titlePosX - 50, titlePosY + 150, 80, 80);
-  ctx.drawImage(window.iconImages.linkedInLogo, titlePosX + 170, titlePosY + 150, 72, 72);
-  ctx.drawImage(window.iconImages.folderIcon, titlePosX + 380, titlePosY + 150, 88, 88);
+  ctx.fillStyle = "rgb(240,240,240)";
+  ctx.font = `${30 + (2 * homepageWave) }px Impact`;
+  ctx.fillText(`PRESS ENTER TO START`, titlePosX + 85 - (5 * homepageWave), titlePosY + 100 + (2*homepageWave));
+
+  ctx.font = '50px Impact';
+  ctx.fillText(`INSTRUCTIONS`, titlePosX + 75, titlePosY + 360);
+
+  ctx.fillText(`MAIN MENU`, titlePosX + 110, titlePosY + 850);
+
+  ctx.font = '25px Arial Black';
+  ctx.fillText("Become the Biggest!", titlePosX + 80, titlePosY + 930);
+
+  ctx.fillText("Absorb smaller amoebas, avoid the bigger ones,", titlePosX - 100, titlePosY + 1000);
+  ctx.fillText("and become the biggest blob in the land.", titlePosX - 50, titlePosY + 1030);
+
+  ctx.fillText("Aim and hold the left mouse button to shoot out smaller amoebas", titlePosX - 230, titlePosY + 1100);
+  ctx.fillText("and propel yourself the other way... but be careful!", titlePosX - 120, titlePosY + 1130);
+  ctx.fillText("Every shot uses little bit of your own mass.", titlePosX - 70, titlePosY + 1160);
+
+  ctx.fillText("You can speed up or slow down time using the left/right arrow keys.", titlePosX - 250, titlePosY + 1230);
+
+  ctx.fillText("Press space to pause the game", titlePosX + 5, titlePosY + 1300);
+  ctx.fillText("and press H to return to the Main Menu at any time.", titlePosX - 130, titlePosY + 1330);
+
+  ctx.fillText("Have fun!", titlePosX + 150, titlePosY + 1400);
+
+  ctx.drawImage(window.iconImages.githubLogo, titlePosX - 50, titlePosY + 170, 80, 80);
+  ctx.drawImage(window.iconImages.linkedInLogo, titlePosX + 180, titlePosY + 170, 72, 72);
+  ctx.drawImage(window.iconImages.folderIcon, titlePosX + 380, titlePosY + 170, 88, 88);
 };
 /* harmony export (immutable) */ __webpack_exports__["b"] = makeHomepage;
 
