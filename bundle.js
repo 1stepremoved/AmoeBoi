@@ -86,7 +86,7 @@ window.realBoardHeight = 20000;
 window.realBoardWidth = 20000;
 window.boardHeight = window.realBoardHeight / window.currentZoom;
 window.boardWidth = window.realBoardWidth / window.currentZoom;
-window.boardFocus = {x: 5000, y: 5000};
+window.boardFocus = {x: window.realBoardWidth / 2, y: window.realBoardHeight / 2};
 window.timeBase = 10;
 window.timeCoefficient = .2;
 window.clockAngle = 0;
@@ -94,6 +94,7 @@ window.baseMass = 50000;
 window.mouseDownTime = null;
 window.mouseDownInterval = null;
 window.paused = false;
+window.status = "playing";
 
 document.addEventListener("DOMContentLoaded", () => {
   window.onresize = ()=>{
@@ -102,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   window.addEventListener("mousedown", (e) => {
-    if (window.paused) {
+    if (window.paused || window.status !== "playing") {
       return;
     }
     window.mouseDownTime = Date.now();
@@ -115,6 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   window.addEventListener("mousemove", (e) => {
+    window.mousePos = {x: e.pageX, y: e.pageY};
     if (window.mouseDownTime) {
       window.amoeboi.mousePosX = e.pageX;
       window.amoeboi.mousePosY = e.pageY;
@@ -129,16 +131,21 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("keydown", (e) => {
     switch (e.keyCode) {
       case 39:
-        if (window.paused) {return;}
+        if (window.paused || window.status !== "playing") { return; }
         window.timeCoefficient = Math.min(window.timeCoefficient * 1.1, window.timeBase);
         return;
       case 37:
-        if (window.paused) {return;}
+        if (window.paused || window.status !== "playing") { return; }
         window.timeCoefficient = Math.max(window.timeCoefficient * 0.9, Math.pow(window.timeBase, - 1));
         return;
       case 32:
+        if (window.status !== "playing") { return; }
         window.paused = !window.paused;
         window.mouseDownTime = null;
+        return;
+      case 72:
+        window.status = "reset";
+        window.paused = false;
         return;
       default:
         return;
@@ -147,9 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("mousewheel", (e)=> {
     e.preventDefault();
-    if (window.paused) {
-      return;
-    }
+    if (window.paused  || window.status !== "playing") { return; }
     let zoomDelta = (e.deltaY / -1000);
     window.currentZoom = Object(__WEBPACK_IMPORTED_MODULE_2__util__["b" /* boundNum */])(window.currentZoom + zoomDelta, window.minZoom, window.maxZoom);
     window.boardHeight = window.realBoardHeight / window.currentZoom;
@@ -173,6 +178,27 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.clearRect(0,0, innerWidth, innerHeight);
     Object(__WEBPACK_IMPORTED_MODULE_3__game__["a" /* makeGrid */])(ctx);
 
+    if (window.status === "reset") {
+      window.maxZoom = 4;
+      window.currentZoom = 2;
+      window.boardHeight = window.realBoardHeight / window.currentZoom;
+      window.boardWidth = window.realBoardWidth / window.currentZoom;
+      window.amoeboi = null;
+      window.amoebas = [];
+      for (let i = 0; i < 400; i++) {
+        window.amoebas.push(new __WEBPACK_IMPORTED_MODULE_0__amoeba_js__["a" /* default */](ctx));
+      }
+      window.boardFocus = {x: window.realBoardWidth / 2, y: window.realBoardHeight / 2};
+      window.status = "homescreen";
+      return requestAnimationFrame(animate);
+    }
+
+    if (window.status === "homescreen") {
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["e" /* moveAmoebas */])(ctx);
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["b" /* makeHomescreen */])(ctx);
+      return requestAnimationFrame(animate);
+    }
+
     if (window.paused) {
       window.amoebas.forEach(amoeba => {
         amoeba.draw();
@@ -181,35 +207,14 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.fillStyle = "black";
       ctx.fillRect(0,0, innerWidth, innerHeight);
       window.amoeboi.draw();
-      Object(__WEBPACK_IMPORTED_MODULE_3__game__["b" /* makeMargins */])(ctx);
+      Object(__WEBPACK_IMPORTED_MODULE_3__game__["c" /* makeMargins */])(ctx);
       return requestAnimationFrame(animate);
     }
 
-    window.amoebas = window.amoebas.filter(amoeba => {
-      return amoeba.radius > 0;
-    });
-    window.amoebas.forEach(amoeba => {
-      window.amoeboi.aabbCheck(amoeba);
-      amoeba.aabbCheck(window.amoeboi);
-      window.amoebas.forEach(amoeba2 =>{
-        if (amoeba2 !== amoeba){
-          amoeba.aabbCheck(amoeba2);
-        }
-      });
-      amoeba.wallCollision();
-    });
-    window.amoeboi.wallCollision();
-    ctx.globalAlpha = 0.8;
-    window.amoebas.forEach(amoeba => {
-      amoeba.move();
-      amoeba.draw();
-    });
-    window.amoeboi.move();
-    window.amoeboi.draw();
-    ctx.globalAlpha = 1;
+    Object(__WEBPACK_IMPORTED_MODULE_3__game__["e" /* moveAmoebas */])(ctx);
 
-    Object(__WEBPACK_IMPORTED_MODULE_3__game__["b" /* makeMargins */])(ctx);
-    Object(__WEBPACK_IMPORTED_MODULE_3__game__["c" /* makeMassDisplay */])(ctx);
+    Object(__WEBPACK_IMPORTED_MODULE_3__game__["c" /* makeMargins */])(ctx);
+    Object(__WEBPACK_IMPORTED_MODULE_3__game__["d" /* makeMassDisplay */])(ctx);
     // makeClock(ctx);
     if (window.amoeboi.mass > 0) {
       window.boardFocus = {x: window.amoeboi.xpos, y: window.amoeboi.ypos};
@@ -559,13 +564,13 @@ const makeGrid = (ctx) => {
 const makeMassDisplay = (ctx) => {
   ctx.globalAlpha = 0.7;
   ctx.fillStyle = 'black';
-  ctx.fillRect(window.innerWidth - 300, 65, 130 + (20 * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(Math.floor(Math.log10(window.amoeboi.mass / 100),1, 10000))), 50);
+  ctx.fillRect(window.innerWidth - 300, 65, 130 + (15 * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(Math.floor(Math.log10(window.amoeboi.mass / 100),1, 10000))), 50);
   ctx.globalAlpha = 1;
   ctx.fillStyle = 'white';
-  ctx.font = '30px Georgia';
+  ctx.font = '30px Impact';
   ctx.fillText(`Mass: ${Math.floor(window.amoeboi.mass / 100) }`, window.innerWidth - 280, 100);
 };
-/* harmony export (immutable) */ __webpack_exports__["c"] = makeMassDisplay;
+/* harmony export (immutable) */ __webpack_exports__["d"] = makeMassDisplay;
 
 
 const makeMargins = (ctx) => {
@@ -600,7 +605,49 @@ const makeMargins = (ctx) => {
   ctx.fillRect(timebarX + (timebarWidth * time0to1) - 10, timebarY, 20, timebarHeight);
   ctx.globalAlpha = 1;
 };
-/* harmony export (immutable) */ __webpack_exports__["b"] = makeMargins;
+/* harmony export (immutable) */ __webpack_exports__["c"] = makeMargins;
+
+
+const moveAmoebas = (ctx) => {
+  window.amoebas = window.amoebas.filter(amoeba => {
+    return amoeba.radius > 0;
+  });
+  window.amoebas.forEach(amoeba => {
+    window.amoeboi ? window.amoeboi.aabbCheck(amoeba) : null;
+    window.amoeboi ? amoeba.aabbCheck(window.amoeboi) : null;
+    window.amoebas.forEach(amoeba2 =>{
+      if (amoeba2 !== amoeba){
+        amoeba.aabbCheck(amoeba2);
+      }
+    });
+    amoeba.wallCollision();
+  });
+  window.amoeboi ? window.amoeboi.wallCollision() : null;
+  ctx.globalAlpha = 0.8;
+  window.amoebas.forEach(amoeba => {
+    amoeba.move();
+    amoeba.draw();
+  });
+  window.amoeboi ? window.amoeboi.move() : null;
+  window.amoeboi ? window.amoeboi.draw() : null;
+  ctx.globalAlpha = 1;
+};
+/* harmony export (immutable) */ __webpack_exports__["e"] = moveAmoebas;
+
+
+const makeHomescreen = (ctx) => {
+  ctx.globalAlpha = 0.7;
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  let mouseOffsetX = window.mousePos['x'] / window.innerWidth * 50;
+  let mouseOffsetY = window.mousePos['y'] / window.innerHeight * 50;
+
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = 'white';
+  ctx.font = '120px Impact';
+  ctx.fillText(`AmoeBoi`, (window.innerWidth / 2) - 180 - mouseOffsetX, (window.innerHeight / 2) - 40 - mouseOffsetY);
+};
+/* harmony export (immutable) */ __webpack_exports__["b"] = makeHomescreen;
 
 
 

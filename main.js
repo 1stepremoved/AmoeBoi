@@ -1,7 +1,8 @@
 import Amoeba from './amoeba.js';
 import Amoeboi from './amoeboi.js';
 import {boundNum, baseLog, transitionVar} from './util';
-import {makePause, makeGrid, makeClock, makeMargins, makeMassDisplay} from './game';
+import {moveAmoebas, makePause, makeGrid, makeClock,
+        makeMargins, makeMassDisplay, makeHomescreen} from './game';
 
 
 window.maxZoom = 4;
@@ -11,7 +12,7 @@ window.realBoardHeight = 20000;
 window.realBoardWidth = 20000;
 window.boardHeight = window.realBoardHeight / window.currentZoom;
 window.boardWidth = window.realBoardWidth / window.currentZoom;
-window.boardFocus = {x: 5000, y: 5000};
+window.boardFocus = {x: window.realBoardWidth / 2, y: window.realBoardHeight / 2};
 window.timeBase = 10;
 window.timeCoefficient = .2;
 window.clockAngle = 0;
@@ -19,6 +20,7 @@ window.baseMass = 50000;
 window.mouseDownTime = null;
 window.mouseDownInterval = null;
 window.paused = false;
+window.status = "playing";
 
 document.addEventListener("DOMContentLoaded", () => {
   window.onresize = ()=>{
@@ -27,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   window.addEventListener("mousedown", (e) => {
-    if (window.paused) {
+    if (window.paused || window.status !== "playing") {
       return;
     }
     window.mouseDownTime = Date.now();
@@ -40,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   window.addEventListener("mousemove", (e) => {
+    window.mousePos = {x: e.pageX, y: e.pageY};
     if (window.mouseDownTime) {
       window.amoeboi.mousePosX = e.pageX;
       window.amoeboi.mousePosY = e.pageY;
@@ -54,16 +57,21 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("keydown", (e) => {
     switch (e.keyCode) {
       case 39:
-        if (window.paused) {return;}
+        if (window.paused || window.status !== "playing") { return; }
         window.timeCoefficient = Math.min(window.timeCoefficient * 1.1, window.timeBase);
         return;
       case 37:
-        if (window.paused) {return;}
+        if (window.paused || window.status !== "playing") { return; }
         window.timeCoefficient = Math.max(window.timeCoefficient * 0.9, Math.pow(window.timeBase, - 1));
         return;
       case 32:
+        if (window.status !== "playing") { return; }
         window.paused = !window.paused;
         window.mouseDownTime = null;
+        return;
+      case 72:
+        window.status = "reset";
+        window.paused = false;
         return;
       default:
         return;
@@ -72,9 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("mousewheel", (e)=> {
     e.preventDefault();
-    if (window.paused) {
-      return;
-    }
+    if (window.paused  || window.status !== "playing") { return; }
     let zoomDelta = (e.deltaY / -1000);
     window.currentZoom = boundNum(window.currentZoom + zoomDelta, window.minZoom, window.maxZoom);
     window.boardHeight = window.realBoardHeight / window.currentZoom;
@@ -98,6 +104,27 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.clearRect(0,0, innerWidth, innerHeight);
     makeGrid(ctx);
 
+    if (window.status === "reset") {
+      window.maxZoom = 4;
+      window.currentZoom = 2;
+      window.boardHeight = window.realBoardHeight / window.currentZoom;
+      window.boardWidth = window.realBoardWidth / window.currentZoom;
+      window.amoeboi = null;
+      window.amoebas = [];
+      for (let i = 0; i < 400; i++) {
+        window.amoebas.push(new Amoeba(ctx));
+      }
+      window.boardFocus = {x: window.realBoardWidth / 2, y: window.realBoardHeight / 2};
+      window.status = "homescreen";
+      return requestAnimationFrame(animate);
+    }
+
+    if (window.status === "homescreen") {
+      moveAmoebas(ctx);
+      makeHomescreen(ctx);
+      return requestAnimationFrame(animate);
+    }
+
     if (window.paused) {
       window.amoebas.forEach(amoeba => {
         amoeba.draw();
@@ -110,28 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return requestAnimationFrame(animate);
     }
 
-    window.amoebas = window.amoebas.filter(amoeba => {
-      return amoeba.radius > 0;
-    });
-    window.amoebas.forEach(amoeba => {
-      window.amoeboi.aabbCheck(amoeba);
-      amoeba.aabbCheck(window.amoeboi);
-      window.amoebas.forEach(amoeba2 =>{
-        if (amoeba2 !== amoeba){
-          amoeba.aabbCheck(amoeba2);
-        }
-      });
-      amoeba.wallCollision();
-    });
-    window.amoeboi.wallCollision();
-    ctx.globalAlpha = 0.8;
-    window.amoebas.forEach(amoeba => {
-      amoeba.move();
-      amoeba.draw();
-    });
-    window.amoeboi.move();
-    window.amoeboi.draw();
-    ctx.globalAlpha = 1;
+    moveAmoebas(ctx);
 
     makeMargins(ctx);
     makeMassDisplay(ctx);

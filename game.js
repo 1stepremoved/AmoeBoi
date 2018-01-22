@@ -62,10 +62,10 @@ export const makeGrid = (ctx) => {
 export const makeMassDisplay = (ctx) => {
   ctx.globalAlpha = 0.7;
   ctx.fillStyle = 'black';
-  ctx.fillRect(window.innerWidth - 300, 65, 130 + (20 * boundNum(Math.floor(Math.log10(window.amoeboi.mass / 100),1, 10000))), 50);
+  ctx.fillRect(window.innerWidth - 300, 65, 130 + (15 * boundNum(Math.floor(Math.log10(window.amoeboi.mass / 100),1, 10000))), 50);
   ctx.globalAlpha = 1;
   ctx.fillStyle = 'white';
-  ctx.font = '30px Georgia';
+  ctx.font = '30px Impact';
   ctx.fillText(`Mass: ${Math.floor(window.amoeboi.mass / 100) }`, window.innerWidth - 280, 100);
 };
 
@@ -100,4 +100,42 @@ export const makeMargins = (ctx) => {
   ctx.fillStyle = `white`;
   ctx.fillRect(timebarX + (timebarWidth * time0to1) - 10, timebarY, 20, timebarHeight);
   ctx.globalAlpha = 1;
+};
+
+export const moveAmoebas = (ctx) => {
+  window.amoebas = window.amoebas.filter(amoeba => {
+    return amoeba.radius > 0;
+  });
+  window.amoebas.forEach(amoeba => {
+    window.amoeboi ? window.amoeboi.aabbCheck(amoeba) : null;
+    window.amoeboi ? amoeba.aabbCheck(window.amoeboi) : null;
+    window.amoebas.forEach(amoeba2 =>{
+      if (amoeba2 !== amoeba){
+        amoeba.aabbCheck(amoeba2);
+      }
+    });
+    amoeba.wallCollision();
+  });
+  window.amoeboi ? window.amoeboi.wallCollision() : null;
+  ctx.globalAlpha = 0.8;
+  window.amoebas.forEach(amoeba => {
+    amoeba.move();
+    amoeba.draw();
+  });
+  window.amoeboi ? window.amoeboi.move() : null;
+  window.amoeboi ? window.amoeboi.draw() : null;
+  ctx.globalAlpha = 1;
+};
+
+export const makeHomescreen = (ctx) => {
+  ctx.globalAlpha = 0.7;
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  let mouseOffsetX = window.mousePos['x'] / window.innerWidth * 50;
+  let mouseOffsetY = window.mousePos['y'] / window.innerHeight * 50;
+
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = 'white';
+  ctx.font = '120px Impact';
+  ctx.fillText(`AmoeBoi`, (window.innerWidth / 2) - 180 - mouseOffsetX, (window.innerHeight / 2) - 40 - mouseOffsetY);
 };
