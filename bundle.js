@@ -802,7 +802,7 @@ const makeHomepage = (ctx) => {
 
   ctx.fillText("Aim and hold the left mouse button to shoot out smaller amoebas", titlePosX - 230, titlePosY + 1100);
   ctx.fillText("and propel yourself the other way... but be careful!", titlePosX - 120, titlePosY + 1130);
-  ctx.fillText("Every shot uses little bit of your own mass.", titlePosX - 70, titlePosY + 1160);
+  ctx.fillText("Every shot uses a little bit of your own mass.", titlePosX - 80, titlePosY + 1160);
 
   ctx.fillText("You can speed up or slow down time using the left/right arrow keys.", titlePosX - 250, titlePosY + 1230);
 
