@@ -258,12 +258,12 @@ Amoeba.prototype.momentumMax = 10;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__amoeba2__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__amoeba__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(0);
 
 
 
-class Amoeboi extends __WEBPACK_IMPORTED_MODULE_0__amoeba2__["a" /* default */] {
+class Amoeboi extends __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */] {
   constructor(ctx, x, y, mass, momentum) {
     super(ctx, x, y, mass, momentum);
     this.mousePosX = null;
@@ -296,7 +296,7 @@ class Amoeboi extends __WEBPACK_IMPORTED_MODULE_0__amoeba2__["a" /* default */] 
     let xpos = this.xpos + (dirX * this.radius) + ((dirX > 0 ) ? radius : -1 * radius);
     let ypos = this.ypos + (dirY * this.radius) + ((dirY > 0 ) ? radius : -1 * radius);
     let momentum = {x: mass * 50 * dirX * 2, y: mass * 50 * dirY * 2};
-    amoebas.push(new __WEBPACK_IMPORTED_MODULE_0__amoeba2__["a" /* default */](this.ctx, xpos, ypos, mass, momentum));
+    amoebas.push(new __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */](this.ctx, xpos, ypos, mass, momentum));
     this.nextMomentum['x'] += momentum['x'] * -1 * 3;
     this.nextMomentum['y'] += momentum['y'] * -1 * 3;
     // debugger
@@ -315,9 +315,9 @@ class Amoeboi extends __WEBPACK_IMPORTED_MODULE_0__amoeba2__["a" /* default */] 
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game2__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__amoeba2_js__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__amoeboi2_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__amoeba_js__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__amoeboi_js__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(0);
 
 
@@ -334,7 +334,7 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  let game = new __WEBPACK_IMPORTED_MODULE_0__game2__["a" /* default */](ctx, 20000, 20000);
+  let game = new __WEBPACK_IMPORTED_MODULE_0__game__["a" /* default */](ctx, 20000, 20000);
 
   window.onresize = ()=>{
     canvas.width = window.innerWidth;
@@ -383,7 +383,6 @@ document.addEventListener("DOMContentLoaded", () => {
     game.amoeboi.mousePosY = e.pageY;
     game.amoeboi.propel(e,game.amoebas);
     game.mouseDownInterval = setInterval(() => {
-      debugger
       game.amoeboi.propel(e,game.amoebas);
     }, 200);
   });
@@ -492,8 +491,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__amoeba2_js__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__amoeboi2_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__amoeba_js__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__amoeboi_js__ = __webpack_require__(2);
 
 
 
@@ -531,7 +530,7 @@ class Game {
     this.mouseVars = {};
     this.mouseVars.mouseDownTime = null;
 
-    __WEBPACK_IMPORTED_MODULE_1__amoeba2_js__["a" /* default */].prototype.mouseVars = this.mouseVars;
+    __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */].prototype.mouseVars = this.mouseVars;
   }
 
   setupTime() {
@@ -539,7 +538,7 @@ class Game {
     this.timeVars.timeBase = 10;
     this.timeVars.timeCoefficient = .2;
 
-    __WEBPACK_IMPORTED_MODULE_1__amoeba2_js__["a" /* default */].prototype.timeVars = this.timeVars;
+    __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */].prototype.timeVars = this.timeVars;
   }
 
   setupProportions(realBoardWidth, realBoardHeight) {
@@ -555,7 +554,7 @@ class Game {
     this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
     this.boardVars.boardFocus = {x: this.boardVars.realBoardWidth / 2, y: this.boardVars.realBoardHeight / 2};
 
-    __WEBPACK_IMPORTED_MODULE_1__amoeba2_js__["a" /* default */].prototype.boardVars = this.boardVars;
+    __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */].prototype.boardVars = this.boardVars;
   }
 
   setupImages() {
@@ -582,7 +581,7 @@ class Game {
       this.amoeboi = null;
       this.amoebas = [];
       for (let i = 0; i < 400; i++) {
-        this.amoebas.push(new __WEBPACK_IMPORTED_MODULE_1__amoeba2_js__["a" /* default */](this.ctx));
+        this.amoebas.push(new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx));
       }
       this.boardVars.boardFocus = {x: this.boardVars.realBoardWidth / 2, y: this.boardVars.realBoardHeight / 2};
       this.currentStatus = "homepage";
@@ -591,9 +590,9 @@ class Game {
 
     if (this.currentStatus === "setup") {
       this.amoebas = [];
-      this.amoeboi = new __WEBPACK_IMPORTED_MODULE_2__amoeboi2_js__["a" /* default */](this.ctx, this.boardVars.realBoardWidth / 2, this.boardVars.realBoardHeight / 2, 100000, {x: 100000, y: 0});
+      this.amoeboi = new __WEBPACK_IMPORTED_MODULE_2__amoeboi_js__["a" /* default */](this.ctx, this.boardVars.realBoardWidth / 2, this.boardVars.realBoardHeight / 2, 100000, {x: 100000, y: 0});
       for (let i = 0; i < 400; i++) {
-        this.amoebas.push(new __WEBPACK_IMPORTED_MODULE_1__amoeba2_js__["a" /* default */](this.ctx));
+        this.amoebas.push(new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx));
       }
       this.boardVars.currentZoom = 4;
       this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
