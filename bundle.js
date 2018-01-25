@@ -132,8 +132,8 @@ class Amoeba {
     // yDelta = (yDelta > this.momentumMax) ? Math.abs(yDelta) / yDelta * this.momentumMax : yDelta;
     this.xpos += xDelta * this.timeVars.timeCoefficient;
     this.ypos += yDelta * this.timeVars.timeCoefficient;
-    // this.xpos += boundNum(xDelta * window.timeCoefficient, -10, 10);
-    // this.ypos += boundNum(yDelta * window.timeCoefficient, -10, 10);
+    // this.xpos += boundNum(xDelta * this.timeVars.timeCoefficient, -10, 10);
+    // this.ypos += boundNum(yDelta * this.timeVars.timeCoefficient, -10, 10);
   }
 
   adjustRadius() {
@@ -716,12 +716,12 @@ class Game {
     ctx.lineTo(120 + (60*Math.cos(this.clockAngle * Math.PI / 180)), 120 + (60*Math.sin(this.clockAngle * Math.PI / 180)));
     ctx.fillStyle = 'black';
     ctx.stroke();
-    window.clockAngle = (this.clockAngle + (this.timeVars.timeCoefficient)) % 360;
+    this.clockAngle = (this.clockAngle + (this.timeVars.timeCoefficient)) % 360;
     ctx.globalAlpha = 1;
   }
 
   makeGrid(ctx) {
-    // let currentLineX = window.boardFocus['x'] - (window.boardWidth / 2);
+    // let currentLineX = this.boardFocus['x'] - (this.boardWidth / 2);
     ctx.globalAlpha = 0.4;
 
     let interval = 500;
@@ -786,7 +786,7 @@ class Game {
     // gradient.addColorStop(time0to1, "rgb(255,255,255)");
     // gradient.addColorStop(time0to1, "rgb(255,255,255)");
     // gradient.addColorStop(1, "rgb(0,0,0)");
-    // let color = (baseLog(window.timeBase, window.timeCoefficient) + 1) / 2 * 255;
+    // let color = (baseLog(this.timeVars.timeBase, this.timeVars.timeCoefficient) + 1) / 2 * 255;
     // debugger
     // ctx.fillStyle = gradient;
     // ctx.fillStyle = `rgb(${255 - color},0,${color})`;
