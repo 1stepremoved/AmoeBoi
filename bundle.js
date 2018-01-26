@@ -221,8 +221,10 @@ class Amoeba {
   }
 
   relativePos() {
-    let relativeX = (((this.xpos - this.boardVars.boardFocus['x']) / (this.boardVars.boardWidth / 2)) * 500) + (window.innerWidth / 2);
-    let relativeY = (((this.ypos - this.boardVars.boardFocus['y']) / (this.boardVars.boardHeight/ 2)) * 500) + (window.innerHeight / 2);
+    let relativeX = (((this.xpos - this.boardVars.boardFocus['x']) / (this.boardVars.boardWidth / 2)) * 500)
+                       + (window.innerWidth / 2) + this.mouseVars.mouseOffset['x'];
+    let relativeY = (((this.ypos - this.boardVars.boardFocus['y']) / (this.boardVars.boardHeight/ 2)) * 500)
+                       + (window.innerHeight / 2) + this.mouseVars.mouseOffset['y'];
     return {x: relativeX, y: relativeY};
   }
 
@@ -414,12 +416,16 @@ document.addEventListener("DOMContentLoaded", () => {
       let titlePosX = (window.innerWidth / 2) - 195 - mouseOffsetX;
       let titlePosY = (window.innerHeight / 2) - 80 - mouseOffsetY + game.homepageYOffset;
 
-      if (e.pageX > titlePosX + 110 && e.pageX < titlePosX + 335
-       && e.pageY > titlePosY + 805 && e.pageY < titlePosY + 850) {
-         document.body.style.cursor = "pointer";
-      } else {
-        document.body.style.cursor = "default";
-      }
+        if (e.pageX > titlePosX + 110 && e.pageX < titlePosX + 335
+            && e.pageY > titlePosY + 805 && e.pageY < titlePosY + 850) {
+          document.body.style.cursor = "pointer";
+        } else {
+          document.body.style.cursor = "default";
+        }
+    } else if (game.currentStatus === "playing" && game.shiftDown) {
+      debugger
+      game.mouseVars.mouseOffset['x'] = (window.innerWidth / 2) - e.pageX;
+      game.mouseVars.mouseOffset['y'] = (window.innerHeight / 2) - e.pageY;
     }
 
     game.mousePos['x'] = e.pageX;
@@ -463,6 +469,22 @@ document.addEventListener("DOMContentLoaded", () => {
         game.homepageTime = null;
         if (game.currentStatus !== "homepage") { return; }
         game.currentStatus = "setup";
+        return;
+      case 16:
+        game.shiftDown = true;
+        return;
+      default:
+        return;
+    }
+  });
+
+  window.addEventListener("keyup", (e) => {
+    switch (e.keyCode) {
+      case 16:
+        game.mouseVars.mouseOffset['x'] = 0;
+        game.mouseVars.mouseOffset['y'] = 0;
+        game.shiftDown = false;
+        return;
       default:
         return;
     }
@@ -514,7 +536,8 @@ class Game {
     this.currentStatus = "reset";
     this.homepageYOffset = 0;
     this.homepageTime = null;
-    this.mousePos= {x: 0, y: 0};
+    this.mousePos = {x: 0, y: 0};
+    this.shiftDown = false;
 
     this.animate = this.animate.bind(this);
     this.moveAmoebas = this.moveAmoebas.bind(this);
@@ -529,6 +552,7 @@ class Game {
   setupMouse() {
     this.mouseVars = {};
     this.mouseVars.mouseDownTime = null;
+    this.mouseVars.mouseOffset = {x: 0, y: 0};
 
     __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */].prototype.mouseVars = this.mouseVars;
   }
@@ -770,22 +794,22 @@ class Game {
 
     let interval = 500;
     let realX = 0;
-    let topBorderY =  (((0 - this.boardVars.boardFocus['y']) / (this.boardVars.boardHeight / 2)) * 500) + (window.innerHeight / 2);
-    let bottomBorderY =  (((this.boardVars.realBoardHeight - this.boardVars.boardFocus['y']) / (this.boardVars.boardHeight / 2)) * 500) + (window.innerHeight / 2);
+    let topBorderY =  (((0 - this.boardVars.boardFocus['y'])  / (this.boardVars.boardHeight / 2)) * 500) + (window.innerHeight / 2) + this.mouseVars.mouseOffset['y'];
+    let bottomBorderY =  (((this.boardVars.realBoardHeight - this.boardVars.boardFocus['y']) / (this.boardVars.boardHeight / 2)) * 500) + (window.innerHeight / 2)  + this.mouseVars.mouseOffset['y'];
     while (realX <= this.boardVars.realBoardWidth) {
       ctx.fillStyle = (realX ===this.boardVars.realBoardWidth || realX === 0) ? "red" :"black";
       let lineX = (((realX - this.boardVars.boardFocus['x']) / (this.boardVars.boardWidth / 2)) * 500) + (window.innerWidth / 2);
-      ctx.fillRect(lineX,topBorderY, 2, bottomBorderY - topBorderY);
+      ctx.fillRect(lineX + this.mouseVars.mouseOffset['x'],topBorderY, 2, bottomBorderY - topBorderY);
       realX += interval;
     }
 
     let realY = 0;
-    let leftBorderX = (((0 - this.boardVars.boardFocus['x']) / (this.boardVars.boardWidth / 2)) * 500) + (window.innerWidth / 2);
-    let rightBorderX = (((this.boardVars.realBoardWidth - this.boardVars.boardFocus['x']) / (this.boardVars.boardWidth / 2)) * 500) + (window.innerWidth / 2);
+    let leftBorderX = (((0 - this.boardVars.boardFocus['x']) / (this.boardVars.boardWidth / 2)) * 500) + (window.innerWidth / 2) + this.mouseVars.mouseOffset['x'];
+    let rightBorderX = (((this.boardVars.realBoardWidth - this.boardVars.boardFocus['x']) / (this.boardVars.boardWidth / 2)) * 500) + (window.innerWidth / 2) + this.mouseVars.mouseOffset['x'];
     while (realY <= this.boardVars.realBoardHeight) {
       ctx.fillStyle = (realY ===this.boardVars.realBoardHeight || realY === 0) ? "red" :"black";
       let lineY = (((realY - this.boardVars.boardFocus['y']) / (this.boardVars.boardHeight / 2)) * 500) + (window.innerHeight / 2);
-      ctx.fillRect(leftBorderX,lineY, rightBorderX - leftBorderX, 2);
+      ctx.fillRect(leftBorderX,lineY + this.mouseVars.mouseOffset['y'], rightBorderX - leftBorderX, 2);
       realY += interval;
     }
 
