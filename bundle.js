@@ -166,7 +166,7 @@ class Amoeba {
         * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(amoeba.mass / this.mass, .99, 1);
 
       if (this.mass <= amoeba.mass) {
-        if ((currentDistance - amoeba.radius) / this.radius < 0 || this.mass < 100) {
+        if ((currentDistance - amoeba.radius) < 0 || this.mass < 100) {
           amoeba.mass += this.mass;
           this.mass = 0;
           amoeba.nextMomentum['x'] += this.nextMomentum['x'];
@@ -180,9 +180,27 @@ class Amoeba {
 
         this.mass -= bubble;
         amoeba.mass += bubble;
+      } else {
+        // if ((currentDistance - this.radius)  < 0 || amoeba.mass < 100) {
+        //   this.mass += amoeba.mass;
+        //   amoeba.mass = 0;
+        //   this.nextMomentum['x'] += amoeba.nextMomentum['x'];
+        //   this.nextMomentum['y'] += amoeba.nextMomentum['y'];
+        //   return;
+        // }
+
+        let bubble = amoeba.massDelta * amoeba.mass
+            * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])( (amoeba.radius - (currentDistance - this.radius)) / amoeba.radius, .1, 1)
+            * this.timeVars.timeCoefficient;
+
+        amoeba.mass -= bubble;
+        // debugger
+        this.mass += bubble;
       }
     }
   }
+
+
 
 
 
@@ -651,7 +669,6 @@ class Game {
     for (let i = 0; i < this.amoebas.length; i++) {
       this.quadTree.insert1(this.amoebas[i]);
     }
-    debugger
   }
 
   animate() {
@@ -895,14 +912,14 @@ class Game {
     this.amoebas = this.amoebas.filter(amoeba => {
       return amoeba.radius > 0;
     });
+    this.quadTree.clear();
+    for (let i = 0; i < this.amoebas.length; i++) {
+      this.quadTree.insert1(this.amoebas[i]);
+    }
+    this.quadTree.checkAllCollisions();
     this.amoebas.forEach(amoeba => {
       this.amoeboi ? this.amoeboi.aabbCheck(amoeba) : null;
       this.amoeboi ? amoeba.aabbCheck(this.amoeboi) : null;
-      this.amoebas.forEach(amoeba2 =>{
-        if (amoeba2 !== amoeba){
-          amoeba.aabbCheck(amoeba2);
-        }
-      });
       amoeba.wallCollision();
     });
     this.amoeboi ? this.amoeboi.wallCollision() : null;
@@ -1066,14 +1083,14 @@ class QuadTree {
 
   checkAllCollisions() {
     for (let i = 0; i < this.amoebas.length; i++) {
-      for (let j = 0; j < this.amoebas.length; j++) {
+      for (let j = i + 1; j < this.amoebas.length; j++) {
         if (i === j) {
           continue;
         }
         this.amoebas[i].aabbCheck(this.amoebas[j]);
       }
       for (let j = 0; j < this.children.length; j++) {
-        this.children[i].checkCollision(this.amoebas[i]);
+        this.children[j].checkCollision(this.amoebas[i]);
       }
     }
 
