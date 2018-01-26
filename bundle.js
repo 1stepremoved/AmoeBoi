@@ -126,8 +126,8 @@ class Amoeba {
 
   move() {
     this.momentum = Object.assign({}, this.nextMomentum);
-    let xDelta = this.momentum['x'] / this.mass;
-    let yDelta = this.momentum['y'] / this.mass;
+    let xDelta = (this.mass > 0 ? this.momentum['x'] / this.mass : 0);
+    let yDelta = (this.mass > 0 ? this.momentum['y'] / this.mass : 0);
     // xDelta = (xDelta > this.momentumMax) ? Math.abs(xDelta) / xDelta * this.momentumMax : xDelta;
     // yDelta = (yDelta > this.momentumMax) ? Math.abs(yDelta) / yDelta * this.momentumMax : yDelta;
     this.xpos += xDelta * this.timeVars.timeCoefficient;
@@ -160,10 +160,21 @@ class Amoeba {
         * amoeba.mass * (currentDistance / distance) * this.timeVars.timeCoefficient, -50, 50);
       amoeba.nextMomentum['x'] = amoeba.nextMomentum['x']
         * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(amoeba.mass / this.mass, .99, 1);
+
+      amoeba.nextMomentum['x'] += Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(this.momentum['x']
+        * this.mass * (currentDistance / distance) * this.timeVars.timeCoefficient, -50, 50);
+      this.nextMomentum['x'] = this.nextMomentum['x']
+        * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(this.mass / amoeba.mass, .99, 1);
+
       this.nextMomentum['y'] += Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(amoeba.momentum['y']
         * amoeba.mass * (currentDistance / distance) * this.timeVars.timeCoefficient, -50, 50);
       amoeba.nextMomentum['y'] = amoeba.nextMomentum['y']
         * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(amoeba.mass / this.mass, .99, 1);
+
+      amoeba.nextMomentum['y'] += Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(this.momentum['y']
+        * this.mass * (currentDistance / distance) * this.timeVars.timeCoefficient, -50, 50);
+      this.nextMomentum['y'] = this.nextMomentum['y']
+        * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(this.mass / amoeba.mass, .99, 1);
 
       if (this.mass <= amoeba.mass) {
         if ((currentDistance - amoeba.radius) < 0 || this.mass < 100) {
@@ -181,20 +192,20 @@ class Amoeba {
         this.mass -= bubble;
         amoeba.mass += bubble;
       } else {
-        // if ((currentDistance - this.radius)  < 0 || amoeba.mass < 100) {
-        //   this.mass += amoeba.mass;
-        //   amoeba.mass = 0;
-        //   this.nextMomentum['x'] += amoeba.nextMomentum['x'];
-        //   this.nextMomentum['y'] += amoeba.nextMomentum['y'];
-        //   return;
-        // }
+        if ((currentDistance - this.radius)  < 0 || amoeba.mass < 1000) {
+          // DEBUG this somehow sets either this or the other amoeba's xpos and ypos to NaN,
+          this.mass += amoeba.mass;
+          amoeba.mass = 0;
+          this.nextMomentum['x'] += amoeba.nextMomentum['x'];
+          this.nextMomentum['y'] += amoeba.nextMomentum['y'];
+          return;
+        }
 
         let bubble = amoeba.massDelta * amoeba.mass
             * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])( (amoeba.radius - (currentDistance - this.radius)) / amoeba.radius, .1, 1)
             * this.timeVars.timeCoefficient;
 
         amoeba.mass -= bubble;
-        // debugger
         this.mass += bubble;
       }
     }
@@ -225,6 +236,7 @@ class Amoeba {
     if (this.mass <= 0) {
       return;
     }
+
     let gradient = this.ctx.createRadialGradient(relativeX, relativeY,relativeRadius, relativeX, relativeY, 0);
     if (this.mass < this.boardVars.baseMass) {
       gradient.addColorStop(0, `rgb(${20}, ${20}, ${255})`);
@@ -239,9 +251,12 @@ class Amoeba {
   }
 
   relativePos() {
-    let relativeX = (((this.xpos - this.boardVars.boardFocus['x']) / (this.boardVars.boardWidth / 2)) * 500)
+    let xpos = (isNaN(this.ypos) ? 0 : this.xpos);
+    let ypos = (isNaN(this.ypos) ? 0 : this.ypos);
+    // DEBUG: somehow these get turned into NaN when absorbed completely by another amoeba
+    let relativeX = (((xpos - this.boardVars.boardFocus['x']) / (this.boardVars.boardWidth / 2)) * 500)
                        + (window.innerWidth / 2) + this.mouseVars.mouseOffset['x'];
-    let relativeY = (((this.ypos - this.boardVars.boardFocus['y']) / (this.boardVars.boardHeight/ 2)) * 500)
+    let relativeY = (((ypos - this.boardVars.boardFocus['y']) / (this.boardVars.boardHeight/ 2)) * 500)
                        + (window.innerHeight / 2) + this.mouseVars.mouseOffset['y'];
     return {x: relativeX, y: relativeY};
   }
@@ -255,7 +270,8 @@ class Amoeba {
     let relativeCoors = this.relativePos();
 
     let relativeRadius = this.radius / this.boardVars.realBoardWidth * 1000 * this.boardVars.currentZoom;
-    //radius cannot be kept proportional to window.innerWidth, it will throw of there size on screen
+
+    //radius cannot be kept proportional to window.innerWidth, it will throw off their size on screen
 
     let gradient = this.colorize(relativeCoors['x'], relativeCoors['y'],relativeRadius);
 
@@ -319,9 +335,7 @@ class Amoeboi extends __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */] {
     amoebas.push(new __WEBPACK_IMPORTED_MODULE_0__amoeba__["a" /* default */](this.ctx, xpos, ypos, mass, momentum));
     this.nextMomentum['x'] += momentum['x'] * -1 * 3;
     this.nextMomentum['y'] += momentum['y'] * -1 * 3;
-    // debugger
     let distance = Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2) );
-    // debugger
   }
 
 }
@@ -898,7 +912,6 @@ class Game {
     // gradient.addColorStop(time0to1, "rgb(255,255,255)");
     // gradient.addColorStop(1, "rgb(0,0,0)");
     // let color = (baseLog(this.timeVars.timeBase, this.timeVars.timeCoefficient) + 1) / 2 * 255;
-    // debugger
     // ctx.fillStyle = gradient;
     // ctx.fillStyle = `rgb(${255 - color},0,${color})`;
     ctx.fillStyle = `black`;
@@ -910,19 +923,12 @@ class Game {
 
   moveAmoebas(ctx) {
     this.amoebas = this.amoebas.filter(amoeba => {
-      return amoeba.radius > 0;
+      return amoeba.mass > 0;
     });
     this.quadTree.clear();
     for (let i = 0; i < this.amoebas.length; i++) {
       this.quadTree.insert1(this.amoebas[i]);
     }
-    this.quadTree.checkAllCollisions();
-    this.amoebas.forEach(amoeba => {
-      this.amoeboi ? this.amoeboi.aabbCheck(amoeba) : null;
-      this.amoeboi ? amoeba.aabbCheck(this.amoeboi) : null;
-      amoeba.wallCollision();
-    });
-    this.amoeboi ? this.amoeboi.wallCollision() : null;
     ctx.globalAlpha = 0.8;
     this.amoebas.forEach(amoeba => {
       amoeba.move();
@@ -931,6 +937,13 @@ class Game {
     this.amoeboi ? this.amoeboi.move() : null;
     this.amoeboi ? this.amoeboi.draw() : null;
     ctx.globalAlpha = 1;
+    this.quadTree.checkAllCollisions();
+    this.amoebas.forEach(amoeba => {
+      this.amoeboi ? this.amoeboi.aabbCheck(amoeba) : null;
+      this.amoeboi ? amoeba.aabbCheck(this.amoeboi) : null;
+      amoeba.wallCollision();
+    });
+    this.amoeboi ? this.amoeboi.wallCollision() : null;
   }
 
   makeHomepage(ctx) {
@@ -1050,7 +1063,6 @@ class QuadTree {
       this.split();
       let newAmoebas = [];
       for (let i = 0; i < this.amoebas.length; i++) {
-        // debugger
         index = this.getIndex(this.amoebas[i]);
         if (index !== -1) {
           this.children[index].insert1(this.amoebas[i]);
