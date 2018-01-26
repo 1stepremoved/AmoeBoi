@@ -334,7 +334,7 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  let game = new __WEBPACK_IMPORTED_MODULE_0__game__["a" /* default */](ctx, 20000, 20000);
+  let game = new __WEBPACK_IMPORTED_MODULE_0__game__["a" /* default */](ctx, 30000, 30000);
 
   window.onresize = ()=>{
     canvas.width = window.innerWidth;
@@ -546,8 +546,8 @@ class Game {
     this.boardVars.realBoardWidth = realBoardWidth;
     this.boardVars.realBoardHeight = realBoardHeight;
     this.boardVars.baseMass = 50000;
-    this.boardVars.maxZoom = 4;
-    this.boardVars.absoluteMaxZoom = 4;
+    this.boardVars.maxZoom = 8;
+    this.boardVars.absoluteMaxZoom = 8;
     this.boardVars.minZoom = 0.7;
     this.boardVars.currentZoom = this.boardVars.maxZoom;
     this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
@@ -567,6 +567,54 @@ class Game {
     this.iconImages.folderIcon.src = './assets/images/folderIcon.png';
   }
 
+  setupAmoebas(amoeboi) {
+    this.amoebas = [];
+    this.amoeboi = !amoeboi ? null : new __WEBPACK_IMPORTED_MODULE_2__amoeboi_js__["a" /* default */](this.ctx, this.boardVars.realBoardWidth / 2,
+                                                 this.boardVars.realBoardHeight / 2,
+                                                 100000, {x: 0, y: 0});
+    let mass, radius, xpos, ypos, momentum;
+    for (let i = 0; i < 2; i++) {
+      mass = Math.floor((Math.random() * 40000000) + 10000000);
+      radius = Math.sqrt(mass / (Math.PI));
+      xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
+      ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
+      momentum = {x: Math.floor(Math.random() * 1000000) - 500000, y: Math.floor(Math.random() * 1000000) - 500000};
+      this.amoebas.push(new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass));
+    }
+    for (let i = 0; i < 20; i++) {
+      mass = Math.floor((Math.random() * 4000000) + 1000000);
+      radius = Math.sqrt(mass / (Math.PI));
+      xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
+      ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
+      momentum = {x: Math.floor(Math.random() * 1000000) - 500000, y: Math.floor(Math.random() * 1000000) - 500000};
+      this.amoebas.push(new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass));
+    }
+    for (let i = 0; i < 180; i++) {
+      mass = Math.floor((Math.random() * 400000) + 100000);
+      radius = Math.sqrt(mass / (Math.PI));
+      xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
+      ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
+      momentum = {x: Math.floor(Math.random() * 1000000) - 500000, y: Math.floor(Math.random() * 1000000) - 500000};
+      this.amoebas.push(new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass));
+    }
+    for (let i = 0; i < 300; i++) {
+      mass = Math.floor((Math.random() * 400000) + 10000);
+      radius = Math.sqrt(mass / (Math.PI));
+      xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
+      ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
+      momentum = {x: Math.floor(Math.random() * 1000000) - 500000, y: Math.floor(Math.random() * 1000000) - 500000};
+      this.amoebas.push(new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass));
+    }
+    for (let i = 0; i < 600; i++) {
+      mass = Math.floor((Math.random() * 10000) + 10000);
+      radius = Math.sqrt(mass / (Math.PI));
+      xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
+      ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
+      momentum = {x: Math.floor(Math.random() * 500000) - 250000, y: Math.floor(Math.random() * 500000) - 250000};
+      this.amoebas.push(new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass));
+    }
+  }
+
   animate() {
     this.ctx.clearRect(0,0, innerWidth, innerHeight);
     this.makeGrid(this.ctx);
@@ -578,22 +626,17 @@ class Game {
       this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
       this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
       this.boardVars.baseMass = 50000;
-      this.amoeboi = null;
-      this.amoebas = [];
-      for (let i = 0; i < 400; i++) {
-        this.amoebas.push(new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx));
-      }
+
+      this.setupAmoebas(false);
+
       this.boardVars.boardFocus = {x: this.boardVars.realBoardWidth / 2, y: this.boardVars.realBoardHeight / 2};
       this.currentStatus = "homepage";
       return requestAnimationFrame(this.animate);
     }
 
     if (this.currentStatus === "setup") {
-      this.amoebas = [];
-      this.amoeboi = new __WEBPACK_IMPORTED_MODULE_2__amoeboi_js__["a" /* default */](this.ctx, this.boardVars.realBoardWidth / 2, this.boardVars.realBoardHeight / 2, 100000, {x: 100000, y: 0});
-      for (let i = 0; i < 400; i++) {
-        this.amoebas.push(new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx));
-      }
+      this.setupAmoebas(true);
+
       this.boardVars.currentZoom = 4;
       this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
       this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
@@ -652,6 +695,7 @@ class Game {
 
     this.makeMargins(this.ctx);
     this.makeMassDisplay(this.ctx);
+    this.makeInstructions(this.ctx);
     // this.makeClock(this.ctx);
     if (this.amoeboi.mass > 0) {
       this.boardVars.boardFocus = {x: this.amoeboi.xpos, y: this.amoeboi.ypos};
@@ -757,11 +801,22 @@ class Game {
     } else {
       displayWidth = 145;
     }
-    ctx.fillRect(window.innerWidth - 300, 65, displayWidth, 50);
+    ctx.fillRect(window.innerWidth - 220, 65, displayWidth, 50);
     ctx.globalAlpha = 1;
     ctx.fillStyle = 'white';
     ctx.font = '30px Impact';
-    ctx.fillText(`Mass: ${Math.floor(this.amoeboi.mass / 100) }`, window.innerWidth - 280, 100);
+    ctx.fillText(`Mass: ${Math.floor(this.amoeboi.mass / 100) }`, window.innerWidth - 200, 100);
+  }
+
+  makeInstructions(ctx) {
+    ctx.globalAlpha = 0.7;
+    ctx.fillStyle = 'black';
+    ctx.fillRect(50, 60, 150, 80);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = 'white';
+    ctx.font = '20px Georgia';
+    ctx.fillText(`Space: Pause`, 60, 90);
+    ctx.fillText(`H: Main Menu`, 60, 130);
   }
 
   makeMargins(ctx) {
