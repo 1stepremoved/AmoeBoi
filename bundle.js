@@ -186,8 +186,7 @@ class Amoeba {
         }
 
         let bubble = this.massDelta * this.mass
-            * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])( (this.radius - (currentDistance - amoeba.radius)) / this.radius, .1, 1)
-            * this.timeVars.timeCoefficient;
+            * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])( (this.radius - (currentDistance - amoeba.radius)) / this.radius, .1, 1);
 
         this.mass -= bubble;
         amoeba.mass += bubble;
@@ -202,8 +201,7 @@ class Amoeba {
         }
 
         let bubble = amoeba.massDelta * amoeba.mass
-            * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])( (amoeba.radius - (currentDistance - this.radius)) / amoeba.radius, .1, 1)
-            * this.timeVars.timeCoefficient;
+            * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])( (amoeba.radius - (currentDistance - this.radius)) / amoeba.radius, .1, 1);
 
         amoeba.mass -= bubble;
         this.mass += bubble;
