@@ -249,9 +249,6 @@ class Amoeba {
   }
 
   relativePos() {
-    // let xpos = (isNaN(this.xpos) ? 0 : this.xpos);
-    // let ypos = (isNaN(this.ypos) ? 0 : this.ypos);
-    // DEBUG: somehow these get turned into NaN when absorbed completely by another amoeba
     let relativeX = (((this.xpos - this.boardVars.boardFocus['x']) / (this.boardVars.boardWidth / 2)) * 500)
                        + (window.innerWidth / 2) + this.mouseVars.mouseOffset['x'];
     let relativeY = (((this.ypos - this.boardVars.boardFocus['y']) / (this.boardVars.boardHeight/ 2)) * 500)
@@ -264,6 +261,7 @@ class Amoeba {
       return;
     }
     if (isNaN(this.xpos) || isNaN(this.ypos) ){
+      // DEBUG: somehow these get turned into NaN when absorbed completely by another amoeba
       this.mass = 0;
       return;
     }
@@ -976,9 +974,9 @@ class Game {
     ctx.fillText(`PRESS ENTER TO START`, titlePosX + 85 - (5 * homepageWave), titlePosY + 100 + (2*homepageWave));
 
     ctx.font = '50px Impact';
-    ctx.fillText(`INSTRUCTIONS`, titlePosX + 75, titlePosY + 360);
+    ctx.fillText(`⬇ INSTRUCTIONS ⬇`, titlePosX + 15, titlePosY + 360);
 
-    ctx.fillText(`MAIN MENU`, titlePosX + 110, titlePosY + 850);
+    ctx.fillText(`⬆ MAIN MENU ⬆`, titlePosX + 50, titlePosY + 850);
 
     ctx.font = '25px Arial Black';
     ctx.fillText("Become the Biggest!", titlePosX + 80, titlePosY + 930);
