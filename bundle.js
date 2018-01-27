@@ -770,7 +770,7 @@ class Game {
       this.boardVars.baseMass = this.amoeboi.mass;
       if (this.amoeboi.radius / this.boardVars.realBoardWidth * 1000 * this.boardVars.currentZoom > 75) {
         this.boardVars.maxZoom = Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(75 / (this.amoeboi.radius / this.boardVars.realBoardWidth * 1000), 1, this.boardVars.absoluteMaxZoom);
-        this.boardVars.currentZoom = Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(this.boardVars.currentZoom * 0.999, this.boardVars.minZoom, this.boardVars.maxZoom);
+        this.boardVars.currentZoom = Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(this.boardVars.currentZoom * 0.9999999, this.boardVars.minZoom, this.boardVars.maxZoom);
         this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
         this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
       }
