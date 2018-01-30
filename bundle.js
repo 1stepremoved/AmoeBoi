@@ -905,12 +905,13 @@ class Game {
   makeInstructions(ctx) {
     ctx.globalAlpha = 0.7;
     ctx.fillStyle = 'black';
-    ctx.fillRect(50, 60, 150, 80);
+    ctx.fillRect(50, 60, 265, 120);
     ctx.globalAlpha = 1;
     ctx.fillStyle = 'white';
-    ctx.font = '20px Georgia';
-    ctx.fillText(`Space: Pause`, 60, 90);
-    ctx.fillText(`H: Main Menu`, 60, 130);
+    ctx.font = '20px Arial Black';
+    ctx.fillText(`SPACE  :  Pause`, 60, 90);
+    ctx.fillText(` SHIFT  :  Look Around`, 60, 130);
+    ctx.fillText(`    H      :  Main Menu`, 62, 170);
   }
 
   makeMargins(ctx) {
