@@ -606,7 +606,7 @@ class Game {
   setupTime() {
     this.timeVars = {};
     this.timeVars.timeBase = 10;
-    this.timeVars.timeCoefficient = .2;
+    this.timeVars.timeCoefficient = 1;
 
     __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */].prototype.timeVars = this.timeVars;
   }
@@ -730,7 +730,7 @@ class Game {
     if (this.currentStatus === "reset") {
       this.boardVars.maxZoom = 4;
       this.boardVars.currentZoom = 2;
-      this.timeVars.timeCoefficient = 0.2;
+      this.timeVars.timeCoefficient = 0.5;
       this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
       this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
       this.boardVars.baseMass = 50000;
@@ -746,6 +746,7 @@ class Game {
       this.setupAmoebas(true);
       this.homepageYOffset = 0;
       this.boardVars.currentZoom = 4;
+      this.timeVars.timeCoefficient = 1;
       this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
       this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
       this.boardVars.baseMass = this.amoeboi.mass;
