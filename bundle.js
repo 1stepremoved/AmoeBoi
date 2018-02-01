@@ -961,21 +961,28 @@ class Game {
   }
 
   makeInstructions(ctx) {
+    ctx.globalAlpha = 0.7;
+    ctx.fillStyle = 'black';
     if (!this.showInstructions) {
+      ctx.fillRect(50, 65, 340, 50);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = 'white';
+      ctx.font = '20px Arial Black';
+      ctx.fillText(`PRESS I FOR INSTRUCTIONS`, 60, 100);
       return;
     }
     ctx.globalAlpha = 0.7;
     ctx.fillStyle = 'black';
-    ctx.fillRect(50, 60, 350, 240);
+    ctx.fillRect(50, 65, 350, 240);
     ctx.globalAlpha = 1;
     ctx.fillStyle = 'white';
     ctx.font = '20px Arial Black';
-    ctx.fillText(`SPACE   :  Pause`, 60, 90);
-    ctx.fillText(` SHIFT   :  Look Around`, 61, 130);
+    ctx.fillText(`SPACE   :  Pause`, 60, 95);
+    ctx.fillText(` SHIFT   :  Look Around`, 61, 135);
     ctx.fillText(`SCROLL :  Zoom`, 60, 170);
-    ctx.fillText(`     H      :  Main Menu`, 65, 210);
-    ctx.fillText(`     R      :  Restart`, 65, 250);
-    ctx.fillText(`     I       :  Toggle Instructions`, 67, 290);
+    ctx.fillText(`     H      :  Main Menu`, 65, 215);
+    ctx.fillText(`     R      :  Restart`, 65, 255);
+    ctx.fillText(`     I       :  Toggle Instructions`, 67, 295);
   }
 
   makeMargins(ctx) {
