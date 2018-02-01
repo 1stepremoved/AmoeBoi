@@ -191,7 +191,8 @@ class Amoeba {
         }
 
         let bubble = amoebae['small'].massDelta * amoebae['small'].mass
-            * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])( (amoebae['small'].radius - (currentDistance - amoebae['big'].radius)) / amoebae['small'].radius, .01, .1);
+            * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])( (amoebae['small'].radius - (currentDistance - amoebae['big'].radius)) / amoebae['small'].radius, .01, .1)
+            * Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(this.timeVars.timeCoefficient, 0.5, 2);
 
         amoebae['small'].mass -= bubble;
         amoebae['big'].mass += bubble;
@@ -497,8 +498,9 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       case 13:
         game.homepageTime = null;
-        if (game.currentStatus !== "homepage") { return; }
+        if (game.currentStatus !== "homepage" && game.currentStatus !== "instructions" ) { return; }
         game.currentStatus = "setup";
+        game.homepageYOffset = 0;
         return;
       case 16:
         game.shiftDown = true;
@@ -636,7 +638,7 @@ class Game {
       xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
       ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
       momentum = {x: Math.floor(Math.random() * 1000000) - 500000, y: Math.floor(Math.random() * 1000000) - 500000};
-      amoeba = new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass);
+      amoeba = new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass, momentum);
       while (this.amoeboi && this.amoeboi.collidesWith(amoeba)) {
         amoeba.xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
         amoeba.ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
@@ -649,46 +651,46 @@ class Game {
       xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
       ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
       momentum = {x: Math.floor(Math.random() * 1000000) - 500000, y: Math.floor(Math.random() * 1000000) - 500000};
-      amoeba = new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass);
+      amoeba = new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass, momentum);
       while (this.amoeboi && this.amoeboi.collidesWith(amoeba)) {
         amoeba.xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
         amoeba.ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
       }
       this.amoebas.push(amoeba);
     }
-    for (let i = 0; i < 180; i++) {
+    for (let i = 0; i < 700; i++) {
       mass = Math.floor((Math.random() * 400000) + 100000);
       radius = Math.sqrt(mass / (Math.PI));
       xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
       ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
       momentum = {x: Math.floor(Math.random() * 1000000) - 500000, y: Math.floor(Math.random() * 1000000) - 500000};
-      amoeba = new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass);
+      amoeba = new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass, momentum);
       while (this.amoeboi && this.amoeboi.collidesWith(amoeba)) {
         amoeba.xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
         amoeba.ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
       }
       this.amoebas.push(amoeba);
     }
-    for (let i = 0; i < 300; i++) {
+    for (let i = 0; i < 50; i++) {
       mass = Math.floor((Math.random() * 400000) + 10000);
       radius = Math.sqrt(mass / (Math.PI));
       xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
       ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
       momentum = {x: Math.floor(Math.random() * 1000000) - 500000, y: Math.floor(Math.random() * 1000000) - 500000};
-      amoeba = new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass);
+      amoeba = new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass, momentum);
       while (this.amoeboi && this.amoeboi.collidesWith(amoeba)) {
         amoeba.xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
         amoeba.ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
       }
       this.amoebas.push(amoeba);
     }
-    for (let i = 0; i < 600; i++) {
+    for (let i = 0; i < 1000; i++) {
       mass = Math.floor((Math.random() * 10000) + 10000);
       radius = Math.sqrt(mass / (Math.PI));
       xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
       ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
-      momentum = {x: Math.floor(Math.random() * 500000) - 250000, y: Math.floor(Math.random() * 500000) - 250000};
-      amoeba = new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass);
+      momentum = {x: Math.floor(Math.random() * 100000) - 50000, y: Math.floor(Math.random() * 100000) - 50000};
+      amoeba = new __WEBPACK_IMPORTED_MODULE_1__amoeba_js__["a" /* default */](this.ctx, xpos, ypos, mass, momentum);
       while (this.amoeboi && this.amoeboi.collidesWith(amoeba)) {
         amoeba.xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
         amoeba.ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
@@ -774,6 +776,34 @@ class Game {
       return requestAnimationFrame(this.animate);
     }
 
+    if (this.currentStatus === "movingToLoseScreen") {
+      if (this.homepageYOffset > 1000) {
+        this.homepageYOffset -= 20;
+      } else {
+        this.currentStatus = "losescreen";
+      }
+      this.moveAmoebas(this.ctx);
+      this.makeHomepage(this.ctx);
+      return requestAnimationFrame(this.animate);
+    }
+
+    if (this.currentStatus === "losescreen") {
+      this.moveAmoebas(this.ctx);
+      this.makeHomepage(this.ctx);
+      return requestAnimationFrame(this.animate);
+    }
+
+    if (this.currentStatus === "losescreenToHomePage") {
+      if (this.homepageYOffset > 0) {
+        this.homepageYOffset -= 20;
+      } else {
+        this.currentStatus = "homepage";
+      }
+      this.moveAmoebas(this.ctx);
+      this.makeHomepage(this.ctx);
+      return requestAnimationFrame(this.animate);
+    }
+
     if (this.paused) {
       this.amoebas.forEach(amoeba => {
         amoeba.draw();
@@ -812,6 +842,26 @@ class Game {
       this.boardVars.baseMass = 0;
     }
     requestAnimationFrame(this.animate);
+  }
+
+  makeLoseScren(ctx) {
+    ctx.globalAlpha = 0.7;
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    let mouseOffsetX = this.mousePos['x'] / window.innerWidth * 50;
+    let mouseOffsetY = this.mousePos['y'] / window.innerHeight * 50;
+
+    let homepageWave = Math.sin(((Date.now() - this.homepageTime) % 1500) / 1500 * Math.PI);
+
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = 'white';
+    ctx.font = '70px Impact';
+    let titlePosX = (window.innerWidth / 2) - 75 - mouseOffsetX;
+    let titlePosY = (window.innerHeight / 2) + 50 - mouseOffsetY + this.homepageYOffset;
+    ctx.fillText(`YOU'VE LOST`, titlePosX, titlePosY);
+    ctx.font = '40px Impact';
+    ctx.fillText(`Press R to play again`, titlePosX, titlePosY + 40);
+    ctx.fillText(`Press H to return to Main Menu`, titlePosX, titlePosY + 80);
   }
 
   makePause(ctx) {
@@ -905,13 +955,14 @@ class Game {
   makeInstructions(ctx) {
     ctx.globalAlpha = 0.7;
     ctx.fillStyle = 'black';
-    ctx.fillRect(50, 60, 265, 120);
+    ctx.fillRect(50, 60, 270, 160);
     ctx.globalAlpha = 1;
     ctx.fillStyle = 'white';
     ctx.font = '20px Arial Black';
-    ctx.fillText(`SPACE  :  Pause`, 60, 90);
-    ctx.fillText(` SHIFT  :  Look Around`, 60, 130);
-    ctx.fillText(`    H      :  Main Menu`, 62, 170);
+    ctx.fillText(`SPACE   :  Pause`, 60, 90);
+    ctx.fillText(` SHIFT   :  Look Around`, 61, 130);
+    ctx.fillText(`SCROLL :  Zoom`, 60, 170);
+    ctx.fillText(`     H      :  Main Menu`, 65, 210);
   }
 
   makeMargins(ctx) {
@@ -1017,7 +1068,7 @@ class Game {
     ctx.fillText("Press space to pause the game", titlePosX + 10, titlePosY + 1300);
     ctx.fillText("and press H to return to the Main Menu at any time.", titlePosX - 130, titlePosY + 1330);
 
-    ctx.fillText("Have fun!", titlePosX + 160, titlePosY + 1400);
+    ctx.fillText("PRESS ENTER TO START", titlePosX + 50 , titlePosY + 1400);
 
     ctx.drawImage(this.iconImages.githubLogo, titlePosX - 50, titlePosY + 170, 80, 80);
     ctx.drawImage(this.iconImages.linkedInLogo, titlePosX + 180, titlePosY + 170, 72, 72);
