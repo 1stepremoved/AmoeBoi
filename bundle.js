@@ -492,9 +492,19 @@ document.addEventListener("DOMContentLoaded", () => {
           document.body.style.cursor = "default";
           game.currentStatus = "movingToHomePage";
           return;
+        } else if (game.currentStatus === "losescreen"){
+          document.body.style.cursor = "default";
+          game.currentStatus = "losescreenToHomePage";
+          return;
         }
         game.currentStatus = "reset";
         game.paused = false;
+        return;
+      case 73:
+        game.showInstructions = !game.showInstructions;
+        return;
+      case 82:
+        game.currentStatus = "setup";
         return;
       case 13:
         game.homepageTime = null;
@@ -572,6 +582,8 @@ class Game {
     this.homepageTime = null;
     this.mousePos = {x: 0, y: 0};
     this.shiftDown = false;
+    this.homepageAlpha = 0;
+    this.showInstructions = true;
 
     this.animate = this.animate.bind(this);
     this.moveAmoebas = this.moveAmoebas.bind(this);
@@ -732,13 +744,14 @@ class Game {
 
     if (this.currentStatus === "setup") {
       this.setupAmoebas(true);
-
+      this.homepageYOffset = 0;
       this.boardVars.currentZoom = 4;
       this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
       this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
       this.boardVars.baseMass = this.amoeboi.mass;
       this.boardVars.boardFocus = {x: this.amoeboi.xpos, y: this.amoeboi.ypos};
       this.currentStatus = "playing";
+      this.showInstructions = true;
       return requestAnimationFrame(this.animate);
     }
 
@@ -773,6 +786,26 @@ class Game {
       }
       this.moveAmoebas(this.ctx);
       this.makeHomepage(this.ctx);
+      return requestAnimationFrame(this.animate);
+    }
+
+    if (this.currentStatus === "coloringLoseScreen") {
+      this.boardVars.boardFocus['x'] += (this.boardVars.boardFocus['x'] < this.boardVars.realBoardWidth / 2) ? 10 : -10;
+      this.boardVars.boardFocus['y'] += (this.boardVars.boardFocus['y'] < this.boardVars.realBoardHeight / 2) ? 10 : -10;
+      this.boardVars.currentZoom = this.boardVars.currentZoom > 1 ? this.boardVars.currentZoom * 0.9 : this.boardVars.currentZoom;
+      this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
+      this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
+      this.boardVars.baseMass = 0;
+      if (this.homepageAlpha < 0.7) {
+        this.homepageAlpha += .1;
+      } else {
+        this.homepageYOffset = 1500;
+        this.currentStatus = "movingToLoseScreen";
+      }
+      this.ctx.globalAlpha = this.homepageAlpha;
+      this.ctx.fillStyle = 'black';
+      this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+      this.moveAmoebas(this.ctx);
       return requestAnimationFrame(this.animate);
     }
 
@@ -834,34 +867,9 @@ class Game {
         this.boardVars.maxZoom = Object(__WEBPACK_IMPORTED_MODULE_0__util__["b" /* boundNum */])(75 / (this.amoeboi.radius / this.boardVars.realBoardWidth * 1000), 1, this.boardVars.absoluteMaxZoom);
       }
     } else {
-      this.boardVars.boardFocus['x'] += (this.boardVars.boardFocus['x'] < this.boardVars.realBoardWidth / 2) ? 10 : -10;
-      this.boardVars.boardFocus['y'] += (this.boardVars.boardFocus['y'] < this.boardVars.realBoardHeight / 2) ? 10 : -10;
-      this.boardVars.currentZoom = this.boardVars.currentZoom > 1 ? this.boardVars.currentZoom * 0.9 : this.boardVars.currentZoom;
-      this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
-      this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
-      this.boardVars.baseMass = 0;
+      this.currentStatus = "coloringLoseScreen";
     }
     requestAnimationFrame(this.animate);
-  }
-
-  makeLoseScren(ctx) {
-    ctx.globalAlpha = 0.7;
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-    let mouseOffsetX = this.mousePos['x'] / window.innerWidth * 50;
-    let mouseOffsetY = this.mousePos['y'] / window.innerHeight * 50;
-
-    let homepageWave = Math.sin(((Date.now() - this.homepageTime) % 1500) / 1500 * Math.PI);
-
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = 'white';
-    ctx.font = '70px Impact';
-    let titlePosX = (window.innerWidth / 2) - 75 - mouseOffsetX;
-    let titlePosY = (window.innerHeight / 2) + 50 - mouseOffsetY + this.homepageYOffset;
-    ctx.fillText(`YOU'VE LOST`, titlePosX, titlePosY);
-    ctx.font = '40px Impact';
-    ctx.fillText(`Press R to play again`, titlePosX, titlePosY + 40);
-    ctx.fillText(`Press H to return to Main Menu`, titlePosX, titlePosY + 80);
   }
 
   makePause(ctx) {
@@ -953,9 +961,12 @@ class Game {
   }
 
   makeInstructions(ctx) {
+    if (!this.showInstructions) {
+      return;
+    }
     ctx.globalAlpha = 0.7;
     ctx.fillStyle = 'black';
-    ctx.fillRect(50, 60, 270, 160);
+    ctx.fillRect(50, 60, 350, 240);
     ctx.globalAlpha = 1;
     ctx.fillStyle = 'white';
     ctx.font = '20px Arial Black';
@@ -963,6 +974,8 @@ class Game {
     ctx.fillText(` SHIFT   :  Look Around`, 61, 130);
     ctx.fillText(`SCROLL :  Zoom`, 60, 170);
     ctx.fillText(`     H      :  Main Menu`, 65, 210);
+    ctx.fillText(`     R      :  Restart`, 65, 250);
+    ctx.fillText(`     I       :  Toggle Instructions`, 67, 290);
   }
 
   makeMargins(ctx) {
@@ -1073,6 +1086,13 @@ class Game {
     ctx.drawImage(this.iconImages.githubLogo, titlePosX - 50, titlePosY + 170, 80, 80);
     ctx.drawImage(this.iconImages.linkedInLogo, titlePosX + 180, titlePosY + 170, 72, 72);
     ctx.drawImage(this.iconImages.folderIcon, titlePosX + 380, titlePosY + 170, 88, 88);
+
+    ctx.fillStyle = 'white';
+    ctx.font = '70px Impact';
+    ctx.fillText(`YOU'VE LOST`, titlePosX + 55, titlePosY - 920);
+    ctx.font = '40px Impact';
+    ctx.fillText(`Press R to play again`, titlePosX + 50, titlePosY - 840);
+    ctx.fillText(`Press H to return to Main Menu`, titlePosX - 27.5, titlePosY - 760);
   }
 
 }
