@@ -797,16 +797,21 @@ class Game {
       this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
       this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
       this.boardVars.baseMass = 0;
+      this.moveAmoebas(this.ctx);
       if (this.homepageAlpha < 0.7) {
-        this.homepageAlpha += .1;
+        this.homepageAlpha += .05;
       } else {
         this.homepageYOffset = 1500;
+        this.ctx.globalAlpha = this.homepageAlpha;
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+        this.homepageAlpha = 0;
         this.currentStatus = "movingToLoseScreen";
+        return requestAnimationFrame(this.animate);
       }
       this.ctx.globalAlpha = this.homepageAlpha;
       this.ctx.fillStyle = 'black';
       this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-      this.moveAmoebas(this.ctx);
       return requestAnimationFrame(this.animate);
     }
 
