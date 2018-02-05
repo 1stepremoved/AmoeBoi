@@ -521,6 +521,11 @@ document.addEventListener("DOMContentLoaded", () => {
       case 16:
         game.shiftDown = true;
         return;
+      case 67:
+        if (game.currentStatus === "winScreen") {
+          game.currentStatus = "nextLevel";
+        }
+        return;
       default:
         return;
     }
@@ -618,6 +623,8 @@ class Game {
   }
 
   setupProportions(realBoardWidth, realBoardHeight) {
+    this.boardSize = (realBoardWidth / 30000);
+
     this.boardVars = {};
     this.boardVars.realBoardWidth = realBoardWidth;
     this.boardVars.realBoardHeight = realBoardHeight;
@@ -650,7 +657,7 @@ class Game {
                                                  100000, {x: 0, y: 0});
     this.quadTree = new __WEBPACK_IMPORTED_MODULE_3__quadtree_js__["a" /* default */](0,0, this.boardVars.realBoardWidth, this.boardVars.realBoardHeight);
     let mass, radius, xpos, ypos, momentum, amoeba;
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0, num = parseInt(2 * this.boardSize); i < num; i++) {
       mass = Math.floor((Math.random() * 40000000) + 10000000);
       radius = Math.sqrt(mass / (Math.PI));
       xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
@@ -663,7 +670,7 @@ class Game {
       }
       this.amoebas.push(amoeba);
     }
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0, num = parseInt(20 * this.boardSize); i < num; i++) {
       mass = Math.floor((Math.random() * 4000000) + 1000000);
       radius = Math.sqrt(mass / (Math.PI));
       xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
@@ -676,7 +683,7 @@ class Game {
       }
       this.amoebas.push(amoeba);
     }
-    for (let i = 0; i < 700; i++) {
+    for (let i = 0, num = parseInt(700 * this.boardSize); i < num; i++) {
       mass = Math.floor((Math.random() * 400000) + 100000);
       radius = Math.sqrt(mass / (Math.PI));
       xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
@@ -689,7 +696,7 @@ class Game {
       }
       this.amoebas.push(amoeba);
     }
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0, num = parseInt(50 * this.boardSize); i < num; i++) {
       mass = Math.floor((Math.random() * 400000) + 10000);
       radius = Math.sqrt(mass / (Math.PI));
       xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
@@ -702,7 +709,7 @@ class Game {
       }
       this.amoebas.push(amoeba);
     }
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0, num = parseInt(1000 * this.boardSize); i < num; i++) {
       mass = Math.floor((Math.random() * 10000) + 10000);
       radius = Math.sqrt(mass / (Math.PI));
       xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
@@ -749,12 +756,26 @@ class Game {
     }
 
     if (this.currentStatus === "setup") {
+      this.setupProportions(30000,30000);
       this.setupAmoebas(true);
       this.homepageYOffset = 0;
       this.boardVars.currentZoom = 4;
       this.timeVars.timeCoefficient = 0.5;
       this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
       this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
+      this.boardVars.baseMass = this.amoeboi.mass;
+      this.boardVars.boardFocus = {x: this.amoeboi.xpos, y: this.amoeboi.ypos};
+      this.currentStatus = "playing";
+      this.showInstructions = true;
+      return requestAnimationFrame(this.animate);
+    }
+
+    if (this.currentStatus === "nextLevel") {
+      this.homepageYOffset = 0;
+      this.boardVars.currentZoom = 4;
+      this.timeVars.timeCoefficient = 0.5;
+      this.setupProportions(this.boardVars.realBoardWidth * 1.2, this.boardVars.realBoardHeight * 1.2);
+      this.setupAmoebas(true);
       this.boardVars.baseMass = this.amoeboi.mass;
       this.boardVars.boardFocus = {x: this.amoeboi.xpos, y: this.amoeboi.ypos};
       this.currentStatus = "playing";
@@ -857,6 +878,51 @@ class Game {
       return requestAnimationFrame(this.animate);
     }
 
+    if (this.currentStatus === "playing" && this.checkWin()) {
+      this.currentStatus = "coloringWinScreen";
+    }
+
+    if (this.currentStatus === "coloringWinScreen") {
+      this.boardVars.boardFocus['x'] += (this.boardVars.boardFocus['x'] < this.boardVars.realBoardWidth / 2) ? 10 : -10;
+      this.boardVars.boardFocus['y'] += (this.boardVars.boardFocus['y'] < this.boardVars.realBoardHeight / 2) ? 10 : -10;
+      this.boardVars.currentZoom = this.boardVars.currentZoom > 1 ? this.boardVars.currentZoom * 0.9 : this.boardVars.currentZoom;
+      this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
+      this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
+      this.boardVars.baseMass = this.amoeboi.mass;
+      this.moveAmoebas(this.ctx);
+      if (this.homepageAlpha < 0.5) {
+        this.homepageAlpha += .05;
+      } else {
+        this.homepageYOffset = 1500;
+        this.homepageAlpha = 0;
+        this.currentStatus = "movingToWinScreen";
+        return requestAnimationFrame(this.animate);
+      }
+      this.ctx.globalAlpha = this.homepageAlpha;
+      this.ctx.fillStyle = 'black';
+      this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+      return requestAnimationFrame(this.animate);
+    }
+
+    if (this.currentStatus === "movingToWinScreen") {
+      if (this.homepageYOffset > 1000) {
+        this.homepageYOffset -= 20;
+      } else {
+        this.currentStatus = "winScreen";
+      }
+      this.boardVars.baseMass = this.amoeboi.mass;
+      this.moveAmoebas(this.ctx);
+      this.makeWinScreen(this.ctx);
+      return requestAnimationFrame(this.animate);
+    }
+
+    if (this.currentStatus === "winScreen") {
+      this.boardVars.baseMass = this.amoeboi.mass;
+      this.moveAmoebas(this.ctx);
+      this.makeWinScreen(this.ctx);
+      return requestAnimationFrame(this.animate);
+    }
+
     this.moveAmoebas(this.ctx);
 
     this.makeMargins(this.ctx);
@@ -879,6 +945,40 @@ class Game {
       this.currentStatus = "coloringLoseScreen";
     }
     requestAnimationFrame(this.animate);
+  }
+
+  moveAmoebas(ctx) {
+    this.amoebas = this.amoebas.filter(amoeba => {
+      return amoeba.mass > 0;
+    });
+    this.quadTree.clear();
+    for (let i = 0; i < this.amoebas.length; i++) {
+      this.quadTree.insert1(this.amoebas[i]);
+    }
+    ctx.globalAlpha = 0.8;
+    this.amoebas.forEach(amoeba => {
+      amoeba.move();
+      amoeba.draw();
+    });
+    this.amoeboi ? this.amoeboi.move() : null;
+    this.amoeboi ? this.amoeboi.draw() : null;
+    ctx.globalAlpha = 1;
+    this.quadTree.checkAllCollisions();
+    this.amoebas.forEach(amoeba => {
+      this.amoeboi ? this.amoeboi.aabbCheck(amoeba) : null;
+      this.amoeboi ? amoeba.aabbCheck(this.amoeboi) : null;
+      amoeba.wallCollision();
+    });
+    this.amoeboi ? this.amoeboi.wallCollision() : null;
+  }
+
+  checkWin() {
+    for (let i = 0, num = this.amoebas.length; i < num; i++) {
+      if (this.amoeboi.mass < this.amoebas[i].mass) {
+        return false;
+      }
+    }
+    return true;
   }
 
   makePause(ctx) {
@@ -1026,29 +1126,20 @@ class Game {
     ctx.globalAlpha = 1;
   }
 
-  moveAmoebas(ctx) {
-    this.amoebas = this.amoebas.filter(amoeba => {
-      return amoeba.mass > 0;
-    });
-    this.quadTree.clear();
-    for (let i = 0; i < this.amoebas.length; i++) {
-      this.quadTree.insert1(this.amoebas[i]);
-    }
-    ctx.globalAlpha = 0.8;
-    this.amoebas.forEach(amoeba => {
-      amoeba.move();
-      amoeba.draw();
-    });
-    this.amoeboi ? this.amoeboi.move() : null;
-    this.amoeboi ? this.amoeboi.draw() : null;
+  makeWinScreen(ctx) {
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    let mouseOffsetX = this.mousePos['x'] / window.innerWidth * 50;
+    let mouseOffsetY = this.mousePos['y'] / window.innerHeight * 50;
+    let titlePosX = (window.innerWidth / 2) - 195 - mouseOffsetX;
+    let titlePosY = (window.innerHeight / 2) - 80 - mouseOffsetY + this.homepageYOffset;
     ctx.globalAlpha = 1;
-    this.quadTree.checkAllCollisions();
-    this.amoebas.forEach(amoeba => {
-      this.amoeboi ? this.amoeboi.aabbCheck(amoeba) : null;
-      this.amoeboi ? amoeba.aabbCheck(this.amoeboi) : null;
-      amoeba.wallCollision();
-    });
-    this.amoeboi ? this.amoeboi.wallCollision() : null;
+    ctx.fillStyle = 'white';
+    ctx.font = '70px Impact';
+    ctx.fillText(`YOU'VE WON`, titlePosX + 55, titlePosY - 920);
+    ctx.font = '40px Impact';
+    ctx.fillText(`Press C to continue`, titlePosX + 65, titlePosY - 840);
   }
 
   makeHomepage(ctx) {
