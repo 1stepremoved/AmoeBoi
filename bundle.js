@@ -442,18 +442,24 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         document.body.style.cursor = "default";
       }
+      if (window.innerHeight - e.pageY < 30) {
+        game.currentStatus = "movingToInstructions";
+      }
     } else if (game.currentStatus === "instructions") {
       let mouseOffsetX = game.mousePos['x'] / window.innerWidth * 50;
       let mouseOffsetY = game.mousePos['y'] / window.innerHeight * 50;
       let titlePosX = (window.innerWidth / 2) - 195 - mouseOffsetX;
       let titlePosY = (window.innerHeight / 2) - 80 - mouseOffsetY + game.homepageYOffset;
 
-        if (e.pageX > titlePosX + 110 && e.pageX < titlePosX + 335
-            && e.pageY > titlePosY + 805 && e.pageY < titlePosY + 850) {
-          document.body.style.cursor = "pointer";
-        } else {
-          document.body.style.cursor = "default";
-        }
+      if (e.pageX > titlePosX + 110 && e.pageX < titlePosX + 335
+          && e.pageY > titlePosY + 805 && e.pageY < titlePosY + 850) {
+        document.body.style.cursor = "pointer";
+      } else {
+        document.body.style.cursor = "default";
+      }
+      if (e.pageY < 30) {
+        game.currentStatus = "movingToHomePage";
+      }
     } else if (game.currentStatus === "playing" && game.shiftDown) {
       game.mouseVars.mouseOffset['x'] = ((window.innerWidth / 2) - e.pageX) / 2;
       game.mouseVars.mouseOffset['y'] = ((window.innerHeight / 2) - e.pageY) / 2;
@@ -798,13 +804,10 @@ class Game {
       this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
       this.boardVars.baseMass = 0;
       this.moveAmoebas(this.ctx);
-      if (this.homepageAlpha < 0.7) {
+      if (this.homepageAlpha < 0.5) {
         this.homepageAlpha += .05;
       } else {
         this.homepageYOffset = 1500;
-        this.ctx.globalAlpha = this.homepageAlpha;
-        this.ctx.fillStyle = 'black';
-        this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
         this.homepageAlpha = 0;
         this.currentStatus = "movingToLoseScreen";
         return requestAnimationFrame(this.animate);
@@ -879,7 +882,7 @@ class Game {
   }
 
   makePause(ctx) {
-    ctx.globalAlpha = 0.7;
+    ctx.globalAlpha = 0.5;
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
     let mouseOffsetX = this.mousePos['x'] / window.innerWidth * 50;
@@ -951,7 +954,7 @@ class Game {
   }
 
   makeMassDisplay(ctx) {
-    ctx.globalAlpha = 0.7;
+    ctx.globalAlpha = 0.5;
     ctx.fillStyle = 'black';
     let displayWidth;
     if (this.amoeboi.mass > 0) {
@@ -967,7 +970,7 @@ class Game {
   }
 
   makeInstructions(ctx) {
-    ctx.globalAlpha = 0.7;
+    ctx.globalAlpha = 0.5;
     ctx.fillStyle = 'black';
     if (!this.showInstructions) {
       ctx.fillRect(50, 65, 340, 50);
@@ -977,7 +980,7 @@ class Game {
       ctx.fillText(`PRESS I FOR INSTRUCTIONS`, 60, 100);
       return;
     }
-    ctx.globalAlpha = 0.7;
+    ctx.globalAlpha = 0.5;
     ctx.fillStyle = 'black';
     ctx.fillRect(50, 65, 350, 240);
     ctx.globalAlpha = 1;
@@ -992,7 +995,7 @@ class Game {
   }
 
   makeMargins(ctx) {
-    ctx.globalAlpha = 0.7;
+    ctx.globalAlpha = 0.5;
     ctx.fillStyle = "black";
     let marginHeight = Math.floor(window.innerHeight / 8);
     let marginWidth = Math.floor(window.innerWidth / 8);
@@ -1049,7 +1052,7 @@ class Game {
   }
 
   makeHomepage(ctx) {
-    ctx.globalAlpha = 0.7;
+    ctx.globalAlpha = 0.5;
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
     let mouseOffsetX = this.mousePos['x'] / window.innerWidth * 50;
