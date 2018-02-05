@@ -629,8 +629,8 @@ class Game {
     this.boardVars.realBoardWidth = realBoardWidth;
     this.boardVars.realBoardHeight = realBoardHeight;
     this.boardVars.baseMass = 50000;
-    this.boardVars.maxZoom = 8;
-    this.boardVars.absoluteMaxZoom = 8;
+    this.boardVars.maxZoom = parseInt(50 / Math.sqrt(100000 / Math.PI) * realBoardWidth / 1000); //100000 is the starting mass for amoeboi
+    this.boardVars.absoluteMaxZoom = this.boardVars.maxZoom;
     this.boardVars.minZoom = 0.7;
     this.boardVars.currentZoom = this.boardVars.maxZoom;
     this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
@@ -658,7 +658,8 @@ class Game {
     this.quadTree = new __WEBPACK_IMPORTED_MODULE_3__quadtree_js__["a" /* default */](0,0, this.boardVars.realBoardWidth, this.boardVars.realBoardHeight);
     let mass, radius, xpos, ypos, momentum, amoeba;
     for (let i = 0, num = parseInt(2 * this.boardSize); i < num; i++) {
-      mass = Math.floor((Math.random() * 40000000) + 10000000);
+      mass = Math.pow(this.boardVars.realBoardHeight / 30 * Math.PI,2)
+      mass = Math.floor((Math.random() * mass * 4) + mass);
       radius = Math.sqrt(mass / (Math.PI));
       xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
       ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
@@ -671,7 +672,7 @@ class Game {
       this.amoebas.push(amoeba);
     }
     for (let i = 0, num = parseInt(20 * this.boardSize); i < num; i++) {
-      mass = Math.floor((Math.random() * 4000000) + 1000000);
+      mass = Math.floor((Math.random() * 4000000 * Math.pow(this.boardSize,2)) + (1000000 * Math.pow(this.boardSize, 2)));
       radius = Math.sqrt(mass / (Math.PI));
       xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
       ypos = Math.floor(Math.random() * (this.boardVars.realBoardHeight - radius)) + radius;
@@ -756,7 +757,7 @@ class Game {
     }
 
     if (this.currentStatus === "setup") {
-      this.setupProportions(30000,30000);
+      this.setupProportions(60000,60000);
       this.setupAmoebas(true);
       this.homepageYOffset = 0;
       this.boardVars.currentZoom = 4;
@@ -999,7 +1000,7 @@ class Game {
   }
 
   makeClock(ctx) {
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = 0.7;
 
     ctx.beginPath();
     ctx.arc(120, 120, 65, 0, ((Object(__WEBPACK_IMPORTED_MODULE_0__util__["a" /* baseLog */])(this.timeVars.timeBase, this.timeVars.timeCoefficient) + 1) / 2 * Math.PI * 2));
@@ -1054,7 +1055,7 @@ class Game {
   }
 
   makeMassDisplay(ctx) {
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = 0.7;
     ctx.fillStyle = 'black';
     let displayWidth;
     if (this.amoeboi.mass > 0) {
@@ -1070,7 +1071,7 @@ class Game {
   }
 
   makeInstructions(ctx) {
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = 0.7;
     ctx.fillStyle = 'black';
     if (!this.showInstructions) {
       ctx.fillRect(50, 65, 340, 50);
@@ -1080,7 +1081,7 @@ class Game {
       ctx.fillText(`PRESS I FOR INSTRUCTIONS`, 60, 100);
       return;
     }
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = 0.7;
     ctx.fillStyle = 'black';
     ctx.fillRect(50, 65, 350, 240);
     ctx.globalAlpha = 1;
@@ -1095,7 +1096,7 @@ class Game {
   }
 
   makeMargins(ctx) {
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = 0.7;
     ctx.fillStyle = "black";
     let marginHeight = Math.floor(window.innerHeight / 8);
     let marginWidth = Math.floor(window.innerWidth / 8);
