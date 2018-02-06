@@ -360,7 +360,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 // import {moveAmoebas, makePause, makeGrid, makeClock,
 //         makeMargins, makeMassDisplay, makeHomepage} from './game';
 
-
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("background");
   const ctx = canvas.getContext("2d");
@@ -658,7 +657,7 @@ class Game {
     this.quadTree = new __WEBPACK_IMPORTED_MODULE_3__quadtree_js__["a" /* default */](0,0, this.boardVars.realBoardWidth, this.boardVars.realBoardHeight);
     let mass, radius, xpos, ypos, momentum, amoeba;
     for (let i = 0, num = parseInt(2 * this.boardSize); i < num; i++) {
-      mass = Math.pow(this.boardVars.realBoardHeight / 30 * Math.PI,2)
+      mass = Math.pow(this.boardVars.realBoardHeight / 30 * Math.PI,2);
       mass = Math.floor((Math.random() * mass * 4) + mass);
       radius = Math.sqrt(mass / (Math.PI));
       xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
@@ -757,7 +756,7 @@ class Game {
     }
 
     if (this.currentStatus === "setup") {
-      this.setupProportions(30000,30000);
+      this.setupProportions(30000,30000); //this will undo any leveling
       this.setupAmoebas(true);
       this.homepageYOffset = 0;
       this.boardVars.currentZoom = 4;
@@ -1298,29 +1297,26 @@ class QuadTree {
   }
 
   checkAllCollisions() {
-    for (let i = 0; i < this.amoebas.length; i++) {
-      for (let j = i + 1; j < this.amoebas.length; j++) {
-        if (i === j) {
-          continue;
-        }
+    for (let i = 0, amoebaeLen = this.amoebas.length; i < amoebaeLen; i++) {
+      for (let j = i + 1; j < amoebaeLen; j++) {
         this.amoebas[i].aabbCheck(this.amoebas[j]);
       }
-      for (let j = 0; j < this.children.length; j++) {
+      for (let j = 0, childrenLen = this.children.length; j < childrenLen; j++) {
         this.children[j].checkCollision(this.amoebas[i]);
       }
     }
 
-    for (let i = 0; i < this.children.length; i++) {
+    for (let i = 0, childrenLen = this.children.length; i <childrenLen; i++) {
       this.children[i].checkAllCollisions();
     }
   }
 
   checkCollision(amoeba) {
-    for (let i = 0; i < this.amoebas.length; i++) {
+    for (let i = 0, amoebaeLen = this.amoebas.length; i < amoebaeLen; i++) {
       amoeba.aabbCheck(this.amoebas[i]);
     }
 
-    for (let i = 0; i < this.children.length; i++) {
+    for (let i = 0,  childrenLen = this.children.length; i < childrenLen; i++) {
       this.children[i].checkCollision(amoeba);
     }
 
