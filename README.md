@@ -63,30 +63,29 @@ It uses a custom built physics engine to determine the acceleration and absorpti
 For increased efficiency amoebae are organized in a quadtree and collisions are calculated recursively down the branches, with no redundant calculations. This brings collision detection to O(n) efficiency under ideal circumstance, and o(nlogn) on average.
 
 ```javascript
-  checkAllCollisions() {
-    for (let i = 0; i < this.amoebas.length; i++) {
-      for (let j = i + 1; j < this.amoebas.length; j++) {
-        if (i === j) {
-          continue;
+    checkAllCollisions() {
+      for (let i = 0, amoebaeLen = this.amoebas.length; i < amoebaeLen; i++) {
+        for (let j = i + 1; j < amoebaeLen; j++) {
+          this.amoebas[i].aabbCheck(this.amoebas[j]);
         }
-        this.amoebas[i].aabbCheck(this.amoebas[j]);
+        for (let j = 0, childrenLen = this.children.length; j < childrenLen; j++) {
+          this.children[j].checkCollision(this.amoebas[i]);
+        }
       }
-      for (let j = 0; j < this.children.length; j++) {
-        this.children[j].checkCollision(this.amoebas[i]);
-      }
-    }
-    for (let i = 0; i < this.children.length; i++) {
-      this.children[i].checkAllCollisions();
-    }
-  }
 
-  checkCollision(amoeba) {
-    for (let i = 0; i < this.amoebas.length; i++) {
-      amoeba.aabbCheck(this.amoebas[i]);
+      for (let i = 0, childrenLen = this.children.length; i <childrenLen; i++) {
+        this.children[i].checkAllCollisions();
+      }
     }
 
-    for (let i = 0; i < this.children.length; i++) {
-      this.children[i].checkCollision(amoeba);
+    checkCollision(amoeba) {
+      for (let i = 0, amoebaeLen = this.amoebas.length; i < amoebaeLen; i++) {
+        amoeba.aabbCheck(this.amoebas[i]);
+      }
+
+      for (let i = 0, childrenLen = this.children.length; i < childrenLen; i++) {
+        this.children[i].checkCollision(amoeba);
+      }
+
     }
-  }
 ```
