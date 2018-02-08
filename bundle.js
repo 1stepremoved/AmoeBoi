@@ -468,7 +468,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (e.pageX > titlePosX + 400 && e.pageX < titlePosX + 450
         && e.pageY > titlePosY + 60 && e.pageY < titlePosY + 110) {
           document.body.style.cursor = "pointer";
-        } else {
+      } else {
         document.body.style.cursor = "default";
       }
       if (window.innerHeight - e.pageY < 30) {
