@@ -366,7 +366,13 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  let game = new __WEBPACK_IMPORTED_MODULE_0__game__["a" /* default */](ctx, 30000, 30000);
+
+  let audio = document.getElementById("audio");
+  let game = new __WEBPACK_IMPORTED_MODULE_0__game__["a" /* default */](ctx, 30000, 30000, audio);
+
+  audio.playbackRate = 0.5 + ((1 / (1 + Math.pow(Math.E, -10 * Object(__WEBPACK_IMPORTED_MODULE_3__util__["a" /* baseLog */])(10,game.timeVars.timeCoefficient)))) * 3.5);
+  audio.volume = 0.5;
+
 
   window.onresize = ()=>{
     canvas.width = window.innerWidth;
@@ -392,7 +398,25 @@ document.addEventListener("DOMContentLoaded", () => {
         && e.pageY > titlePosY + 315 && e.pageY < titlePosY + 360) {
           game.currentStatus = "movingToInstructions";
           document.body.style.cursor = "default";
-      }
+      } else if (e.pageX > titlePosX -5 && e.pageX < titlePosX + 45
+        && e.pageY > titlePosY + 60 && e.pageY < titlePosY + 110) {
+          if (audio.volume === 0) {
+            audio.volume = 0.5;
+            game.muted = false;
+          } else {
+            audio.volume = 0;
+            game.muted = true;
+          }
+      } else if (e.pageX > titlePosX + 400 && e.pageX < titlePosX + 450
+        && e.pageY > titlePosY + 60 && e.pageY < titlePosY + 110) {
+          if (audio.volume === 0) {
+            audio.volume = 0.5;
+            game.muted = false;
+          } else {
+            audio.volume = 0;
+            game.muted = true;
+          }
+        }
     } else if (game.currentStatus === "instructions") {
       let mouseOffsetX = game.mousePos['x'] / window.innerWidth * 50;
       let mouseOffsetY = game.mousePos['y'] / window.innerHeight * 50;
@@ -478,14 +502,17 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   window.addEventListener("keydown", (e) => {
+    let rate;
     switch (e.keyCode) {
       case 39:
         if (game.paused || game.currentStatus !== "playing") { return; }
         game.timeVars.timeCoefficient = Math.min(game.timeVars.timeCoefficient * 1.1, game.timeVars.timeBase);
+        audio.playbackRate = 0.5 + ((1 / (1 + Math.pow(Math.E, -10 * Object(__WEBPACK_IMPORTED_MODULE_3__util__["a" /* baseLog */])(10,game.timeVars.timeCoefficient)))) * 3.5);
         return;
       case 37:
         if (game.paused || game.currentStatus !== "playing") { return; }
         game.timeVars.timeCoefficient = Math.max(game.timeVars.timeCoefficient * 0.9, Math.pow(game.timeVars.timeBase, - 1));
+        audio.playbackRate = 0.5 + ((1 / (1 + Math.pow(Math.E, -10 * Object(__WEBPACK_IMPORTED_MODULE_3__util__["a" /* baseLog */])(10,game.timeVars.timeCoefficient)))) * 3.5);
         return;
       case 32:
         if (game.currentStatus !== "playing") { return; }
@@ -525,6 +552,14 @@ document.addEventListener("DOMContentLoaded", () => {
           game.currentStatus = "nextLevel";
         }
         return;
+      case 77:
+        if (audio.volume === 0) {
+          audio.volume = 0.5;
+          game.muted = false;
+        } else {
+          audio.volume = 0;
+          game.muted = true;
+        }
       default:
         return;
     }
@@ -574,8 +609,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 class Game {
-  constructor(ctx, realBoardWidth=20000, realBoardHeight=20000) {
+  constructor(ctx, realBoardWidth=20000, realBoardHeight=20000, audio) {
     this.ctx = ctx;
+    this.audio = audio;
+    this.muted = false;
 
     this.setupImages();
     this.setupProportions(realBoardWidth, realBoardHeight);
@@ -647,6 +684,19 @@ class Game {
     this.iconImages.linkedInLogo.src = './assets/images/linkedInLogo.png';
     this.iconImages.folderIcon = new Image();
     this.iconImages.folderIcon.src = './assets/images/folderIcon.png';
+    this.iconImages.linkedInLogo.src = './assets/images/linkedInLogo.png';
+    this.iconImages.folderIcon = new Image();
+    this.iconImages.folderIcon.src = './assets/images/folderIcon.png';
+    this.iconImages.linkedInLogo.src = './assets/images/linkedInLogo.png';
+    this.iconImages.volume = new Image();
+    this.iconImages.volume.src = './assets/images/volume.png';
+    this.iconImages.volumeReverse = new Image();
+    this.iconImages.volumeReverse.src = './assets/images/volume-reverse.png';
+    this.iconImages.linkedInLogo.src = './assets/images/linkedInLogo.png';
+    this.iconImages.mute = new Image();
+    this.iconImages.mute.src = './assets/images/mute.png';
+    this.iconImages.muteReverse = new Image();
+    this.iconImages.muteReverse.src = './assets/images/mute-reverse.png';
   }
 
   setupAmoebas(amoeboi) {
@@ -767,6 +817,7 @@ class Game {
       this.boardVars.boardFocus = {x: this.amoeboi.xpos, y: this.amoeboi.ypos};
       this.currentStatus = "playing";
       this.showInstructions = true;
+      this.audio.playbackRate = 0.5 + ((1 / (1 + Math.pow(Math.E, -10 * Object(__WEBPACK_IMPORTED_MODULE_0__util__["a" /* baseLog */])(10,this.timeVars.timeCoefficient)))) * 3.5);
       return requestAnimationFrame(this.animate);
     }
 
@@ -780,6 +831,7 @@ class Game {
       this.boardVars.boardFocus = {x: this.amoeboi.xpos, y: this.amoeboi.ypos};
       this.currentStatus = "playing";
       this.showInstructions = true;
+      this.audio.playbackRate = 0.5 + ((1 / (1 + Math.pow(Math.E, -10 * Object(__WEBPACK_IMPORTED_MODULE_0__util__["a" /* baseLog */])(10,this.timeVars.timeCoefficient)))) * 3.5);
       return requestAnimationFrame(this.animate);
     }
 
@@ -1082,16 +1134,17 @@ class Game {
     }
     ctx.globalAlpha = 0.7;
     ctx.fillStyle = 'black';
-    ctx.fillRect(50, 65, 350, 240);
+    ctx.fillRect(50, 65, 350, 280);
     ctx.globalAlpha = 1;
     ctx.fillStyle = 'white';
     ctx.font = '20px Arial Black';
     ctx.fillText(`SPACE   :  Pause`, 60, 95);
     ctx.fillText(` SHIFT   :  Look Around`, 61, 135);
-    ctx.fillText(`SCROLL :  Zoom`, 60, 170);
+    ctx.fillText(`SCROLL :  Zoom In/Out`, 60, 170);
     ctx.fillText(`     H      :  Main Menu`, 65, 215);
     ctx.fillText(`     R      :  Restart`, 65, 255);
     ctx.fillText(`     I       :  Toggle Instructions`, 67, 295);
+    ctx.fillText(`     M      :  Toggle Volume`, 63, 335);
   }
 
   makeMargins(ctx) {
@@ -1193,6 +1246,10 @@ class Game {
     ctx.drawImage(this.iconImages.githubLogo, titlePosX - 50, titlePosY + 170, 80, 80);
     ctx.drawImage(this.iconImages.linkedInLogo, titlePosX + 180, titlePosY + 170, 72, 72);
     ctx.drawImage(this.iconImages.folderIcon, titlePosX + 380, titlePosY + 170, 88, 88);
+    ctx.drawImage(this.muted ? this.iconImages.mute : this.iconImages.volume, titlePosX - 5,
+       titlePosY + (this.muted ? 60 : 65), 50, 50);
+    ctx.drawImage(this.muted ? this.iconImages.muteReverse : this.iconImages.volumeReverse, titlePosX + 400,
+       titlePosY + (this.muted ? 60 : 65), 50, 50);
 
     ctx.fillStyle = 'white';
     ctx.font = '70px Impact';
