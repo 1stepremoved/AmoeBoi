@@ -542,6 +542,7 @@ document.addEventListener("DOMContentLoaded", () => {
         game.showInstructions = !game.showInstructions;
         return;
       case 82:
+        if (game.currentStatus === "playing" || game.currentStatus === "losescreen" || game.currentStatus === "winScreen")
         game.currentStatus = "setup";
         return;
       case 13:
@@ -886,6 +887,9 @@ class Game {
       if (this.homepageAlpha < 0.5) {
         this.homepageAlpha += .05;
       } else {
+        this.ctx.globalAlpha = this.homepageAlpha;
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
         this.homepageYOffset = 1500;
         this.homepageAlpha = 0;
         this.currentStatus = "movingToLoseScreen";
@@ -951,6 +955,9 @@ class Game {
       if (this.homepageAlpha < 0.5) {
         this.homepageAlpha += .05;
       } else {
+        this.ctx.globalAlpha = this.homepageAlpha;
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
         this.homepageYOffset = 1500;
         this.homepageAlpha = 0;
         this.currentStatus = "movingToWinScreen";
