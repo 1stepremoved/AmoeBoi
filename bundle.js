@@ -122,6 +122,7 @@ class Amoeba {
     this.colorize = this.colorize.bind(this);
     this.relativePos = this.relativePos.bind(this);
     this.color = "blue";
+    this.adjustments = 0;
   }
 
   move() {
@@ -640,6 +641,7 @@ class Game {
     this.showInstructions = true;
 
     this.animate = this.animate.bind(this);
+    this.setupAmoebas = this.setupAmoebas.bind(this);
     this.moveAmoebas = this.moveAmoebas.bind(this);
     this.makePause = this.makePause.bind(this);
     this.makeClock = this.makeClock.bind(this);
@@ -647,6 +649,7 @@ class Game {
     this.makeMassDisplay = this.makeMassDisplay.bind(this);
     this.makeMargins = this.makeMargins.bind(this);
     this.makeHomepage = this.makeHomepage.bind(this);
+
   }
 
   setupMouse() {
@@ -712,6 +715,8 @@ class Game {
                                                  this.boardVars.realBoardHeight / 2,
                                                  100000, {x: 0, y: 0});
     this.quadTree = new __WEBPACK_IMPORTED_MODULE_3__quadtree_js__["a" /* default */](0,0, this.boardVars.realBoardWidth, this.boardVars.realBoardHeight);
+    __WEBPACK_IMPORTED_MODULE_3__quadtree_js__["a" /* default */].prototype.realBoardWidth = this.boardVars.realBoardWidth;
+    __WEBPACK_IMPORTED_MODULE_3__quadtree_js__["a" /* default */].prototype.realBoardHeight = this.boardVars.realBoardHeight;
     let mass, radius, xpos, ypos, momentum, amoeba;
     for (let i = 0, num = parseInt(2 * this.boardSize); i < num; i++) {
       mass = Math.pow(this.boardVars.realBoardHeight / 30 * Math.PI,2);
@@ -789,7 +794,7 @@ class Game {
     //   this.amoebas.push(new Amoeba(this.ctx, xpos, ypos, mass));
     // }
     for (let i = 0; i < this.amoebas.length; i++) {
-      this.quadTree.insert1(this.amoebas[i]);
+      this.quadTree.insert2(this.amoebas[i]);
     }
   }
 
@@ -1287,6 +1292,8 @@ class Game {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__amoeba__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__amoeboi__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(0);
+
 
 
 
@@ -1347,7 +1354,55 @@ class QuadTree {
       }
       this.amoebas = newAmoebas;
     }
+  }
 
+  insert2(amoeba) {
+    let moveX = 0;
+    let moveY = 0;
+    let collided = true;
+    let otherAmoeba, diffX, diffY, angle;
+    while (collided && amoeba.adjustments < 1000) {
+      collided = false;
+      for (let i = 0, amoebaLen = this.amoebas.length; i < amoebaLen; i++) {
+        otherAmoeba = this.amoebas[i];
+        if (amoeba.collidesWith(this.amoebas[i])) {
+          diffX = amoeba.xpos - otherAmoeba.xpos;
+          diffY = amoeba.ypos - otherAmoeba.ypos;
+          angle = Math.atan2(diffY, diffX);
+          moveX += (amoeba.radius - Math.abs(amoeba.xpos - otherAmoeba.xpos) + otherAmoeba.radius)
+                   * (otherAmoeba.xpos < amoeba.xpos ? 1 : -1);
+          moveY += (amoeba.radius - Math.abs(amoeba.ypos - otherAmoeba.ypos) + otherAmoeba.radius)
+                   * (otherAmoeba.ypos < amoeba.ypos ? 1 : -1);
+          collided = true;
+        }
+      }
+      amoeba.xpos = Object(__WEBPACK_IMPORTED_MODULE_2__util__["b" /* boundNum */])(amoeba.xpos + moveX, 0 + amoeba.radius, this.realBoardWidth - amoeba.radius);
+      amoeba.ypos = Object(__WEBPACK_IMPORTED_MODULE_2__util__["b" /* boundNum */])(amoeba.ypos + moveY, 0 + amoeba.radius, this.realBoardHeight - amoeba.radius);
+      moveX = 0;
+      moveY = 0;
+      amoeba.adjustments += 1;
+    }
+
+    let index = this.getIndex(amoeba);
+    if (this.children.length > 0 && index !== -1) {
+      return this.children[index].insert1(amoeba);
+    }
+
+    this.amoebas.push(amoeba);
+
+    if (this.children.length === 0 && this.amoebas.length > this.maxAmoebas) {
+      this.split();
+      let newAmoebas = [];
+      for (let i = 0; i < this.amoebas.length; i++) {
+        index = this.getIndex(this.amoebas[i]);
+        if (index !== -1) {
+          this.children[index].insert1(this.amoebas[i]);
+        } else {
+          newAmoebas.push(this.amoebas[i]);
+        }
+      }
+      this.amoebas = newAmoebas;
+    }
   }
 
   getIndex(amoeba) {
