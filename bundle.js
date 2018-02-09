@@ -448,7 +448,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("touchmove", (e) => {
     if (game.currentStatus === "playing") {
-      debugger
       game.amoeboi.mousePosX = e.touches[0].pageX;
       game.amoeboi.mousePosY = e.touches[0].pageY;
     }
