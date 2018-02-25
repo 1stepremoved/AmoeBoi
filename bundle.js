@@ -751,7 +751,7 @@ class Game {
     this.amoebas = [];
     this.amoeboi = !amoeboi ? null : new __WEBPACK_IMPORTED_MODULE_2__amoeboi_js__["a" /* default */](this.ctx, this.boardVars.realBoardWidth / 2,
                                                  this.boardVars.realBoardHeight / 2,
-                                                 100000, {x: 0, y: 0});
+                                                 10000000, {x: 0, y: 0});
     this.quadTree = new __WEBPACK_IMPORTED_MODULE_3__quadtree_js__["a" /* default */](0,0, this.boardVars.realBoardWidth, this.boardVars.realBoardHeight);
     let mass, radius, xpos, ypos, momentum, amoeba;
     for (let i = 0, num = parseInt(2 * this.boardSize); i < num; i++) {
@@ -831,6 +831,11 @@ class Game {
     // }
     for (let i = 0; i < this.amoebas.length; i++) {
       this.quadTree.insert1(this.amoebas[i]);
+    }
+
+    if (amoeboi) {
+      this.amoeboi.mass /= 100;
+      this.amoeboi.adjustRadius();
     }
   }
 
