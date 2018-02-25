@@ -1385,7 +1385,7 @@ class QuadTree {
 
     let index = this.getIndex(amoeba);
     if (this.children.length > 0 && index !== -1) {
-      return this.children[index].insert1(amoeba);
+      return this.children[index].insert2(amoeba);
     }
 
     this.amoebas.push(amoeba);
@@ -1396,7 +1396,7 @@ class QuadTree {
       for (let i = 0; i < this.amoebas.length; i++) {
         index = this.getIndex(this.amoebas[i]);
         if (index !== -1) {
-          this.children[index].insert1(this.amoebas[i]);
+          this.children[index].insert2(this.amoebas[i]);
         } else {
           newAmoebas.push(this.amoebas[i]);
         }
