@@ -625,7 +625,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  document.addEventListener("mousewheel", (e)=> {
+  let mousewheelevent = (/Firefox/i.test(navigator.userAgent)) ? "wheel" : "mousewheel";
+
+  document.addEventListener(mousewheelevent, (e)=> {
     e.preventDefault();
     if (game.paused  || game.currentStatus !== "playing") { return; }
     let zoomDelta = (e.deltaY / -1000);
