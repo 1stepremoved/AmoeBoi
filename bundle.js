@@ -552,14 +552,18 @@ document.addEventListener("DOMContentLoaded", () => {
     let rate;
     switch (e.keyCode) {
       case 39:
-        if (game.paused || game.currentStatus !== "playing") { return; }
+        if (game.paused || game.currentStatus !== "playing" || game.autoscaleTime) { return; }
         game.timeVars.timeCoefficient = Math.min(game.timeVars.timeCoefficient * 1.1, game.timeVars.timeBase);
         audio.playbackRate = 0.5 + ((1 / (1 + Math.pow(Math.E, -10 * Object(__WEBPACK_IMPORTED_MODULE_3__util__["a" /* baseLog */])(10,game.timeVars.timeCoefficient)))) * 3.5);
         return;
       case 37:
-        if (game.paused || game.currentStatus !== "playing") { return; }
+        if (game.paused || game.currentStatus !== "playing" || game.autoscaleTime) { return; }
         game.timeVars.timeCoefficient = Math.max(game.timeVars.timeCoefficient * 0.9, Math.pow(game.timeVars.timeBase, - 1));
         audio.playbackRate = 0.5 + ((1 / (1 + Math.pow(Math.E, -10 * Object(__WEBPACK_IMPORTED_MODULE_3__util__["a" /* baseLog */])(10,game.timeVars.timeCoefficient)))) * 3.5);
+        return;
+      case 65:
+        if (game.paused || game.currentStatus !== "playing") { return; }
+        game.autoscaleTime = !game.autoscaleTime;
         return;
       case 32:
         if (game.currentStatus !== "playing") { return; }
@@ -681,6 +685,7 @@ class Game {
     this.shiftDown = false;
     this.homepageAlpha = 0;
     this.showInstructions = true;
+    this.autoscaleTime = false;
 
     this.animate = this.animate.bind(this);
     this.moveAmoebas = this.moveAmoebas.bind(this);
@@ -1043,6 +1048,11 @@ class Game {
     this.makeMargins(this.ctx);
     this.makeMassDisplay(this.ctx);
     this.makeInstructions(this.ctx);
+    if (this.autoscaleTime) {
+      let largest = this.amoebas[0];
+      this.amoebas.forEach(a => {largest = largest.radius < a.radius ? a : largest;});
+      this.timeVars.timeCoefficient = (this.amoeboi.radius / largest.radius) * this.timeVars.timeBase * .75;
+    }
     // this.makeClock(this.ctx);
     if (this.amoeboi.mass > 0) {
       this.boardVars.boardFocus = {x: this.amoeboi.xpos, y: this.amoeboi.ypos};
@@ -1197,7 +1207,7 @@ class Game {
     }
     ctx.globalAlpha = 0.7;
     ctx.fillStyle = 'black';
-    ctx.fillRect(50, 65, 350, 280);
+    ctx.fillRect(50, 65, 350, 320);
     ctx.globalAlpha = 1;
     ctx.fillStyle = 'white';
     ctx.font = '20px Arial Black';
@@ -1208,6 +1218,7 @@ class Game {
     ctx.fillText(`     R      :  Restart`, 65, 255);
     ctx.fillText(`     I       :  Toggle Instructions`, 67, 295);
     ctx.fillText(`     M      :  Toggle Volume`, 63, 335);
+    ctx.fillText(`     A      :  Autoscale Time`, 63, 375);
   }
 
   makeMargins(ctx) {
