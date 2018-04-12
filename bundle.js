@@ -685,7 +685,7 @@ class Game {
     this.shiftDown = false;
     this.homepageAlpha = 0;
     this.showInstructions = true;
-    this.autoscaleTime = false;
+    this.autoscaleTime = true;
 
     this.animate = this.animate.bind(this);
     this.moveAmoebas = this.moveAmoebas.bind(this);
@@ -1207,7 +1207,7 @@ class Game {
     }
     ctx.globalAlpha = 0.7;
     ctx.fillStyle = 'black';
-    ctx.fillRect(50, 65, 350, 320);
+    ctx.fillRect(50, 65, 365, 320);
     ctx.globalAlpha = 1;
     ctx.fillStyle = 'white';
     ctx.font = '20px Arial Black';
@@ -1217,8 +1217,8 @@ class Game {
     ctx.fillText(`     H      :  Main Menu`, 65, 215);
     ctx.fillText(`     R      :  Restart`, 65, 255);
     ctx.fillText(`     I       :  Toggle Instructions`, 67, 295);
-    ctx.fillText(`     M      :  Toggle Volume`, 63, 335);
-    ctx.fillText(`     A      :  Autoscale Time`, 63, 375);
+    ctx.fillText(`     M      :  Toggle Volume (${this.muted ? "OFF" : "ON"})`, 63, 335);
+    ctx.fillText(`     A      :  Autoscale Time (${this.autoscaleTime ? "ON" : "OFF"})`, 63, 375);
   }
 
   makeMargins(ctx) {
