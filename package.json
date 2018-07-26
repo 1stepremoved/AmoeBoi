@@ -9,5 +9,8 @@
   },
   "scripts": {
     "postinstall": "webpack"
+  },
+  "devDependencies": {
+    "webpack-cli": "^3.1.0"
   }
 }
