@@ -1,16 +1,10 @@
 var path = require('path');
 
 module.exports = {
-  entry: './lib/main.js',
+  entry: './lib/v0/main.js',
   output: {
-    filename: './bundle.js',
-  },
-  module: {
-    loaders: [
-      {
-        exclude: /(node_modules)/
-      }
-    ]
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
   },
   devtool: 'source-map',
   resolve: {
