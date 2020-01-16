@@ -1,4 +1,4 @@
-[Live](https://1stepremoved.github.io/Osmosis/)
+[Live](https://1stepremoved.github.io/AmoeBoi)
 
 Osmosis (or AmoeBoi) is a become-the-largest style game built entirely using JavaScript and canvas. The goal is to navigate the field and absorb smaller amoebae until your amoeba is the largest (or last remaining). You propel yourself through the field by shooting off a little of your own mass, pushing you in the opposite direction.
 
