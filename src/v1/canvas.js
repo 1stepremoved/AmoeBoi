@@ -236,7 +236,7 @@ class Canvas {
 
     setupImage = (fileName) => {
         this.iconImages[fileName] = new Image();
-        this.iconImages[fileName].src = `./assets/images/${fileName}.png`;
+        this.iconImages[fileName].src = `../assets/images/${fileName}.png`;
     };
 
     makeHomepage = (mouseVars, muted) =>{
