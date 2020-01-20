@@ -12,14 +12,6 @@ class Canvas {
         this.setupImages();
     }
 
-    relativePos = (amoeba, boardVars, mouseVars) => {
-        let relativeX = (((amoeba.xpos - boardVars.boardFocus.x) / (boardVars.boardWidth / 2)) * 500)
-            + (window.innerWidth / 2) + mouseVars.mouseOffset.x;
-        let relativeY = (((amoeba.ypos - boardVars.boardFocus.y) / (boardVars.boardHeight/ 2)) * 500)
-            + (window.innerHeight / 2) + mouseVars.mouseOffset.y;
-        return { x: relativeX, y: relativeY };
-    };
-
     buildAndColorAmoeba = (amoeba, boardVars, mouseVars, colorize) => {
         if (amoeba.mass <= 0) {
             return;
@@ -32,16 +24,27 @@ class Canvas {
 
         amoeba.adjustRadius();
 
-        let relativeCoors = this.relativePos(amoeba, boardVars, mouseVars);
+        const relativeY = boardYRelativeToFocus({
+            boardFocusY: boardVars.boardFocus.y,
+            boardHeight: boardVars.boardHeight,
+            innerHeight: window.innerHeight,
+            mouseOffsetY: mouseVars.mouseOffset.y,
+        })(amoeba.ypos);
+        const relativeX = boardXRelativeToFocus({
+            boardFocusX: boardVars.boardFocus.x,
+            boardWidth: boardVars.boardWidth,
+            innerWidth: window.innerWidth,
+            mouseOffsetX: mouseVars.mouseOffset.x,
+        })(amoeba.xpos);
 
         let relativeRadius = amoeba.radius / boardVars.realBoardWidth * 1000 * boardVars.currentZoom;
 
         //radius cannot be kept proportional to window.innerWidth, it will throw off their size on screen
 
-        let gradient = colorize(amoeba, relativeCoors.x, relativeCoors.y, relativeRadius, boardVars.baseMass);
+        let gradient = colorize(amoeba, relativeX, relativeY, relativeRadius, boardVars.baseMass);
 
         this.ctx.beginPath();
-        this.ctx.arc(relativeCoors.x, relativeCoors.y, relativeRadius, 0, Math.PI * 2);
+        this.ctx.arc(relativeX, relativeY, relativeRadius, 0, Math.PI * 2);
         this.ctx.fillStyle = gradient;
         this.ctx.fill();
     };
@@ -124,7 +127,7 @@ class Canvas {
         this.ctx.globalAlpha = 1;
     };
 
-    drawField = (boardVars, mouseVars) => {
+    drawField = (boardVars, mouseVars, quadtree) => {
         const relY = boardYRelativeToFocus({
             boardFocusY: boardVars.boardFocus.y,
             boardHeight: boardVars.boardHeight,
@@ -139,6 +142,7 @@ class Canvas {
         });
         this.drawBorders(relX, relY, boardVars.realBoardWidth, boardVars.realBoardHeight);
         this.drawGrid(relX, relY, boardVars.realBoardWidth, boardVars.realBoardHeight);
+        // this.drawQuadtree(relX, relY, quadtree);
     };
 
     drawGrid = (relX, relY, realBoardWidth, realBoardHeight) => {
@@ -178,6 +182,36 @@ class Canvas {
         const rightBorderX = relX(realBoardWidth);
         this.ctx.fillRect(leftBorderX, relY(0), rightBorderX - leftBorderX, 2);
         this.ctx.fillRect(leftBorderX, relY(realBoardHeight), rightBorderX - leftBorderX, 2);
+
+        this.ctx.globalAlpha = 1;
+    };
+
+    drawQuadtree = (relX, relY, quadtree) => {
+        if (!quadtree || !quadtree.quadrants.length) return;
+        this.ctx.globalAlpha = 0.4;
+        this.ctx.strokeStyle = 'black';
+
+        const relativeX = relX(quadtree.x);
+        const relativeY = relY(quadtree.y);
+        const relativeEndX = relX(quadtree.endX);
+        const relativeEndY = relY(quadtree.endY);
+        const relativeHalfX = relX(quadtree.halfX);
+        const relativeHalfY = relY(quadtree.halfY);
+        this.ctx.beginPath();
+        this.ctx.moveTo(relativeX, relativeHalfY);
+        this.ctx.lineTo(relativeEndX, relativeHalfY);
+        this.ctx.closePath();
+        this.ctx.stroke();
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(relativeHalfX, relativeY);
+        this.ctx.lineTo(relativeHalfX, relativeEndY);
+        this.ctx.closePath();
+        this.ctx.stroke();
+
+        quadtree.quadrants.forEach(subQuadtree => {
+           this.drawQuadtree(relX, relY, subQuadtree);
+        });
 
         this.ctx.globalAlpha = 1;
     };

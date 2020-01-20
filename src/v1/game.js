@@ -121,7 +121,7 @@ class Game {
 
   animate = (canvas) => {
     canvas.ctx.clearRect(0,0, innerWidth, innerHeight);
-    canvas.drawField(this.boardVars, this.mouseVars);
+    canvas.drawField(this.boardVars, this.mouseVars, this.quadTree);
 
     if (this.currentStatus === "reset") {
       this.boardVars.maxZoom = 4;
