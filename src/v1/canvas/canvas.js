@@ -26,13 +26,13 @@ class Canvas {
 
         const relativeY = boardYRelativeToFocus({
             boardFocusY: boardVars.boardFocus.y,
-            boardHeight: boardVars.boardHeight,
+            boardHeight: boardVars.boardHeight(),
             innerHeight: window.innerHeight,
             mouseOffsetY: mouseVars.mouseOffset.y,
         })(amoeba.ypos);
         const relativeX = boardXRelativeToFocus({
             boardFocusX: boardVars.boardFocus.x,
-            boardWidth: boardVars.boardWidth,
+            boardWidth: boardVars.boardWidth(),
             innerWidth: window.innerWidth,
             mouseOffsetX: mouseVars.mouseOffset.x,
         })(amoeba.xpos);
@@ -130,13 +130,13 @@ class Canvas {
     drawField = (boardVars, mouseVars, quadtree) => {
         const relY = boardYRelativeToFocus({
             boardFocusY: boardVars.boardFocus.y,
-            boardHeight: boardVars.boardHeight,
+            boardHeight: boardVars.boardHeight(),
             innerHeight: window.innerHeight,
             mouseOffsetY: mouseVars.mouseOffset.y,
         });
         const relX = boardXRelativeToFocus({
             boardFocusX: boardVars.boardFocus.x,
-            boardWidth: boardVars.boardWidth,
+            boardWidth: boardVars.boardWidth(),
             innerWidth: window.innerWidth,
             mouseOffsetX: mouseVars.mouseOffset.x,
         });

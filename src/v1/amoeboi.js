@@ -23,8 +23,8 @@ class Amoeboi extends Amoeba {
       y: ypos,
       mass,
       momentum,
-      boardWidth: boardVars.realBoardWidth,
-      boardHeight: boardVars.realBoardHeight,
+      realBoardWidth: boardVars.realBoardWidth,
+      realBoardHeight: boardVars.realBoardHeight,
     }));
     this.nextMomentum.x += momentum.x * -1 * 3;
     this.nextMomentum.y += momentum.y * -1 * 3;

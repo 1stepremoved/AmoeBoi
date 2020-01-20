@@ -8,10 +8,11 @@ class BoardVars {
         this.absoluteMaxZoom = opts.absoluteMaxZoom;
         this.minZoom = opts.minZoom;
         this.currentZoom = opts.currentZoom;
-        this.boardWidth = opts.boardWidth;
-        this.boardHeight = opts.boardHeight;
         this.boardFocus = opts.boardFocus;
     }
+
+    boardHeight = () => this.realBoardHeight / this.currentZoom;
+    boardWidth = () => this.realBoardWidth / this.currentZoom;
 }
 
 export default BoardVars;

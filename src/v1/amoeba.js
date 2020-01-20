@@ -1,9 +1,9 @@
 class Amoeba {
-  constructor({ x, y, mass, momentum, boardWidth, boardHeight }) {
+  constructor({ x, y, mass, momentum, realBoardWidth, realBoardHeight }) {
     this.mass = mass || Math.floor((Math.random() * 100000) + 10000);
     this.radius = Math.sqrt(this.mass / (Math.PI));
-    this.xpos = x || Math.floor(Math.random() * (boardWidth - this.radius)) + this.radius;
-    this.ypos = y || Math.floor(Math.random() * (boardHeight - this.radius)) + this.radius;
+    this.xpos = x || Math.floor(Math.random() * (realBoardWidth - this.radius)) + this.radius;
+    this.ypos = y || Math.floor(Math.random() * (realBoardHeight - this.radius)) + this.radius;
     this.momentum = momentum || {x: Math.floor(Math.random() * 1000000) - 500000, y: Math.floor(Math.random() * 1000000) - 500000};
     this.nextMomentum = Object.assign({}, this.momentum);
     this.color = "blue";

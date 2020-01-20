@@ -50,8 +50,6 @@ class Game {
       absoluteMaxZoom,
       minZoom: 0.7,
       currentZoom,
-      boardWidth: realBoardWidth / currentZoom,
-      boardHeight: realBoardHeight / currentZoom,
       boardFocus: { x: realBoardWidth / 2, y: realBoardHeight / 2},
     });
   };
@@ -68,8 +66,8 @@ class Game {
         y: ypos,
         mass,
         momentum,
-        boardWidth: this.boardVars.realBoardWidth,
-        boardHeight: this.boardVars.realBoardHeight,
+        realBoardWidth: this.boardVars.realBoardWidth,
+        realBoardHeight: this.boardVars.realBoardHeight,
       });
       while (this.amoeboi && collidesWith(this.amoeboi, amoeba)) {
         amoeba.xpos = Math.floor(Math.random() * (this.boardVars.realBoardWidth - radius)) + radius;
@@ -85,8 +83,8 @@ class Game {
                                                    y: this.boardVars.realBoardHeight / 2,
                                                    mass: 10000000,
                                                    momentum: {x: 0, y: 0},
-                                                   boardWidth: this.boardVars.realBoardWidth,
-                                                   boardHeight: this.boardVars.realBoardHeight,
+                                                   realBoardWidth: this.boardVars.realBoardWidth,
+                                                   realBoardHeight: this.boardVars.realBoardHeight,
                                                 });
     this.quadTree = new QuadTree({ x: 0, y: 0, width: this.boardVars.realBoardWidth, height: this.boardVars.realBoardHeight });
     let mass, massFunc;
@@ -127,8 +125,6 @@ class Game {
       this.boardVars.maxZoom = 4;
       this.boardVars.currentZoom = 2;
       this.timeVars.timeCoefficient = 0.5;
-      this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
-      this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
       this.boardVars.baseMass = 50000;
 
       this.setupAmoebas(false);
@@ -144,8 +140,6 @@ class Game {
       canvas.homepageYOffset = 0;
       this.boardVars.currentZoom = 4;
       this.timeVars.timeCoefficient = 0.5;
-      this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
-      this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
       this.boardVars.baseMass = this.amoeboi.mass;
       this.boardVars.boardFocus = {x: this.amoeboi.xpos, y: this.amoeboi.ypos};
       this.currentStatus = "playing";
@@ -206,8 +200,6 @@ class Game {
       this.boardVars.boardFocus.x += (this.boardVars.boardFocus.x < this.boardVars.realBoardWidth / 2) ? 10 : -10;
       this.boardVars.boardFocus.y += (this.boardVars.boardFocus.y < this.boardVars.realBoardHeight / 2) ? 10 : -10;
       this.boardVars.currentZoom = this.boardVars.currentZoom > 1 ? this.boardVars.currentZoom * 0.9 : this.boardVars.currentZoom;
-      this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
-      this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
       this.boardVars.baseMass = 0;
       this.moveAmoebas(canvas);
       if (this.homepageAlpha < 0.5) {
@@ -273,8 +265,6 @@ class Game {
       this.boardVars.boardFocus.x += (this.boardVars.boardFocus.x < this.boardVars.realBoardWidth / 2) ? 10 : -10;
       this.boardVars.boardFocus.y += (this.boardVars.boardFocus.y < this.boardVars.realBoardHeight / 2) ? 10 : -10;
       this.boardVars.currentZoom = this.boardVars.currentZoom > 1 ? this.boardVars.currentZoom * 0.9 : this.boardVars.currentZoom;
-      this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
-      this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
       this.boardVars.baseMass = this.amoeboi.mass;
       this.moveAmoebas(canvas);
       if (this.homepageAlpha < 0.5) {
@@ -330,8 +320,6 @@ class Game {
       if (this.amoeboi.radius / this.boardVars.realBoardWidth * 1000 * this.boardVars.currentZoom > 75) {
         this.boardVars.maxZoom = boundNum(75 / (this.amoeboi.radius / this.boardVars.realBoardWidth * 1000), 1, this.boardVars.absoluteMaxZoom);
         this.boardVars.currentZoom = boundNum(this.boardVars.currentZoom * 0.9999999, this.boardVars.minZoom, this.boardVars.maxZoom);
-        this.boardVars.boardHeight = this.boardVars.realBoardHeight / this.boardVars.currentZoom;
-        this.boardVars.boardWidth = this.boardVars.realBoardWidth / this.boardVars.currentZoom;
       }
       if (this.amoeboi.radius / this.boardVars.realBoardWidth * 1000 * this.boardVars.maxZoom < 75) {
         this.boardVars.maxZoom = boundNum(75 / (this.amoeboi.radius / this.boardVars.realBoardWidth * 1000), 1, this.boardVars.absoluteMaxZoom);

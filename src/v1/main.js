@@ -276,8 +276,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (game.paused  || game.currentStatus !== "playing") { return; }
     let zoomDelta = (e.deltaY / -1000);
     game.boardVars.currentZoom = boundNum(game.boardVars.currentZoom + zoomDelta, game.boardVars.minZoom, game.boardVars.maxZoom);
-    game.boardVars.boardHeight = game.boardVars.realBoardHeight / game.boardVars.currentZoom;
-    game.boardVars.boardWidth = game.boardVars.realBoardWidth / game.boardVars.currentZoom;
   });
 
   game.animate(canvas);
