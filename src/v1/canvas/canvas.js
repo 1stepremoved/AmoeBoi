@@ -141,8 +141,8 @@ class Canvas {
             mouseOffsetX: mouseVars.mouseOffset.x,
         });
         this.drawBorders(relX, relY, boardVars.realBoardWidth, boardVars.realBoardHeight);
-        this.drawGrid(relX, relY, boardVars.realBoardWidth, boardVars.realBoardHeight);
-        // this.drawQuadtree(relX, relY, quadtree);
+        // this.drawGrid(relX, relY, boardVars.realBoardWidth, boardVars.realBoardHeight);
+        this.drawQuadtree(relX, relY, quadtree);
     };
 
     drawGrid = (relX, relY, realBoardWidth, realBoardHeight) => {
