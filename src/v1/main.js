@@ -1,5 +1,5 @@
 import Game from './game';
-import Canvas from './canvas';
+import Canvas from './canvas/canvas';
 import { boundNum, baseLog } from './util';
 
 document.addEventListener("DOMContentLoaded", () => {

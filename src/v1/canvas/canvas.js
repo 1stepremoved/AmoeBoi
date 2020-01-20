@@ -1,4 +1,5 @@
-import { baseLog, boundNum } from './util';
+import { boardYRelativeToFocus, boardXRelativeToFocus } from './util';
+import { baseLog, boundNum } from '../util';
 
 class Canvas {
     constructor(canvasId) {
@@ -123,29 +124,60 @@ class Canvas {
         this.ctx.globalAlpha = 1;
     };
 
-    makeGrid = (boardVars, mouseVars) => {
+    drawField = (boardVars, mouseVars) => {
+        const relY = boardYRelativeToFocus({
+            boardFocusY: boardVars.boardFocus.y,
+            boardHeight: boardVars.boardHeight,
+            innerHeight: window.innerHeight,
+            mouseOffsetY: mouseVars.mouseOffset.y,
+        });
+        const relX = boardXRelativeToFocus({
+            boardFocusX: boardVars.boardFocus.x,
+            boardWidth: boardVars.boardWidth,
+            innerWidth: window.innerWidth,
+            mouseOffsetX: mouseVars.mouseOffset.x,
+        });
+        this.drawBorders(relX, relY, boardVars.realBoardWidth, boardVars.realBoardHeight);
+        this.drawGrid(relX, relY, boardVars.realBoardWidth, boardVars.realBoardHeight);
+    };
+
+    drawGrid = (relX, relY, realBoardWidth, realBoardHeight) => {
         this.ctx.globalAlpha = 0.4;
+        this.ctx.fillStyle = 'black';
 
-        let interval = 500;
-        let realX = 0;
-        let topBorderY =  (((0 - boardVars.boardFocus.y)  / (boardVars.boardHeight / 2)) * 500) + (window.innerHeight / 2) + mouseVars.mouseOffset.y;
-        let bottomBorderY =  (((boardVars.realBoardHeight - boardVars.boardFocus.y) / (boardVars.boardHeight / 2)) * 500) + (window.innerHeight / 2)  + mouseVars.mouseOffset.y;
-        while (realX <= boardVars.realBoardWidth) {
-            this.ctx.fillStyle = (realX === boardVars.realBoardWidth || realX === 0) ? "red" :"black";
-            let lineX = (((realX - boardVars.boardFocus.x) / (boardVars.boardWidth / 2)) * 500) + (window.innerWidth / 2);
-            this.ctx.fillRect(lineX + mouseVars.mouseOffset.x,topBorderY, 2, bottomBorderY - topBorderY);
-            realX += interval;
+        const interval = 500;
+        let x = interval;
+        const topBorderY = relY(0);
+        const bottomBorderY =  relY(realBoardHeight);
+        while (x < realBoardWidth) {
+            this.ctx.fillRect(relX(x), topBorderY, 2, bottomBorderY - topBorderY);
+            x += interval;
         }
 
-        let realY = 0;
-        let leftBorderX = (((0 - boardVars.boardFocus.x) / (boardVars.boardWidth / 2)) * 500) + (window.innerWidth / 2) + mouseVars.mouseOffset.x;
-        let rightBorderX = (((boardVars.realBoardWidth - boardVars.boardFocus.x) / (boardVars.boardWidth / 2)) * 500) + (window.innerWidth / 2) + mouseVars.mouseOffset.x;
-        while (realY <= boardVars.realBoardHeight) {
-            this.ctx.fillStyle = (realY === boardVars.realBoardHeight || realY === 0) ? "red" :"black";
-            let lineY = (((realY - boardVars.boardFocus.y) / (boardVars.boardHeight / 2)) * 500) + (window.innerHeight / 2);
-            this.ctx.fillRect(leftBorderX,lineY + mouseVars.mouseOffset.y, rightBorderX - leftBorderX, 2);
-            realY += interval;
+        let y = interval;
+        const leftBorderX = relX(0);
+        const rightBorderX = relX(realBoardWidth);
+        while (y < realBoardHeight) {
+            this.ctx.fillRect(leftBorderX, relY(y), rightBorderX - leftBorderX, 2);
+            y += interval;
         }
+
+        this.ctx.globalAlpha = 1;
+    };
+
+    drawBorders = (relX, relY, realBoardWidth, realBoardHeight) => {
+        this.ctx.globalAlpha = 0.4;
+        this.ctx.fillStyle = 'red';
+
+        const topBorderY = relY(0);
+        const bottomBorderY =  relY(realBoardHeight);
+        this.ctx.fillRect(relX(0), topBorderY, 2, bottomBorderY - topBorderY);
+        this.ctx.fillRect(relX(realBoardWidth), topBorderY, 2, bottomBorderY - topBorderY);
+
+        const leftBorderX = relX(0);
+        const rightBorderX = relX(realBoardWidth);
+        this.ctx.fillRect(leftBorderX, relY(0), rightBorderX - leftBorderX, 2);
+        this.ctx.fillRect(leftBorderX, relY(realBoardHeight), rightBorderX - leftBorderX, 2);
 
         this.ctx.globalAlpha = 1;
     };
