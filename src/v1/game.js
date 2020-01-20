@@ -20,6 +20,9 @@ class Game {
     this.shiftDown = false;
     this.homepageAlpha = 0;
     this.autoscaleTime = true;
+    this.lastAnimation = Date.now();
+    this.animationCount = 0;
+    this.animationTimes = [];
   }
 
   setupMouse = () => {
@@ -118,6 +121,13 @@ class Game {
   };
 
   animate = (canvas) => {
+    this.animationTimes.push(Date.now() - this.lastAnimation);
+    this.lastAnimation = Date.now();
+    this.animationCount += 1;
+    if (this.animationCount % 10 === 0) {
+      console.log(this.animationTimes.reduce((a,b) => a + b) / this.animationTimes.length)
+      this.animationTimes = []
+    }
     canvas.ctx.clearRect(0,0, innerWidth, innerHeight);
     canvas.drawField(this.boardVars, this.mouseVars, this.quadTree);
 

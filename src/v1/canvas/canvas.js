@@ -37,16 +37,19 @@ class Canvas {
             mouseOffsetX: mouseVars.mouseOffset.x,
         })(amoeba.xpos);
 
-        let relativeRadius = amoeba.radius / boardVars.realBoardWidth * 1000 * boardVars.currentZoom;
+        const relativeRadius = amoeba.radius / boardVars.realBoardWidth * 1000 * boardVars.currentZoom;
 
         //radius cannot be kept proportional to window.innerWidth, it will throw off their size on screen
 
-        let gradient = colorize(amoeba, relativeX, relativeY, relativeRadius, boardVars.baseMass);
+        // if (relativeX + relativeRadius >= 0 || relativeX - relativeRadius <= window.innerWidth
+        //     || relativeY + relativeRadius >= 0 || relativeY - relativeRadius <= window.innerHeight) {
+            const gradient = colorize(amoeba, relativeX, relativeY, relativeRadius, boardVars.baseMass);
+            this.ctx.beginPath();
+            this.ctx.arc(relativeX, relativeY, relativeRadius, 0, Math.PI * 2);
+            this.ctx.fillStyle = gradient;
+            this.ctx.fill();
+        // }
 
-        this.ctx.beginPath();
-        this.ctx.arc(relativeX, relativeY, relativeRadius, 0, Math.PI * 2);
-        this.ctx.fillStyle = gradient;
-        this.ctx.fill();
     };
 
     drawAmoeboi = (amoeboi, boardVars, mouseVars) => {
