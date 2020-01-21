@@ -35,7 +35,7 @@ export const aabbCheck = (timeCoefficient = 1) => (amoeba1, amoeba2) => {
 const collision = (amoeba1, amoeba2, timeCoefficient) => {
   let distance = amoeba1.radius + amoeba2.radius;
   let currentDistance = Math.sqrt(
-      Math.pow(amoeba1.xpos - amoeba2.xpos ,2)  + Math.pow(amoeba1.ypos - amoeba2.ypos ,2)
+    Math.pow(amoeba1.xpos - amoeba2.xpos ,2)  + Math.pow(amoeba1.ypos - amoeba2.ypos ,2)
   );
   if (distance > currentDistance) {
 
@@ -86,13 +86,13 @@ const applyCollisionPhysics = (bigAmoeba, smallAmoeba, currentDistance, timeCoef
 export const collidesWith = (amoeba1, amoeba2) => {
   let distance = amoeba1.radius + amoeba2.radius;
   let currentDistance = Math.sqrt(
-      Math.pow(amoeba1.xpos - amoeba2.xpos, 2) + Math.pow(amoeba1.ypos - amoeba2.ypos, 2)
+    Math.pow(amoeba1.xpos - amoeba2.xpos, 2) + Math.pow(amoeba1.ypos - amoeba2.ypos, 2)
   );
   if (distance > currentDistance) {
     return true;
   } else {
     return false;
-  };
+  }
 };
 
 export const wallCollision = (amoeba, boardVars) => {
