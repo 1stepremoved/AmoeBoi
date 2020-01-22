@@ -14,11 +14,13 @@ export const MOVING_TO_INSTRUCTIONS_STATUS = 'moving-to-instructions-status';
 export const INSTRUCTIONS_STATUS = 'instructions-status';
 export const MOVING_TO_HOMEPAGE_STATUS = 'moving-to-homepage-status';
 export const COLORING_LOSE_SCREEN_STATUS = 'coloring-lose-screen-status';
+export const FINISHED_COLORING_LOSE_SCREEN_STATUS = 'finished-coloring-lose-screen-status';
 export const MOVING_TO_LOSE_SCREEN_STATUS = 'moving-to-lose-screen-status';
 export const LOSE_SCREEN_STATUS = 'lose-screen-status';
 export const LOSE_SCREEN_TO_HOMEPAGE_STATUS = 'lose-screen-to-homepage-status';
 export const PAUSED_STATUS = 'paused-status';
 export const COLORING_WIN_SCREEN_STATUS = 'coloring-win-screen-status';
+export const FINISHED_COLORING_WIN_SCREEN_STATUS = 'finished-coloring-win-screen-status';
 export const MOVING_TO_WIN_SCREEN_STATUS = 'moving-to-win-screen-status';
 export const WIN_SCREEN_STATUS = 'win-screen-status';
 export const PLAYING_STATUS = 'playing-status';
@@ -32,7 +34,6 @@ class Game {
     this.setupTime();
     this.setupMouse();
 
-    this.currentStatus = RESET_STATUS;
     this.shiftDown = false;
     this.homepageAlpha = 0;
     this.autoscaleTime = true;
@@ -51,41 +52,91 @@ class Game {
     this.timeVars = new TimeVars({ timeBase: 10, timeCoefficient: 1 });
   };
 
-  animate = (canvas) => {
+  determineNextStatus = (status, canvas) => {
+    if (status === SET_UP_STATUS) {
+      return PLAYING_STATUS;
+    } else if (status === RESET_STATUS) {
+      return HOMEPAGE_STATUS;
+    } else if (status === NEXT_LEVEL_STATUS) {
+      return PLAYING_STATUS
+    } else if (status === HOMEPAGE_STATUS) {
+      return HOMEPAGE_STATUS;
+    } else if (status === MOVING_TO_INSTRUCTIONS_STATUS) {
+      return canvas.homepageYOffset > -1000 ? MOVING_TO_INSTRUCTIONS_STATUS : INSTRUCTIONS_STATUS;
+    } else if (status === INSTRUCTIONS_STATUS) {
+      return INSTRUCTIONS_STATUS;
+    } else if(status === MOVING_TO_HOMEPAGE_STATUS) {
+      return canvas.homepageYOffset < 0 ? MOVING_TO_HOMEPAGE_STATUS : HOMEPAGE_STATUS;
+    } else if (status === COLORING_LOSE_SCREEN_STATUS) {
+      return this.homepageAlpha < 0.5 ? COLORING_LOSE_SCREEN_STATUS : FINISHED_COLORING_LOSE_SCREEN_STATUS;
+    } else if (status === FINISHED_COLORING_LOSE_SCREEN_STATUS) {
+      return MOVING_TO_LOSE_SCREEN_STATUS;
+    } else if (status === MOVING_TO_LOSE_SCREEN_STATUS) {
+      return canvas.homepageYOffset > 1000 ? MOVING_TO_LOSE_SCREEN_STATUS : LOSE_SCREEN_STATUS;
+    } else if (status === LOSE_SCREEN_STATUS) {
+      return LOSE_SCREEN_STATUS;
+    } else if (status === LOSE_SCREEN_TO_HOMEPAGE_STATUS) {
+      return canvas.homepageYOffset > 0 ? LOSE_SCREEN_TO_HOMEPAGE_STATUS : HOMEPAGE_STATUS;
+    } else if (status === PAUSED_STATUS) {
+      return PAUSED_STATUS;
+    } else if (status === COLORING_WIN_SCREEN_STATUS) {
+      return this.homepageAlpha < 0.5 ? COLORING_WIN_SCREEN_STATUS : FINISHED_COLORING_WIN_SCREEN_STATUS;
+    } else if (status === FINISHED_COLORING_WIN_SCREEN_STATUS) {
+      return MOVING_TO_WIN_SCREEN_STATUS;
+    } else if (status === MOVING_TO_WIN_SCREEN_STATUS) {
+      return canvas.homepageYOffset > 1000 ? MOVING_TO_WIN_SCREEN_STATUS : WIN_SCREEN_STATUS;
+    } else if (status === WIN_SCREEN_STATUS) {
+      return WIN_SCREEN_STATUS;
+    } else if (status === PLAYING_STATUS) {
+      if (this.amoeboi.mass > 0) {
+        return this.checkWin() ? COLORING_WIN_SCREEN_STATUS : PLAYING_STATUS;
+      } else {
+        return COLORING_LOSE_SCREEN_STATUS;
+      }
+    }
+
+    return null;
+  };
+
+  animate = (status, canvas) => {
     canvas.ctx.clearRect(0,0, innerWidth, innerHeight);
     canvas.drawField(this.boardVars, this.mouseVars, this.quadTree);
 
-    if (this.currentStatus === SET_UP_STATUS) {
+    if (status === SET_UP_STATUS) {
       return this.setup(canvas);
-    } else if (this.currentStatus === RESET_STATUS) {
-      return this.reset(canvas);
-    } else if (this.currentStatus === NEXT_LEVEL_STATUS) {
+    } else if (status === RESET_STATUS) {
+      return this.reset();
+    } else if (status === NEXT_LEVEL_STATUS) {
       return this.setUpNextLevel(canvas);
-    } else if (this.currentStatus === HOMEPAGE_STATUS) {
+    } else if (status === HOMEPAGE_STATUS) {
       return this.animateHomepage(canvas);
-    } else if (this.currentStatus === MOVING_TO_INSTRUCTIONS_STATUS) {
+    } else if (status === MOVING_TO_INSTRUCTIONS_STATUS) {
       return this.animateMovingToInstructions(canvas);
-    } else if (this.currentStatus === INSTRUCTIONS_STATUS) {
+    } else if (status === INSTRUCTIONS_STATUS) {
       return this.animateInstructions(canvas);
-    } else if(this.currentStatus === MOVING_TO_HOMEPAGE_STATUS) {
+    } else if(status === MOVING_TO_HOMEPAGE_STATUS) {
       return this.animateMovingToHomePage(canvas);
-    } else if (this.currentStatus === COLORING_LOSE_SCREEN_STATUS) {
+    } else if (status === COLORING_LOSE_SCREEN_STATUS) {
       return this.animateColoringLoseScreen(canvas);
-    } else if (this.currentStatus === MOVING_TO_LOSE_SCREEN_STATUS) {
+    } else if (status === FINISHED_COLORING_LOSE_SCREEN_STATUS) {
+      return this.animateFinishedColoringLoseScreen(canvas);
+    } else if (status === MOVING_TO_LOSE_SCREEN_STATUS) {
       return this.animateMovingToLoseScreen(canvas);
-    } else if (this.currentStatus === LOSE_SCREEN_STATUS) {
+    } else if (status === LOSE_SCREEN_STATUS) {
       return this.animateLosescreen(canvas);
-    } else if (this.currentStatus === LOSE_SCREEN_TO_HOMEPAGE_STATUS) {
+    } else if (status === LOSE_SCREEN_TO_HOMEPAGE_STATUS) {
       return this.animateLosescreenToHomePage(canvas);
-    } else if (this.currentStatus === PAUSED_STATUS) {
+    } else if (status === PAUSED_STATUS) {
       return this.animatePause(canvas);
-    } else if (this.currentStatus === COLORING_WIN_SCREEN_STATUS) {
+    } else if (status === COLORING_WIN_SCREEN_STATUS) {
       return this.animateColoringWinScreen(canvas);
-    } else if (this.currentStatus === MOVING_TO_WIN_SCREEN_STATUS) {
+    } else if (status === FINISHED_COLORING_WIN_SCREEN_STATUS) {
+      return this.animateFinishedColoringWinScreen(canvas);
+    } else if (status === MOVING_TO_WIN_SCREEN_STATUS) {
       return this.animateMovingToWinScreen(canvas);
-    } else if (this.currentStatus === WIN_SCREEN_STATUS) {
+    } else if (status === WIN_SCREEN_STATUS) {
       return this.animateWinScreen(canvas)
-    } else if (this.currentStatus === PLAYING_STATUS) {
+    } else if (status === PLAYING_STATUS) {
       this.moveAmoebas(canvas);
 
       canvas.makeMargins(this.timeVars);
@@ -98,7 +149,7 @@ class Game {
       }
       // canvas.makeClock(this.timeVars);
       if (this.amoeboi.mass > 0) {
-        this.boardVars.boardFocus = {x: this.amoeboi.xpos, y: this.amoeboi.ypos};
+        this.boardVars.boardFocus = { x: this.amoeboi.xpos, y: this.amoeboi.ypos };
         this.boardVars.baseMass = this.amoeboi.mass;
         if (this.amoeboi.radius / this.boardVars.realBoardWidth * 1000 * this.boardVars.currentZoom > 75) {
           this.boardVars.maxZoom = boundNum(75 / (this.amoeboi.radius / this.boardVars.realBoardWidth * 1000), 1, this.boardVars.absoluteMaxZoom);
@@ -107,13 +158,7 @@ class Game {
         if (this.amoeboi.radius / this.boardVars.realBoardWidth * 1000 * this.boardVars.maxZoom < 75) {
           this.boardVars.maxZoom = boundNum(75 / (this.amoeboi.radius / this.boardVars.realBoardWidth * 1000), 1, this.boardVars.absoluteMaxZoom);
         }
-        if (this.checkWin()) {
-          this.currentStatus = COLORING_WIN_SCREEN_STATUS;
-        }
-      } else {
-        this.currentStatus = COLORING_LOSE_SCREEN_STATUS;
       }
-      return requestAnimationFrame(() => this.animate(canvas));
     }
 
     return null;
@@ -127,9 +172,7 @@ class Game {
     this.timeVars.timeCoefficient = 0.5;
     this.boardVars.baseMass = this.amoeboi.mass;
     this.boardVars.boardFocus = {x: this.amoeboi.xpos, y: this.amoeboi.ypos};
-    this.currentStatus = PLAYING_STATUS;
     this.audio.playbackRate = 0.5 + ((1 / (1 + Math.pow(Math.E, -10 * baseLog(10,this.timeVars.timeCoefficient)))) * 3.5);
-    return requestAnimationFrame(() => this.animate(canvas));
   };
 
   setBoardVars = (realBoardWidth, realBoardHeight) => {
@@ -213,7 +256,7 @@ class Game {
     }
   };
 
-  reset = canvas => {
+  reset = () => {
     this.boardVars.maxZoom = 4;
     this.boardVars.currentZoom = 2;
     this.timeVars.timeCoefficient = 0.5;
@@ -222,8 +265,6 @@ class Game {
     this.setUpAmoebas(false);
 
     this.boardVars.boardFocus = { x: this.boardVars.realBoardWidth / 2, y: this.boardVars.realBoardHeight / 2};
-    this.currentStatus = HOMEPAGE_STATUS;
-    return requestAnimationFrame(() => this.animate(canvas));
   };
 
   setUpNextLevel = canvas => {
@@ -236,43 +277,29 @@ class Game {
     this.setUpAmoebas(true);
     this.boardVars.baseMass = this.amoeboi.mass;
     this.boardVars.boardFocus = {x: this.amoeboi.xpos, y: this.amoeboi.ypos};
-    this.currentStatus = PLAYING_STATUS;
     this.audio.playbackRate = 0.5 + ((1 / (1 + Math.pow(Math.E, -10 * baseLog(10, this.timeVars.timeCoefficient)))) * 3.5);
-    return requestAnimationFrame(() => this.animate(canvas));
   };
 
   animateHomepage = canvas => {
     this.moveAmoebas(canvas);
     canvas.makeHomepage(this.mouseVars, this.muted);
-    return requestAnimationFrame(() => this.animate(canvas));
   };
 
   animateMovingToInstructions = canvas => {
-    if (canvas.homepageYOffset > -1000) {
-      canvas.homepageYOffset -= 50;
-    } else {
-      this.currentStatus = INSTRUCTIONS_STATUS;
-    }
+    canvas.homepageYOffset -= 50;
     this.moveAmoebas(canvas);
     canvas.makeHomepage(this.mouseVars, this.muted);
-    return requestAnimationFrame(() => this.animate(canvas));
   };
 
   animateInstructions = canvas => {
     this.moveAmoebas(canvas);
     canvas.makeHomepage(this.mouseVars, this.muted);
-    return requestAnimationFrame(() => this.animate(canvas));
   };
 
   animateMovingToHomePage = canvas => {
-    if (canvas.homepageYOffset < 0) {
-      canvas.homepageYOffset += 50;
-    } else {
-      this.currentStatus = HOMEPAGE_STATUS;
-    }
+    canvas.homepageYOffset += 50;
     this.moveAmoebas(canvas);
     canvas.makeHomepage(this.mouseVars, this.muted);
-    return requestAnimationFrame(() => this.animate(canvas));
   };
 
   animateColoringLoseScreen = canvas => {
@@ -281,49 +308,35 @@ class Game {
     this.boardVars.currentZoom = this.boardVars.currentZoom > 1 ? this.boardVars.currentZoom * 0.9 : this.boardVars.currentZoom;
     this.boardVars.baseMass = 0;
     this.moveAmoebas(canvas);
-    if (this.homepageAlpha < 0.5) {
-      this.homepageAlpha += .1;
-    } else {
-      canvas.ctx.globalAlpha = this.homepageAlpha;
-      canvas.ctx.fillStyle = 'black';
-      canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-      canvas.homepageYOffset = 1500;
-      this.homepageAlpha = 0;
-      this.currentStatus = MOVING_TO_LOSE_SCREEN_STATUS;
-      return requestAnimationFrame(() => this.animate(canvas));
-    }
+    this.homepageAlpha += .1;
     canvas.ctx.globalAlpha = this.homepageAlpha;
     canvas.ctx.fillStyle = 'black';
     canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-    return requestAnimationFrame(() => this.animate(canvas));
+  };
+
+  animateFinishedColoringLoseScreen = canvas => {
+    canvas.ctx.globalAlpha = this.homepageAlpha;
+    canvas.ctx.fillStyle = 'black';
+    canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    canvas.homepageYOffset = 1500;
+    this.homepageAlpha = 0;
   };
 
   animateMovingToLoseScreen = canvas => {
-    if (canvas.homepageYOffset > 1000) {
-      canvas.homepageYOffset -= 50;
-    } else {
-      this.currentStatus = LOSE_SCREEN_STATUS;
-    }
+    canvas.homepageYOffset -= 50;
     this.moveAmoebas(canvas);
     canvas.makeHomepage(this.mouseVars, this.muted);
-    return requestAnimationFrame(() => this.animate(canvas));
   };
 
   animateLosescreen = canvas => {
     this.moveAmoebas(canvas);
     canvas.makeHomepage(this.mouseVars, this.muted);
-    return requestAnimationFrame(() => this.animate(canvas));
   };
 
   animateLosescreenToHomePage = canvas => {
-    if (canvas.homepageYOffset > 0) {
-      canvas.homepageYOffset -= 50;
-    } else {
-      this.currentStatus = HOMEPAGE_STATUS;
-    }
+    canvas.homepageYOffset -= 50;
     this.moveAmoebas(canvas);
     canvas.makeHomepage(this.mouseVars, this.muted);
-    return requestAnimationFrame(() => this.animate(canvas));
   };
 
   animatePause = canvas => {
@@ -333,7 +346,6 @@ class Game {
     canvas.drawAmoeboi(this.amoeboi, this.boardVars, this.mouseVars);
 
     canvas.makePause(this.mouseVars.mousePos.x, this.mouseVars.mousePos.y);
-    return requestAnimationFrame(() => this.animate(canvas));
   };
 
   animateColoringWinScreen = canvas => {
@@ -342,40 +354,32 @@ class Game {
     this.boardVars.currentZoom = this.boardVars.currentZoom > 1 ? this.boardVars.currentZoom * 0.9 : this.boardVars.currentZoom;
     this.boardVars.baseMass = this.amoeboi.mass;
     this.moveAmoebas(canvas);
-    if (this.homepageAlpha < 0.5) {
-      this.homepageAlpha += .1;
-    } else {
-      canvas.ctx.globalAlpha = this.homepageAlpha;
-      canvas.ctx.fillStyle = 'black';
-      canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-      canvas.homepageYOffset = 1500;
-      this.homepageAlpha = 0;
-      this.currentStatus = MOVING_TO_WIN_SCREEN_STATUS;
-      return requestAnimationFrame(() => this.animate(canvas));
-    }
+    this.homepageAlpha += .1;
     canvas.ctx.globalAlpha = this.homepageAlpha;
     canvas.ctx.fillStyle = 'black';
     canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-    return requestAnimationFrame(() => this.animate(canvas));
+  };
+
+  animateFinishedColoringWinScreen = canvas => {
+    canvas.ctx.globalAlpha = this.homepageAlpha;
+    canvas.ctx.fillStyle = 'black';
+    canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    canvas.homepageYOffset = 1500;
+    this.homepageAlpha = 0;
   };
 
   animateMovingToWinScreen = canvas => {
-    if (canvas.homepageYOffset > 1000) {
-      canvas.homepageYOffset -= 50;
-    } else {
-      this.currentStatus = WIN_SCREEN_STATUS;
-    }
+    canvas.homepageYOffset -= 50;
     this.boardVars.baseMass = this.amoeboi.mass;
     this.moveAmoebas(canvas);
     canvas.makeWinScreen(this.mouseVars);
-    return requestAnimationFrame(() => this.animate(canvas));
   };
 
   animateWinScreen = canvas => {
     this.boardVars.baseMass = this.amoeboi.mass;
     this.moveAmoebas(canvas);
     canvas.makeWinScreen(this.mouseVars);
-    return requestAnimationFrame(() => this.animate(canvas));
+    return WIN_SCREEN_STATUS;
   };
 
   moveAmoebas = (canvas) => {
@@ -412,7 +416,6 @@ class Game {
     return true;
   };
 
-  isPaused = () => this.currentStatus === PAUSED_STATUS;
 }
 
 

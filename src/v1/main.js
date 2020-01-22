@@ -15,7 +15,11 @@ import Game, {
 import Canvas from './canvas/canvas';
 import { boundNum, baseLog } from './util';
 
+
 document.addEventListener('DOMContentLoaded', () => {
+  let userInputStatus;
+  let status;
+
   const canvas = new Canvas('background');
   canvas.element.width = window.innerWidth;
   canvas.element.height = window.innerHeight;
@@ -34,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   window.addEventListener('click', (e) => {
-    if (game.currentStatus === HOMEPAGE_STATUS) {
+    if (status === HOMEPAGE_STATUS) {
       let mouseOffsetX = game.mouseVars.mousePos.x / window.innerWidth * 50;
       let mouseOffsetY = game.mouseVars.mousePos.y / window.innerHeight * 50;
       let titlePosX = (window.innerWidth / 2) - 195 - mouseOffsetX;
@@ -50,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location = 'https://1stepremoved.github.io/portfolio/';
       } else if (e.pageX > titlePosX + 75 && e.pageX < titlePosX + 365
         && e.pageY > titlePosY + 315 && e.pageY < titlePosY + 360) {
-        game.currentStatus = MOVING_TO_INSTRUCTIONS_STATUS;
+        userInputStatus = MOVING_TO_INSTRUCTIONS_STATUS;
         document.body.style.cursor = 'default';
       } else if (e.pageX > titlePosX -5 && e.pageX < titlePosX + 45
         && e.pageY > titlePosY + 60 && e.pageY < titlePosY + 110) {
@@ -71,23 +75,23 @@ document.addEventListener('DOMContentLoaded', () => {
           game.muted = true;
         }
       }
-    } else if (game.currentStatus === INSTRUCTIONS_STATUS) {
+    } else if (status === INSTRUCTIONS_STATUS) {
       let mouseOffsetX = game.mouseVars.mousePos.x / window.innerWidth * 50;
       let mouseOffsetY = game.mouseVars.mousePos.y / window.innerHeight * 50;
       let titlePosX = (window.innerWidth / 2) - 195 - mouseOffsetX;
       let titlePosY = (window.innerHeight / 2) - 80 - mouseOffsetY + canvas.homepageYOffset;
       if (e.pageX > titlePosX + 110 && e.pageX < titlePosX + 335
        && e.pageY > titlePosY + 805 && e.pageY < titlePosY + 850) {
-        game.currentStatus = MOVING_TO_HOMEPAGE_STATUS;
+        userInputStatus = MOVING_TO_HOMEPAGE_STATUS;
         document.body.style.cursor = 'default';
       }
     }
   });
 
   window.addEventListener('touchstart', (e) => {
-    if (game.currentStatus === PLAYING_STATUS) {
+    if (status === PLAYING_STATUS) {
       clearInterval(game.mouseVars.mouseDownInterval);
-      if (game.isPaused() || e.button === 2 || game.currentStatus !== PLAYING_STATUS) {
+      if (status === PAUSED_STATUS || e.button === 2 || status !== PLAYING_STATUS) {
         return;
       }
       game.mouseVars.mouseDownTime = Date.now();
@@ -101,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   window.addEventListener('touchmove', (e) => {
-    if (game.currentStatus === PLAYING_STATUS) {
+    if (status === PLAYING_STATUS) {
       game.mouseVars.mousePos.x = e.touches[0].pageX;
       game.mouseVars.mousePos.y = e.touches[0].pageY;
     }
@@ -111,15 +115,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.touches.length > 1) {
       return;
     }
-    if (game.currentStatus === HOMEPAGE_STATUS) {
-      game.currentStatus = SET_UP_STATUS;
+    if (status === HOMEPAGE_STATUS) {
+      userInputStatus = SET_UP_STATUS;
       canvas.homepageYOffset = 0;
-    } else if (game.currentStatus === LOSE_SCREEN_STATUS) {
+    } else if (status === LOSE_SCREEN_STATUS) {
       document.body.style.cursor = 'default';
-      game.currentStatus = LOSE_SCREEN_TO_HOMEPAGE_STATUS;
-    } else if (game.currentStatus === WIN_SCREEN_STATUS) {
-      game.currentStatus = NEXT_LEVEL_STATUS;
-    } else if (game.currentStatus === PLAYING_STATUS) {
+      userInputStatus = LOSE_SCREEN_TO_HOMEPAGE_STATUS;
+    } else if (status === WIN_SCREEN_STATUS) {
+      userInputStatus = NEXT_LEVEL_STATUS;
+    } else if (status === PLAYING_STATUS) {
       game.mouseVars.mouseDownTime = null;
       clearInterval(game.mouseVars.mouseDownInterval);
     }
@@ -127,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('mousedown', (e) => {
     clearInterval(game.mouseVars.mouseDownInterval);
-    if (game.isPaused() || e.button === 2 || game.currentStatus !== PLAYING_STATUS) {
+    if (status === PAUSED_STATUS || e.button === 2 || status !== PLAYING_STATUS) {
       return;
     }
     game.mouseVars.mouseDownTime = Date.now();
@@ -140,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   window.addEventListener('mousemove', (e) => {
-    if (game.currentStatus === HOMEPAGE_STATUS) {
+    if (status === HOMEPAGE_STATUS) {
       let mouseOffsetX = game.mouseVars.mousePos.x / window.innerWidth * 50;
       let mouseOffsetY = game.mouseVars.mousePos.y / window.innerHeight * 50;
       let titlePosX = (window.innerWidth / 2) - 195 - mouseOffsetX;
@@ -167,9 +171,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.cursor = 'default';
       }
       if (window.innerHeight - e.pageY < 30) {
-        game.currentStatus = MOVING_TO_INSTRUCTIONS_STATUS;
+        userInputStatus = MOVING_TO_INSTRUCTIONS_STATUS;
       }
-    } else if (game.currentStatus === INSTRUCTIONS_STATUS) {
+    } else if (status === INSTRUCTIONS_STATUS) {
       let mouseOffsetX = game.mouseVars.mousePos.x / window.innerWidth * 50;
       let mouseOffsetY = game.mouseVars.mousePos.y / window.innerHeight * 50;
       let titlePosX = (window.innerWidth / 2) - 195 - mouseOffsetX;
@@ -182,9 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.cursor = 'default';
       }
       if (e.pageY < 30) {
-        game.currentStatus = MOVING_TO_HOMEPAGE_STATUS;
+        userInputStatus = MOVING_TO_HOMEPAGE_STATUS;
       }
-    } else if (game.currentStatus === PLAYING_STATUS && game.shiftDown) {
+    } else if (status === PLAYING_STATUS && game.shiftDown) {
       game.mouseVars.mouseOffset.x = ((window.innerWidth / 2) - e.pageX) / 2;
       game.mouseVars.mouseOffset.y = ((window.innerHeight / 2) - e.pageY) / 2;
     }
@@ -205,56 +209,56 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('keydown', (e) => {
     switch (e.keyCode) {
     case 39: // right-arrow
-      if (game.isPaused() || game.currentStatus !== PLAYING_STATUS || game.autoscaleTime) { return; }
+      if (status === PAUSED_STATUS || status !== PLAYING_STATUS || game.autoscaleTime) { return; }
       game.timeVars.timeCoefficient = Math.min(game.timeVars.timeCoefficient * 1.1, game.timeVars.timeBase);
       audio.playbackRate = 0.5 + ((1 / (1 + Math.pow(Math.E, -10 * baseLog(10,game.timeVars.timeCoefficient)))) * 3.5);
       return;
     case 37: // left-arrow
-      if (game.isPaused() || game.currentStatus !== PLAYING_STATUS || game.autoscaleTime) { return; }
+      if (status === PAUSED_STATUS || status !== PLAYING_STATUS || game.autoscaleTime) { return; }
       game.timeVars.timeCoefficient = Math.max(game.timeVars.timeCoefficient * 0.9, Math.pow(game.timeVars.timeBase, - 1));
       audio.playbackRate = 0.5 + ((1 / (1 + Math.pow(Math.E, -10 * baseLog(10,game.timeVars.timeCoefficient)))) * 3.5);
       return;
     case 65: // a
-      if (game.isPaused() || game.currentStatus !== PLAYING_STATUS) { return; }
+      if (status === PAUSED_STATUS || status !== PLAYING_STATUS) { return; }
       game.autoscaleTime = !game.autoscaleTime;
       return;
     case 32: // space
-      if (![PAUSED_STATUS, PLAYING_STATUS].includes(game.currentStatus)) {
+      if (![PAUSED_STATUS, PLAYING_STATUS].includes(status)) {
         return;
       }
-      game.currentStatus = game.isPaused() ? PLAYING_STATUS : PAUSED_STATUS;
+      userInputStatus = status === PAUSED_STATUS ? PLAYING_STATUS : PAUSED_STATUS;
       game.mouseVars.mouseDownTime = null;
       return;
     case 72: //h
-      if (game.currentStatus === INSTRUCTIONS_STATUS) {
+      if (status === INSTRUCTIONS_STATUS) {
         document.body.style.cursor = 'default';
-        game.currentStatus = MOVING_TO_HOMEPAGE_STATUS;
+        userInputStatus = MOVING_TO_HOMEPAGE_STATUS;
         return;
-      } else if (game.currentStatus === LOSE_SCREEN_STATUS){
+      } else if (status === LOSE_SCREEN_STATUS){
         document.body.style.cursor = 'default';
-        game.currentStatus = LOSE_SCREEN_TO_HOMEPAGE_STATUS;
+        userInputStatus = LOSE_SCREEN_TO_HOMEPAGE_STATUS;
         return;
       }
-      game.currentStatus = RESET_STATUS;
+      userInputStatus = RESET_STATUS;
       return;
     case 73: // i
       canvas.showInstructions = !canvas.showInstructions;
       return;
     case 82: // r
-      if (game.currentStatus === PLAYING_STATUS || game.currentStatus === LOSE_SCREEN_STATUS || game.currentStatus === WIN_SCREEN_STATUS)
-        game.currentStatus = SET_UP_STATUS;
+      if (status === PLAYING_STATUS || status === LOSE_SCREEN_STATUS || status === WIN_SCREEN_STATUS)
+        userInputStatus = SET_UP_STATUS;
       return;
     case 13: // enter
-      if (game.currentStatus !== HOMEPAGE_STATUS && game.currentStatus !== INSTRUCTIONS_STATUS ) { return; }
-      game.currentStatus = SET_UP_STATUS;
+      if (status !== HOMEPAGE_STATUS && status !== INSTRUCTIONS_STATUS ) { return; }
+      userInputStatus = SET_UP_STATUS;
       canvas.homepageYOffset = 0;
       return;
     case 16: // shift
       game.shiftDown = true;
       return;
     case 67: // c
-      if (game.currentStatus === WIN_SCREEN_STATUS) {
-        game.currentStatus = NEXT_LEVEL_STATUS;
+      if (status === WIN_SCREEN_STATUS) {
+        userInputStatus = NEXT_LEVEL_STATUS;
       }
       return;
     case 77: // m
@@ -286,10 +290,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener(mousewheelevent, (e)=> {
     e.preventDefault();
-    if (game.paused  || game.currentStatus !== PLAYING_STATUS) { return; }
+    if (status === PAUSED_STATUS || userInputStatus !== PLAYING_STATUS) { return; }
     let zoomDelta = (e.deltaY / -1000);
     game.boardVars.currentZoom = boundNum(game.boardVars.currentZoom + zoomDelta, game.boardVars.minZoom, game.boardVars.maxZoom);
   });
 
-  game.animate(canvas);
+  const step = (prevStatus, canvas) => {
+    game.animate(prevStatus, canvas);
+    status = userInputStatus !== undefined ?
+        userInputStatus : game.determineNextStatus(prevStatus, canvas);
+    if (userInputStatus !== undefined) userInputStatus = undefined;
+    return requestAnimationFrame(() => step(status, canvas));
+  };
+
+  requestAnimationFrame(() => step(RESET_STATUS, canvas));
 });
