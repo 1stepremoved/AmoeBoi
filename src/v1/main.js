@@ -203,30 +203,29 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   window.addEventListener('keydown', (e) => {
-    let rate;
     switch (e.keyCode) {
-    case 39:
+    case 39: // right-arrow
       if (game.isPaused() || game.currentStatus !== PLAYING_STATUS || game.autoscaleTime) { return; }
       game.timeVars.timeCoefficient = Math.min(game.timeVars.timeCoefficient * 1.1, game.timeVars.timeBase);
       audio.playbackRate = 0.5 + ((1 / (1 + Math.pow(Math.E, -10 * baseLog(10,game.timeVars.timeCoefficient)))) * 3.5);
       return;
-    case 37:
+    case 37: // left-arrow
       if (game.isPaused() || game.currentStatus !== PLAYING_STATUS || game.autoscaleTime) { return; }
       game.timeVars.timeCoefficient = Math.max(game.timeVars.timeCoefficient * 0.9, Math.pow(game.timeVars.timeBase, - 1));
       audio.playbackRate = 0.5 + ((1 / (1 + Math.pow(Math.E, -10 * baseLog(10,game.timeVars.timeCoefficient)))) * 3.5);
       return;
-    case 65:
+    case 65: // a
       if (game.isPaused() || game.currentStatus !== PLAYING_STATUS) { return; }
       game.autoscaleTime = !game.autoscaleTime;
       return;
-    case 32:
+    case 32: // space
       if (![PAUSED_STATUS, PLAYING_STATUS].includes(game.currentStatus)) {
         return;
       }
       game.currentStatus = game.isPaused() ? PLAYING_STATUS : PAUSED_STATUS;
       game.mouseVars.mouseDownTime = null;
       return;
-    case 72:
+    case 72: //h
       if (game.currentStatus === INSTRUCTIONS_STATUS) {
         document.body.style.cursor = 'default';
         game.currentStatus = MOVING_TO_HOMEPAGE_STATUS;
@@ -238,27 +237,27 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       game.currentStatus = RESET_STATUS;
       return;
-    case 73:
+    case 73: // i
       canvas.showInstructions = !canvas.showInstructions;
       return;
-    case 82:
+    case 82: // r
       if (game.currentStatus === PLAYING_STATUS || game.currentStatus === LOSE_SCREEN_STATUS || game.currentStatus === WIN_SCREEN_STATUS)
         game.currentStatus = SET_UP_STATUS;
       return;
-    case 13:
+    case 13: // enter
       if (game.currentStatus !== HOMEPAGE_STATUS && game.currentStatus !== INSTRUCTIONS_STATUS ) { return; }
       game.currentStatus = SET_UP_STATUS;
       canvas.homepageYOffset = 0;
       return;
-    case 16:
+    case 16: // shift
       game.shiftDown = true;
       return;
-    case 67:
+    case 67: // c
       if (game.currentStatus === WIN_SCREEN_STATUS) {
         game.currentStatus = NEXT_LEVEL_STATUS;
       }
       return;
-    case 77:
+    case 77: // m
       if (audio.volume === 0) {
         audio.volume = 0.5;
         game.muted = false;
