@@ -85,7 +85,7 @@ class Canvas {
         return gradient;
     };
 
-    makePause = (mousePosX, mousePosY) => {
+    drawPause = (mousePosX, mousePosY) => {
         this.ctx.globalAlpha = 0.5;
         this.ctx.fillStyle = 'black';
         this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
@@ -100,7 +100,7 @@ class Canvas {
         this.ctx.fillText(`PAUSED`, titlePosX, titlePosY);
     };
 
-    makeClock = (timeVars) => {
+    drawClock = (timeVars) => {
         this.ctx.globalAlpha = 0.7;
 
         this.ctx.beginPath();
@@ -216,7 +216,7 @@ class Canvas {
         this.ctx.globalAlpha = 1;
     };
 
-    makeMassDisplay = (amoeboi) => {
+    drawMassDisplay = (amoeboi) => {
         this.ctx.globalAlpha = 0.7;
         this.ctx.fillStyle = 'black';
         let displayWidth;
@@ -232,7 +232,7 @@ class Canvas {
         this.ctx.fillText(`Mass: ${Math.floor(amoeboi.mass / 100) }`, window.innerWidth - 200, 100);
     };
 
-    makeInstructions = (muted, autoscaleTime) => {
+    drawInstructions = (muted, autoscaleTime) => {
         this.ctx.globalAlpha = 0.7;
         this.ctx.fillStyle = 'black';
         if (!this.showInstructions) {
@@ -259,7 +259,7 @@ class Canvas {
         this.ctx.fillText(`     A      :  Autoscale Time (${autoscaleTime ? "ON" : "OFF"})`, 63, 375);
     };
 
-    makeMargins = (timeVars) => {
+    drawMargins = (timeVars) => {
         this.ctx.globalAlpha = 0.7;
         this.ctx.fillStyle = "black";
         let marginHeight = Math.floor(window.innerHeight / 8);
@@ -278,7 +278,7 @@ class Canvas {
         this.ctx.globalAlpha = 1;
     };
 
-    makeWinScreen = (mouseVars) => {
+    drawWinScreen = (mouseVars) => {
         this.ctx.globalAlpha = 0.5;
         this.ctx.fillStyle = 'black';
         this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
@@ -305,7 +305,7 @@ class Canvas {
         this.iconImages[fileName].src = `../assets/images/${fileName}.png`;
     };
 
-    makeHomepage = (mouseVars, muted) =>{
+    drawHomepage = (mouseVars, muted) =>{
         this.ctx.globalAlpha = 0.5;
         this.ctx.fillStyle = 'black';
         this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);

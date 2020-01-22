@@ -139,15 +139,15 @@ class Game {
     } else if (status === PLAYING_STATUS) {
       this.moveAmoebas(canvas);
 
-      canvas.makeMargins(this.timeVars);
-      canvas.makeMassDisplay(this.amoeboi);
-      canvas.makeInstructions(this.muted, this.autoscaleTime);
+      canvas.drawMargins(this.timeVars);
+      canvas.drawMassDisplay(this.amoeboi);
+      canvas.drawInstructions(this.muted, this.autoscaleTime);
       if (this.autoscaleTime) {
         let largest = this.amoebas[0];
         this.amoebas.forEach(a => {largest = largest.radius < a.radius ? a : largest;});
         this.timeVars.timeCoefficient = (this.amoeboi.radius / largest.radius) * this.timeVars.timeBase * .75;
       }
-      // canvas.makeClock(this.timeVars);
+      // canvas.drawClock(this.timeVars);
       if (this.amoeboi.mass > 0) {
         this.boardVars.boardFocus = { x: this.amoeboi.xpos, y: this.amoeboi.ypos };
         this.boardVars.baseMass = this.amoeboi.mass;
@@ -282,24 +282,24 @@ class Game {
 
   animateHomepage = canvas => {
     this.moveAmoebas(canvas);
-    canvas.makeHomepage(this.mouseVars, this.muted);
+    canvas.drawHomepage(this.mouseVars, this.muted);
   };
 
   animateMovingToInstructions = canvas => {
     canvas.homepageYOffset -= 50;
     this.moveAmoebas(canvas);
-    canvas.makeHomepage(this.mouseVars, this.muted);
+    canvas.drawHomepage(this.mouseVars, this.muted);
   };
 
   animateInstructions = canvas => {
     this.moveAmoebas(canvas);
-    canvas.makeHomepage(this.mouseVars, this.muted);
+    canvas.drawHomepage(this.mouseVars, this.muted);
   };
 
   animateMovingToHomePage = canvas => {
     canvas.homepageYOffset += 50;
     this.moveAmoebas(canvas);
-    canvas.makeHomepage(this.mouseVars, this.muted);
+    canvas.drawHomepage(this.mouseVars, this.muted);
   };
 
   animateColoringLoseScreen = canvas => {
@@ -325,18 +325,18 @@ class Game {
   animateMovingToLoseScreen = canvas => {
     canvas.homepageYOffset -= 50;
     this.moveAmoebas(canvas);
-    canvas.makeHomepage(this.mouseVars, this.muted);
+    canvas.drawHomepage(this.mouseVars, this.muted);
   };
 
   animateLosescreen = canvas => {
     this.moveAmoebas(canvas);
-    canvas.makeHomepage(this.mouseVars, this.muted);
+    canvas.drawHomepage(this.mouseVars, this.muted);
   };
 
   animateLosescreenToHomePage = canvas => {
     canvas.homepageYOffset -= 50;
     this.moveAmoebas(canvas);
-    canvas.makeHomepage(this.mouseVars, this.muted);
+    canvas.drawHomepage(this.mouseVars, this.muted);
   };
 
   animatePause = canvas => {
@@ -345,7 +345,7 @@ class Game {
     });
     canvas.drawAmoeboi(this.amoeboi, this.boardVars, this.mouseVars);
 
-    canvas.makePause(this.mouseVars.mousePos.x, this.mouseVars.mousePos.y);
+    canvas.drawPause(this.mouseVars.mousePos.x, this.mouseVars.mousePos.y);
   };
 
   animateColoringWinScreen = canvas => {
@@ -372,13 +372,13 @@ class Game {
     canvas.homepageYOffset -= 50;
     this.boardVars.baseMass = this.amoeboi.mass;
     this.moveAmoebas(canvas);
-    canvas.makeWinScreen(this.mouseVars);
+    canvas.drawWinScreen(this.mouseVars);
   };
 
   animateWinScreen = canvas => {
     this.boardVars.baseMass = this.amoeboi.mass;
     this.moveAmoebas(canvas);
-    canvas.makeWinScreen(this.mouseVars);
+    canvas.drawWinScreen(this.mouseVars);
     return WIN_SCREEN_STATUS;
   };
 
