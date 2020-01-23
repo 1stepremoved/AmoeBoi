@@ -1,5 +1,12 @@
 import { boardYRelativeToFocus, boardXRelativeToFocus } from './util';
 import { baseLog, boundNum } from '../util';
+import {
+    SET_UP_STATUS, RESET_STATUS, NEXT_LEVEL_STATUS, HOMEPAGE_STATUS, MOVING_TO_INSTRUCTIONS_STATUS,
+    INSTRUCTIONS_STATUS, MOVING_TO_HOMEPAGE_STATUS, COLORING_LOSE_SCREEN_STATUS,
+    FINISHED_COLORING_LOSE_SCREEN_STATUS, MOVING_TO_LOSE_SCREEN_STATUS, LOSE_SCREEN_STATUS,
+    LOSE_SCREEN_TO_HOMEPAGE_STATUS, PAUSED_STATUS, COLORING_WIN_SCREEN_STATUS,
+    FINISHED_COLORING_WIN_SCREEN_STATUS, MOVING_TO_WIN_SCREEN_STATUS, WIN_SCREEN_STATUS, PLAYING_STATUS
+} from '../constants';
 
 const HOMEPAGE_OFFSET_STEP = 50;
 const HOMEPAGE_OFFSET = 0;
@@ -22,6 +29,60 @@ class Canvas {
         this.homepageTime = null;
         this.setupImages();
     }
+
+    draw = ({ status, boardVars, mouseVars, timeVars, amoeboi, amoebas, muted, autoscaleTime }) => {
+        switch (status) {
+            case SET_UP_STATUS:
+                return this.resetYOffset();
+            case RESET_STATUS:
+                return null;
+            case NEXT_LEVEL_STATUS:
+                return this.resetYOffset();
+            case HOMEPAGE_STATUS:
+                return this.drawHomepage(mouseVars, muted);
+            case MOVING_TO_INSTRUCTIONS_STATUS:
+                this.stepFromHomepageToInstructions();
+                return this.drawHomepage(mouseVars, muted);
+            case INSTRUCTIONS_STATUS:
+                return this.drawHomepage(mouseVars, muted);
+            case MOVING_TO_HOMEPAGE_STATUS:
+                this.stepFromInstructionsToHomepage();
+                return this.drawHomepage(mouseVars, muted);
+            case COLORING_LOSE_SCREEN_STATUS:
+                this.stepColoringHomepage();
+                return this.drawColoringHomepage();
+            case FINISHED_COLORING_LOSE_SCREEN_STATUS:
+                return this.drawFinishedColoringHomepage();
+            case MOVING_TO_LOSE_SCREEN_STATUS:
+                this.stepFromAboveToLevelEndScreen();
+                return this.drawHomepage(mouseVars, muted);
+            case LOSE_SCREEN_STATUS:
+                return this.drawHomepage(mouseVars, muted);
+            case LOSE_SCREEN_TO_HOMEPAGE_STATUS:
+                this.stepFromLoseScreenToHomepage();
+                return this.drawHomepage(mouseVars, muted);
+            case PAUSED_STATUS:
+                amoebas.forEach(amoeba => {
+                    this.drawAmoeba(amoeba, boardVars, mouseVars);
+                });
+                this.drawAmoeboi(amoeboi, boardVars, mouseVars);
+                return this.drawPause(mouseVars.mousePos.x, mouseVars.mousePos.y);
+            case COLORING_WIN_SCREEN_STATUS:
+                this.stepColoringHomepage();
+                return this.drawColoringHomepage();
+            case FINISHED_COLORING_WIN_SCREEN_STATUS:
+                return this.drawFinishedColoringHomepage();
+            case MOVING_TO_WIN_SCREEN_STATUS:
+                this.stepFromAboveToLevelEndScreen();
+                return this.drawWinScreen(mouseVars);
+            case WIN_SCREEN_STATUS:
+                return this.drawWinScreen(mouseVars);
+            case PLAYING_STATUS:
+                this.drawMargins(timeVars);
+                this.drawMassDisplay(amoeboi);
+                return this.drawInstructions(muted, autoscaleTime);
+        }
+    };
 
     clearCtx = () => { this.ctx.clearRect(0,0, innerWidth, innerHeight); };
 

@@ -1,4 +1,5 @@
-import Game, {
+import Game from './game';
+import {
   SET_UP_STATUS,
   RESET_STATUS,
   NEXT_LEVEL_STATUS,
@@ -11,7 +12,7 @@ import Game, {
   WIN_SCREEN_STATUS,
   PLAYING_STATUS,
   PAUSED_STATUS,
-} from './game';
+} from './constants';
 import Canvas from './canvas/canvas';
 import { boundNum, baseLog } from './util';
 
