@@ -1,131 +1,29 @@
 import { boardYRelativeToFocus, boardXRelativeToFocus } from './util';
 import { baseLog, boundNum } from '../util';
 
+const HOMEPAGE_OFFSET_STEP = 50;
+const HOMEPAGE_OFFSET = 0;
+const INSTRUCTION_OFFSET = -1000;
+const LOSE_SCREEN_OFFSET = 1000;
+const ABOVE_LOSE_SCREEN_OFFSET = 1500;
+
+const HOMEPAGE_ALPHA_STEP = 0.1;
+const HOMEPAGE_ALPHA = 0.5;
+const PLAYING_ALPHA = 0;
+
 class Canvas {
     constructor(canvasId) {
         this.element = document.getElementById(canvasId);
         this.ctx = this.element.getContext("2d");
         this.homepageYOffset = 0;
+        this.homepageAlpha = 0;
         this.clockAngle = 0;
         this.showInstructions = true;
         this.homepageTime = null;
         this.setupImages();
     }
 
-    buildAndColorAmoeba = (amoeba, boardVars, mouseVars, colorize) => {
-        if (amoeba.mass <= 0) {
-            return;
-        }
-        if (isNaN(amoeba.xpos) || isNaN(amoeba.ypos) ){
-            // DEBUG: somehow these get turned into NaN when absorbed completely by another amoeba
-            amoeba.mass = 0;
-            return;
-        }
-
-        amoeba.adjustRadius();
-
-        const relativeY = boardYRelativeToFocus({
-            boardFocusY: boardVars.boardFocus.y,
-            boardHeight: boardVars.boardHeight(),
-            innerHeight: window.innerHeight,
-            mouseOffsetY: mouseVars.mouseOffset.y,
-        })(amoeba.ypos);
-        const relativeX = boardXRelativeToFocus({
-            boardFocusX: boardVars.boardFocus.x,
-            boardWidth: boardVars.boardWidth(),
-            innerWidth: window.innerWidth,
-            mouseOffsetX: mouseVars.mouseOffset.x,
-        })(amoeba.xpos);
-
-        let relativeRadius = amoeba.radius / boardVars.realBoardWidth * 1000 * boardVars.currentZoom;
-
-        //radius cannot be kept proportional to window.innerWidth, it will throw off their size on screen
-
-        let gradient = colorize(amoeba, relativeX, relativeY, relativeRadius, boardVars.baseMass);
-
-        this.ctx.beginPath();
-        this.ctx.arc(relativeX, relativeY, relativeRadius, 0, Math.PI * 2);
-        this.ctx.fillStyle = gradient;
-        this.ctx.fill();
-    };
-
-    drawAmoeboi = (amoeboi, boardVars, mouseVars) => {
-        this.buildAndColorAmoeba(amoeboi, boardVars, mouseVars, this.colorizeAmoeboi);
-    };
-
-    drawAmoeba = (amoeboi, boardVars, mouseVars) => {
-        this.buildAndColorAmoeba(amoeboi, boardVars, mouseVars, this.colorizeAmoeba);
-    };
-
-    colorizeAmoeba = (amoeba, relativeX, relativeY, relativeRadius, baseMass) => {
-        if (amoeba.mass <= 0) {
-            return;
-        }
-
-        let gradient = this.ctx.createRadialGradient(relativeX, relativeY, relativeRadius, relativeX, relativeY, 0);
-        if (amoeba.mass < baseMass) {
-            gradient.addColorStop(0, `rgb(${20}, ${20}, ${255})`);
-            gradient.addColorStop(boundNum(1 - (amoeba.mass / baseMass),0, 1) , `rgb(${50}, ${20}, ${200})`);
-            gradient.addColorStop(1 , `rgb(${255}, ${20}, ${20})`);
-        } else {
-            gradient.addColorStop(0, `rgb(${255}, ${20}, ${20})`);
-            gradient.addColorStop(boundNum(1 -(baseMass / amoeba.mass), 0, 1) , `rgb(${200}, ${20}, ${50})` );
-            gradient.addColorStop(1 , `rgb(${20}, ${20}, ${255})`);
-        }
-        return gradient;
-    };
-
-    colorizeAmoeboi = (amoeboi, relativeX, relativeY, relativeRadius) => {
-        if (amoeboi.mass <= 0) {
-            return;
-        }
-        let gradient = this.ctx.createRadialGradient(relativeX, relativeY,relativeRadius, relativeX, relativeY, 0);
-        gradient.addColorStop(0, `rgb(${0}, ${255}, ${0})`);
-        gradient.addColorStop(1, `rgb(${0}, ${150}, ${0})`);
-        return gradient;
-    };
-
-    drawPause = (mousePosX, mousePosY) => {
-        this.ctx.globalAlpha = 0.5;
-        this.ctx.fillStyle = 'black';
-        this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-        let mouseOffsetX = mousePosX / window.innerWidth * 50;
-        let mouseOffsetY = mousePosY / window.innerHeight * 50;
-
-        this.ctx.globalAlpha = 1;
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = '70px Impact';
-        let titlePosX = (window.innerWidth / 2) - 75 - mouseOffsetX;
-        let titlePosY = (window.innerHeight / 2) + 50 - mouseOffsetY + this.homepageYOffset;
-        this.ctx.fillText(`PAUSED`, titlePosX, titlePosY);
-    };
-
-    drawClock = (timeVars) => {
-        this.ctx.globalAlpha = 0.7;
-
-        this.ctx.beginPath();
-        this.ctx.arc(120, 120, 65, 0, ((baseLog(timeVars.timeBase, timeVars.timeCoefficient) + 1) / 2 * Math.PI * 2));
-        this.ctx.strokeStyle = 'orange';
-        this.ctx.lineWidth = 5;
-        this.ctx.stroke();
-
-        this.ctx.beginPath();
-        this.ctx.arc(120, 120, 60, 0, Math.PI * 2);
-        this.ctx.strokeStyle = 'black';
-        this.ctx.lineWidth = 3;
-        this.ctx.stroke();
-        this.ctx.globalAlpha = 0.8;
-        this.ctx.fillStyle = 'white';
-        this.ctx.fill();
-
-        this.ctx.beginPath();
-        this.ctx.moveTo(120,120);
-        this.ctx.lineTo(120 + (60*Math.cos(this.clockAngle * Math.PI / 180)), 120 + (60*Math.sin(this.clockAngle * Math.PI / 180)));
-        this.ctx.fillStyle = 'black';
-        this.ctx.stroke();
-        this.clockAngle = (this.clockAngle + (timeVars.timeCoefficient)) % 360;
-        this.ctx.globalAlpha = 1;
-    };
+    clearCtx = () => { this.ctx.clearRect(0,0, innerWidth, innerHeight); };
 
     drawField = (boardVars, mouseVars, quadtree) => {
         const relY = boardYRelativeToFocus({
@@ -210,9 +108,126 @@ class Canvas {
         this.ctx.stroke();
 
         quadtree.quadrants.forEach(subQuadtree => {
-           this.drawQuadtree(relX, relY, subQuadtree);
+            this.drawQuadtree(relX, relY, subQuadtree);
         });
 
+        this.ctx.globalAlpha = 1;
+    };
+
+    buildAndColorAmoeba = (amoeba, boardVars, mouseVars, colorize) => {
+        if (amoeba.mass <= 0) {
+            return;
+        }
+        if (isNaN(amoeba.xpos) || isNaN(amoeba.ypos) ){
+            // DEBUG: somehow these get turned into NaN when absorbed completely by another amoeba
+            amoeba.mass = 0;
+            return;
+        }
+
+        amoeba.adjustRadius();
+
+        const relativeY = boardYRelativeToFocus({
+            boardFocusY: boardVars.boardFocus.y,
+            boardHeight: boardVars.boardHeight(),
+            innerHeight: window.innerHeight,
+            mouseOffsetY: mouseVars.mouseOffset.y,
+        })(amoeba.ypos);
+        const relativeX = boardXRelativeToFocus({
+            boardFocusX: boardVars.boardFocus.x,
+            boardWidth: boardVars.boardWidth(),
+            innerWidth: window.innerWidth,
+            mouseOffsetX: mouseVars.mouseOffset.x,
+        })(amoeba.xpos);
+
+        let relativeRadius = amoeba.radius / boardVars.realBoardWidth * 1000 * boardVars.currentZoom;
+
+        //radius cannot be kept proportional to window.innerWidth, it will throw off their size on screen
+
+        let gradient = colorize(amoeba, relativeX, relativeY, relativeRadius, boardVars.baseMass);
+
+        this.ctx.globalAlpha = 0.8;
+        this.ctx.beginPath();
+        this.ctx.arc(relativeX, relativeY, relativeRadius, 0, Math.PI * 2);
+        this.ctx.fillStyle = gradient;
+        this.ctx.fill();
+        this.ctx.globalAlpha = 1;
+    };
+
+    drawAmoeboi = (amoeboi, boardVars, mouseVars) => {
+        this.buildAndColorAmoeba(amoeboi, boardVars, mouseVars, this.colorizeAmoeboi);
+    };
+
+    drawAmoeba = (amoeboi, boardVars, mouseVars) => {
+        this.buildAndColorAmoeba(amoeboi, boardVars, mouseVars, this.colorizeAmoeba);
+    };
+
+    colorizeAmoeba = (amoeba, relativeX, relativeY, relativeRadius, baseMass) => {
+        if (amoeba.mass <= 0) {
+            return;
+        }
+
+        let gradient = this.ctx.createRadialGradient(relativeX, relativeY, relativeRadius, relativeX, relativeY, 0);
+        if (amoeba.mass < baseMass) {
+            gradient.addColorStop(0, `rgb(${20}, ${20}, ${255})`);
+            gradient.addColorStop(boundNum(1 - (amoeba.mass / baseMass),0, 1) , `rgb(${50}, ${20}, ${200})`);
+            gradient.addColorStop(1 , `rgb(${255}, ${20}, ${20})`);
+        } else {
+            gradient.addColorStop(0, `rgb(${255}, ${20}, ${20})`);
+            gradient.addColorStop(boundNum(1 -(baseMass / amoeba.mass), 0, 1) , `rgb(${200}, ${20}, ${50})` );
+            gradient.addColorStop(1 , `rgb(${20}, ${20}, ${255})`);
+        }
+        return gradient;
+    };
+
+    colorizeAmoeboi = (amoeboi, relativeX, relativeY, relativeRadius) => {
+        if (amoeboi.mass <= 0) {
+            return;
+        }
+        let gradient = this.ctx.createRadialGradient(relativeX, relativeY,relativeRadius, relativeX, relativeY, 0);
+        gradient.addColorStop(0, `rgb(${0}, ${255}, ${0})`);
+        gradient.addColorStop(1, `rgb(${0}, ${150}, ${0})`);
+        return gradient;
+    };
+
+    drawPause = (mousePosX, mousePosY) => {
+        this.ctx.globalAlpha = 0.5;
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+        let mouseOffsetX = mousePosX / window.innerWidth * 50;
+        let mouseOffsetY = mousePosY / window.innerHeight * 50;
+
+        this.ctx.globalAlpha = 1;
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = '70px Impact';
+        let titlePosX = (window.innerWidth / 2) - 75 - mouseOffsetX;
+        let titlePosY = (window.innerHeight / 2) + 50 - mouseOffsetY + this.homepageYOffset;
+        this.ctx.fillText(`PAUSED`, titlePosX, titlePosY);
+    };
+
+    drawClock = (timeVars) => {
+        this.ctx.globalAlpha = 0.7;
+
+        this.ctx.beginPath();
+        this.ctx.arc(120, 120, 65, 0, ((baseLog(timeVars.timeBase, timeVars.timeCoefficient) + 1) / 2 * Math.PI * 2));
+        this.ctx.strokeStyle = 'orange';
+        this.ctx.lineWidth = 5;
+        this.ctx.stroke();
+
+        this.ctx.beginPath();
+        this.ctx.arc(120, 120, 60, 0, Math.PI * 2);
+        this.ctx.strokeStyle = 'black';
+        this.ctx.lineWidth = 3;
+        this.ctx.stroke();
+        this.ctx.globalAlpha = 0.8;
+        this.ctx.fillStyle = 'white';
+        this.ctx.fill();
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(120,120);
+        this.ctx.lineTo(120 + (60*Math.cos(this.clockAngle * Math.PI / 180)), 120 + (60*Math.sin(this.clockAngle * Math.PI / 180)));
+        this.ctx.fillStyle = 'black';
+        this.ctx.stroke();
+        this.clockAngle = (this.clockAngle + (timeVars.timeCoefficient)) % 360;
         this.ctx.globalAlpha = 1;
     };
 
@@ -368,6 +383,62 @@ class Canvas {
         this.ctx.fillText(`Press R to play again`, titlePosX + 50, titlePosY - 840);
         this.ctx.fillText(`Press H to return to Main Menu`, titlePosX - 27.5, titlePosY - 760);
     };
+
+    drawColoringHomepage = () => {
+        this.ctx.globalAlpha = this.homepageAlpha;
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    };
+
+    drawFinishedColoringHomepage = () => {
+        this.ctx.globalAlpha = this.homepageAlpha;
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+        this.homepageYOffset = ABOVE_LOSE_SCREEN_OFFSET;
+        this.homepageAlpha = 0;
+    };
+
+    stepFromHomepageToInstructions = () => {
+        this.homepageYOffset -= HOMEPAGE_OFFSET_STEP;
+        if (this.homepageYOffset < INSTRUCTION_OFFSET) {
+            this.homepageYOffset = INSTRUCTION_OFFSET;
+        }
+    };
+
+    isMovingFromHomepageToInstructions = () => (this.homepageYOffset > INSTRUCTION_OFFSET);
+
+    stepFromInstructionsToHomepage = () => {
+        this.homepageYOffset += HOMEPAGE_OFFSET_STEP;
+        if (this.homepageYOffset > HOMEPAGE_OFFSET) {
+            this.homepageYOffset = HOMEPAGE_OFFSET;
+        }
+    };
+
+    isMovingFromInstructionsToHomepage = () => (this.homepageYOffset < HOMEPAGE_OFFSET);
+
+    stepFromAboveToLevelEndScreen = () => {
+        this.homepageYOffset -= HOMEPAGE_OFFSET_STEP;
+        if (this.homepageYOffset < LOSE_SCREEN_OFFSET) {
+            this.homepageYOffset = LOSE_SCREEN_OFFSET;
+        }
+    };
+
+    isMovingFromAboveToLevelEndScreen = () => (this.homepageYOffset > LOSE_SCREEN_OFFSET);
+
+    stepFromLoseScreenToHomepage = () => {
+        this.homepageYOffset -= HOMEPAGE_OFFSET_STEP;
+        if (this.homepageYOffset < HOMEPAGE_OFFSET) {
+            this.homepageYOffset = HOMEPAGE_OFFSET;
+        }
+    };
+
+    isMovingFromLoseScreenToHomepage = () => (this.homepageYOffset > HOMEPAGE_OFFSET);
+
+    stepColoringHomepage = () => { this.homepageAlpha += HOMEPAGE_ALPHA_STEP; };
+
+    isColoringHomepage = () => (this.homepageAlpha < HOMEPAGE_ALPHA);
+
+    resetYOffset = () => { this.homepageYOffset = HOMEPAGE_OFFSET; };
 };
 
 export default Canvas;
