@@ -87,53 +87,20 @@ class Game {
   };
 
   animate = (status, canvas) => {
-    canvas.clearCtx();
-    canvas.drawField(this.boardVars, this.mouseVars, this.quadTree);
-
     if (status === SET_UP_STATUS) {
-      return this.setup(canvas, status);
+      this.setup();
     } else if (status === RESET_STATUS) {
-      return this.reset();
+      this.reset();
     } else if (status === NEXT_LEVEL_STATUS) {
-      return this.setUpNextLevel(canvas, status);
-    } else if (status === HOMEPAGE_STATUS) {
-      return this.animateHomepage(canvas, status);
-    } else if (status === MOVING_TO_INSTRUCTIONS_STATUS) {
-      return this.animateMovingToInstructions(canvas, status);
-    } else if (status === INSTRUCTIONS_STATUS) {
-      return this.animateInstructions(canvas, status);
-    } else if(status === MOVING_TO_HOMEPAGE_STATUS) {
-      return this.animateMovingToHomePage(canvas, status);
+      this.setUpNextLevel(canvas, status);
     } else if (status === COLORING_LOSE_SCREEN_STATUS) {
-      return this.animateColoringLoseScreen(canvas, status);
-    } else if (status === FINISHED_COLORING_LOSE_SCREEN_STATUS) {
-      return this.animateFinishedColoringLoseScreen(canvas, status);
-    } else if (status === MOVING_TO_LOSE_SCREEN_STATUS) {
-      return this.animateMovingToLoseScreen(canvas, status);
-    } else if (status === LOSE_SCREEN_STATUS) {
-      return this.animateLoseScreen(canvas, status);
-    } else if (status === LOSE_SCREEN_TO_HOMEPAGE_STATUS) {
-      return this.animateLoseScreenToHomePage(canvas, status);
-    } else if (status === PAUSED_STATUS) {
-      return this.animatePause(canvas, status);
+      this.animateColoringLoseScreen();
     } else if (status === COLORING_WIN_SCREEN_STATUS) {
-      return this.animateColoringWinScreen(canvas, status);
-    } else if (status === FINISHED_COLORING_WIN_SCREEN_STATUS) {
-      return this.animateFinishedColoringWinScreen(canvas, status);
-    } else if (status === MOVING_TO_WIN_SCREEN_STATUS) {
-      return this.animateMovingToWinScreen(canvas, status);
+      this.animateColoringWinScreen();
     } else if (status === WIN_SCREEN_STATUS) {
-      return this.animateWinScreen(canvas, status)
+      this.animateWinScreen()
     } else if (status === PLAYING_STATUS) {
-      this.moveAmoebas(canvas);
 
-      canvas.draw({
-        status,
-        amoeboi: this.amoeboi,
-        timeVars: this.timeVars,
-        muted: this.muted,
-        autoscaleTime: this.autoscaleTime,
-      });
       if (this.autoscaleTime) {
         let largest = this.amoebas[0];
         this.amoebas.forEach(a => {largest = largest.radius < a.radius ? a : largest;});
@@ -153,13 +120,28 @@ class Game {
       }
     }
 
+    if (status !== PAUSED_STATUS) {
+      this.moveAmoebas();
+    }
+
+    canvas.draw({
+      status,
+      boardVars: this.boardVars,
+      mouseVars: this.mouseVars,
+      timeVars: this.timeVars,
+      amoeboi: this.amoeboi,
+      amoebas: this.amoebas,
+      muted: this.muted,
+      autoscaleTime: this.autoscaleTime,
+      quadTree: this.quadTree,
+    });
+
     return null;
   };
 
-  setup = (canvas, status) => {
+  setup = () => {
     this.setBoardVars(30000,30000); //this will undo any leveling
     this.setUpAmoebas(true);
-    canvas.draw({ status });
     this.boardVars.currentZoom = 4;
     this.timeVars.timeCoefficient = 0.5;
     this.boardVars.baseMass = this.amoeboi.mass;
@@ -260,8 +242,7 @@ class Game {
     this.boardVars.boardFocus = { x: this.boardVars.realBoardWidth / 2, y: this.boardVars.realBoardHeight / 2};
   };
 
-  setUpNextLevel = (canvas, status) => {
-    canvas.draw({ status });
+  setUpNextLevel = () => {
     this.boardVars.currentZoom = 4;
     this.timeVars.timeCoefficient = 0.5;
     this.setBoardVars(
@@ -273,84 +254,25 @@ class Game {
     this.audio.playbackRate = 0.5 + ((1 / (1 + Math.pow(Math.E, -10 * baseLog(10, this.timeVars.timeCoefficient)))) * 3.5);
   };
 
-  animateHomepage = (canvas, status) => {
-    this.moveAmoebas(canvas);
-    canvas.draw({ status, mouseVars: this.mouseVars, muted: this.muted });
-  };
-
-  animateMovingToInstructions = (canvas, status) => {
-    this.moveAmoebas(canvas);
-    canvas.draw({ status, mouseVars: this.mouseVars, muted: this.muted });
-  };
-
-  animateInstructions = (canvas, status) => {
-    this.moveAmoebas(canvas);
-    canvas.draw({ status, mouseVars: this.mouseVars, muted: this.muted });
-  };
-
-  animateMovingToHomePage = (canvas, status) => {
-    this.moveAmoebas(canvas);
-    canvas.draw({ status, mouseVars: this.mouseVars, muted: this.muted });
-  };
-
-  animateColoringLoseScreen = (canvas, status) => {
+  animateColoringLoseScreen = () => {
     this.boardVars.boardFocus.x += (this.boardVars.boardFocus.x < this.boardVars.realBoardWidth / 2) ? 10 : -10;
     this.boardVars.boardFocus.y += (this.boardVars.boardFocus.y < this.boardVars.realBoardHeight / 2) ? 10 : -10;
     this.boardVars.currentZoom = this.boardVars.currentZoom > 1 ? this.boardVars.currentZoom * 0.9 : this.boardVars.currentZoom;
     this.boardVars.baseMass = 0;
-    this.moveAmoebas(canvas);
-    canvas.draw({ status });
   };
 
-  animateFinishedColoringLoseScreen = (canvas, status) => {
-    canvas.draw({ status });
-  };
-
-  animateMovingToLoseScreen = (canvas, status) => {
-    this.moveAmoebas(canvas);
-    canvas.draw({ status, mouseVars: this.mouseVars, muted: this.muted });
-  };
-
-  animateLoseScreen = (canvas, status) => {
-    this.moveAmoebas(canvas);
-    canvas.draw({ status, mouseVars: this.mouseVars, muted: this.muted });
-  };
-
-  animateLoseScreenToHomePage = (canvas, status) => {
-    canvas.stepFromLoseScreenToHomepage();
-    this.moveAmoebas(canvas);
-    canvas.draw({ status, mouseVars: this.mouseVars, muted: this.muted });
-  };
-
-  animatePause = (canvas, status) => {
-    canvas.draw({ status, mouseVars: this.mouseVars, amoebas: this.amoebas, amoeboi: this.amoeboi });
-  };
-
-  animateColoringWinScreen = (canvas, status) => {
+  animateColoringWinScreen = () => {
     this.boardVars.boardFocus.x += (this.boardVars.boardFocus.x < this.boardVars.realBoardWidth / 2) ? 10 : -10;
     this.boardVars.boardFocus.y += (this.boardVars.boardFocus.y < this.boardVars.realBoardHeight / 2) ? 10 : -10;
     this.boardVars.currentZoom = this.boardVars.currentZoom > 1 ? this.boardVars.currentZoom * 0.9 : this.boardVars.currentZoom;
     this.boardVars.baseMass = this.amoeboi.mass;
-    this.moveAmoebas(canvas);
-    canvas.draw({ status });
   };
 
-  animateFinishedColoringWinScreen = (canvas, status) => {
-    canvas.draw({ status });
-  };
-
-  animateMovingToWinScreen = (canvas, status) => {
-    canvas.stepFromAboveToLevelEndScreen();
-    canvas.draw({ status, mouseVars: this.mouseVars });
-  };
-
-  animateWinScreen = (canvas, status) => {
+  animateWinScreen = () => {
     this.boardVars.baseMass = this.amoeboi.mass;
-    this.moveAmoebas(canvas);
-    canvas.draw({ status, mouseVars: this.mouseVars });
   };
 
-  moveAmoebas = (canvas) => {
+  moveAmoebas = () => {
     this.amoebas = this.amoebas.filter(amoeba => {
       return amoeba.mass > 0;
     });
@@ -360,10 +282,8 @@ class Game {
     }
     this.amoebas.forEach(amoeba => {
       amoeba.move(this.timeVars.timeCoefficient);
-      canvas.drawAmoeba(amoeba, this.boardVars, this.mouseVars);
     });
     this.amoeboi ? this.amoeboi.move(this.timeVars.timeCoefficient) : null;
-    this.amoeboi ? canvas.drawAmoeboi(this.amoeboi, this.boardVars, this.mouseVars) : null;
     this.quadTree.checkAllCollisions(aabbCheck(this.timeVars.timeCoefficient));
     this.amoebas.forEach(amoeba => {
       this.amoeboi ? aabbCheck(this.timeVars.timeCoefficient)(this.amoeboi, amoeba) : null;

@@ -16,7 +16,6 @@ const ABOVE_LOSE_SCREEN_OFFSET = 1500;
 
 const HOMEPAGE_ALPHA_STEP = 0.1;
 const HOMEPAGE_ALPHA = 0.5;
-const PLAYING_ALPHA = 0;
 
 class Canvas {
     constructor(canvasId) {
@@ -30,7 +29,15 @@ class Canvas {
         this.setupImages();
     }
 
-    draw = ({ status, boardVars, mouseVars, timeVars, amoeboi, amoebas, muted, autoscaleTime }) => {
+    draw = ({ status, boardVars, mouseVars, timeVars, amoeboi, amoebas, muted, autoscaleTime, quadTree }) => {
+        this.clearCtx();
+        this.drawField(boardVars, mouseVars, quadTree);
+        amoebas.forEach(amoeba => {
+            this.drawAmoeba(amoeba, boardVars, mouseVars);
+        });
+        if (amoeboi) {
+            this.drawAmoeboi(amoeboi, boardVars, mouseVars);
+        }
         switch (status) {
             case SET_UP_STATUS:
                 return this.resetYOffset();
